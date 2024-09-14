@@ -36,7 +36,7 @@ namespace MCGalaxy {
 		public List<SpawnEggBlock> EggConfigs = new List<SpawnEggBlock>(){
 			new SpawnEggBlock()
 			{
-				TEXTURE_ID = 2,
+				TEXTURE_ID = 181,
 				BLOCK_ID = 69,
 				MODEL = "sheep",
 				NAME = "Sheep",
@@ -44,7 +44,7 @@ namespace MCGalaxy {
 			},
 			new SpawnEggBlock()
 			{
-				TEXTURE_ID = 2,
+				TEXTURE_ID = 181,
 				BLOCK_ID = 70,
 				MODEL = "zombie",
 				NAME = "Zombie",
@@ -52,7 +52,7 @@ namespace MCGalaxy {
 			},
 			new SpawnEggBlock()
 			{
-				TEXTURE_ID = 2,
+				TEXTURE_ID = 181,
 				BLOCK_ID = 71,
 				MODEL = "creeper",
 				NAME = "Creeper",
@@ -60,7 +60,7 @@ namespace MCGalaxy {
 			},
 			new SpawnEggBlock()
 			{
-				TEXTURE_ID = 2,
+				TEXTURE_ID = 181,
 				BLOCK_ID = 72,
 				MODEL = "skeleton",
 				NAME = "Skeleton",
@@ -68,7 +68,7 @@ namespace MCGalaxy {
 			},
 			new SpawnEggBlock()
 			{
-				TEXTURE_ID = 2,
+				TEXTURE_ID = 181,
 				BLOCK_ID = 73,
 				MODEL = "chicken",
 				NAME = "Chicken",
@@ -76,7 +76,7 @@ namespace MCGalaxy {
 			},
 			new SpawnEggBlock()
 			{
-				TEXTURE_ID = 2,
+				TEXTURE_ID = 181,
 				BLOCK_ID = 74,
 				MODEL = "pig",
 				NAME = "Pig",
