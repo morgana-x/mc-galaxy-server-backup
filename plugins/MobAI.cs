@@ -482,7 +482,7 @@ namespace MCGalaxy
                     bot.movement = false;
                 }
 
-                bot.AdvanceRotation();
+                //bot.AdvanceRotation();
 
                 MobAI.FaceTowards(bot);
 
@@ -743,7 +743,7 @@ namespace MCGalaxy
                         bot.movement = false;
                     }
 
-                    bot.AdvanceRotation();
+                    //bot.AdvanceRotation();
 
                     MobAI.FaceTowards(bot);
 
