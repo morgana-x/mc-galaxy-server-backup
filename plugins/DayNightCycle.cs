@@ -39,15 +39,13 @@ namespace MCGalaxy
 			{96,  "#78A9FF"},
 			{97,  "#78A9FF"},
 			{100, "#78A9FF"},
-			{110, "#74a5fb"},
-			{115, "#78A9FF"},
 			{120, "#73a4fa"},
-			{125, "#4C6BA2"},
-			{126, "#486599"},
-			{127, "#3C547F"},
-			{130, "#2D4061"},
-			{131, "#212E46"},
+			{130, "#486599"},
+			{135, "#3C547F"},
+			{140, "#2D4061"},
+			{145, "#212E46"},
 			{180, "#000000"},
+			{200, "#000000"},
 			{223, "#304365"},
 			{230, "#3C547F"},
 			{232, "#3C547F"},
@@ -62,9 +60,7 @@ namespace MCGalaxy
 			{80,  "#FFFFFF"},
 			{90,  "#FFFFFF"},
 			{100, "#FFFFFF"},
-			{112, "#FFFFFF"},
 			{120, "#FFFFFF"},
-			{126, "#926864"},
 			{127, "#926864"},
 			{130, "#2D4061"},
 			{180, "#000000"},
@@ -84,16 +80,35 @@ namespace MCGalaxy
 			{100, "#FFFFFF"},
 			{112, "#FFFFFF"},
 			{120, "#FFFFFF"},
-			{126, "#926864"},
-			{130, "#7d7d7d"},
-			{180, "#7d7d7d"},
-			{190, "#7d7d7d"},
-			{200, "#7d7d7d"},
-			{210, "#7d7d7d"},
-			{220, "#808080"},
-			{230, "#fac3af"},
+			{130, "#5c5c5c"},
+			{180, "#333333"},
+			{190, "#333333"},
+			{200, "#333333"},
+			{210, "#333333"},
+			{220, "#333333"},
+			{230, "#5c5c5c"},
 			{234, "#fac3af"},
 			{238, "#fac3af"},
+		};
+			public static Dictionary<int, string> ShadowColors = new Dictionary<int, string>()
+        {
+			{0,   "#9B9B9B"},
+			{10,  "#9B9B9B"},
+			{60,  "#9B9B9B"},
+			{80,  "#9B9B9B"},
+			{90,  "#9B9B9B"},
+			{100, "#9B9B9B"},
+			{112, "#9B9B9B"},
+			{120, "#9B9B9B"},
+			{130, "#2b2b2b"},
+			{180, "#1a1a1a"},
+			{190, "#1a1a1a"},
+			{200, "#1a1a1a"},
+			{210, "#1a1a1a"},
+			{220, "#1a1a1a"},
+			{230, "#2b2b2b"},
+			{234, "#333333"},
+			{238, "#757575"},
 		};
 		public static Dictionary<int, string> FogColors = new Dictionary<int, string>()
         {
@@ -107,16 +122,13 @@ namespace MCGalaxy
 			{110, "#ffeae3"},
 			{115, "#ffc0ab"},
 			{120, "#d18469"},
-			{125, "#d18469"},
-			{126, "#D15F36"},
-			{127, "#264559"},
-			{130, "#264559"},
-			{140, "#264559"},
-			{150, "#264559"},
-			{160, "#264559"},
-			{170, "#264559"},
-			{180, "#264559"},
-			{223, "#264559"},
+			{130, "#3b3b3b"},
+			{140, "#0f0f0f"},
+			{150, "#0f0f0f"},
+			{160, "#0f0f0f"},
+			{170, "#0f0f0f"},
+			{180, "#0f0f0f"},
+			{223, "#0f0f0f"},
 			{230, "#D15F36"},
 			{232, "#D15F36"},
 			{234, "#D15F36"},
@@ -185,6 +197,10 @@ namespace MCGalaxy
 		{
 			return GetColor(LightingColors, hour);
 		}
+		ColorDesc GetShadowColor(float hour)
+		{
+			return GetColor(ShadowColors, hour);
+		}
 		float Lerp(float firstFloat, float secondFloat, float by)
 		{
 			 return firstFloat * (1 - by) + secondFloat * by;
@@ -228,14 +244,16 @@ namespace MCGalaxy
 				
 				float hour = (timeOfDay / 100) ;
 				
-                ColorDesc sky   = GetSkyColor  (hour);
-                ColorDesc cloud = GetCloudColor(hour); 
-                ColorDesc fog   = GetFogColor  (hour);
-				ColorDesc sun   = GetSunColor  (hour);
+                ColorDesc sky    = GetSkyColor   (hour);
+                ColorDesc cloud  = GetCloudColor (hour); 
+                ColorDesc fog    = GetFogColor   (hour);
+				ColorDesc sun    = GetSunColor   (hour);
+				ColorDesc shadow = GetShadowColor(hour);
 				
                 pl.Send(Packet.EnvColor(0, sky.R, sky.G, sky.B));
 				pl.Send(Packet.EnvColor(1, cloud.R, cloud.G, cloud.B));
 				pl.Send(Packet.EnvColor(2, fog.R, fog.G, fog.B));
+				pl.Send(Packet.EnvColor(3, shadow.R, shadow.G, shadow.B));
 				pl.Send(Packet.EnvColor(4, sun.R, sun.G, sun.B));
             }
 
