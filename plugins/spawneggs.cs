@@ -151,13 +151,14 @@ namespace MCGalaxy {
                 p.Message("Appended " + instruction + " instruction to bot AI &b" + ai);
             }
         }
-		public void SpawnEntity(Level level, string model, string ai, ushort x, ushort y, ushort z)
+		public void SpawnEntity(Level level, string model, string ai, ushort x, ushort y, ushort z, int health=10)
 		{
 			uniqueId++;
 			string uniqueName = model + uniqueId;
 			PlayerBot bot = new PlayerBot(uniqueName, level);
 			bot.DisplayName = "";
 			bot.Model = model;
+			bot.Owner = health.ToString();
 			//+16 so that it's centered on the block instead of min corner
 			Position pos = Position.FromFeet((int)(x*32) +16, (int)(y*32), (int)(z*32) +16);
 			bot.SetInitialPos(pos);

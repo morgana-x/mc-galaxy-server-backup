@@ -42,7 +42,7 @@ namespace MCGalaxy {
 				// MOBS
 				public static bool CanKillMobs = true;
 				public static bool SpawnMobs = true; // Requires MobAI from https://github.com/ddinan/classicube-stuff/blob/master/MCGalaxy/Plugins/MobAI.cs
-				public static int MaxMobs = 12; // Per player
+				public static int MaxMobs = 50;
 		}
 		
 		
@@ -143,8 +143,7 @@ namespace MCGalaxy {
 			
 			if (!maplist.Contains(p.level.name))
 			{
-				p.SendCpeMessage(CpeMessageType.BottomRight1, "");
-				p.SendCpeMessage(CpeMessageType.BottomRight2, "");
+				SetGuiText(p,"","");
 				p.Extras["SURVIVAL_HEALTH"] = Config.MaxHealth;
 				p.Extras["SURVIVAL_AIR"] = Config.MaxAir;
 				return;
@@ -177,8 +176,7 @@ namespace MCGalaxy {
 		{
 			if (!maplist.Contains(level.name))
 			{
-				p.SendCpeMessage(CpeMessageType.BottomRight1, "");
-				p.SendCpeMessage(CpeMessageType.BottomRight2, "");
+				SetGuiText(p,"","");
 				p.Extras["SURVIVAL_HEALTH"] = Config.MaxHealth;
 				p.Extras["SURVIVAL_AIR"] = Config.MaxAir;
 				return;
@@ -387,10 +385,10 @@ namespace MCGalaxy {
 				}
 				CheckDespawn(lvl);
 				Player[] players = GetPlayersInLevel(lvl);
-				if (GetMobsInLevel(lvl).Length >= (Config.MaxMobs * players.Length))
-				{
+				if (players.Length < 1)
 					continue;
-				}
+				if (GetMobsInLevel(lvl).Length >= (Config.MaxMobs))
+					continue;
 			
 
 				Player selectedPlayer = players[rnd.Next(players.Length)] ;
@@ -562,20 +560,48 @@ namespace MCGalaxy {
 			{
 				return;
 			}
-			/*if (mob.Model == "Humanoid")
-			{
-				return;
-			}*/
-			if (!mobHealth.ContainsKey(mob))
-			{
-				mobHealth.Add(mob, 10);
-			}
-			mobHealth[mob] = mobHealth[mob] - 4;
-			if (mobHealth[mob] <= 0)
-			{
-				PlayerBot.Remove(mob);
-			}
+			HurtBot(4, mob, p);
 		}
+	    public static void HurtBot(int damage, PlayerBot hit, Player bot)
+        {
+            int srcHeight = ModelInfo.CalcEyeHeight(hit);
+            int dstHeight = ModelInfo.CalcEyeHeight(bot);
+            int dx = bot.Pos.X - hit.Pos.X, dy = (bot.Pos.Y + srcHeight) - (hit.Pos.Y + dstHeight), dz = bot.Pos.Z - hit.Pos.Z;
+            Vec3F32 dir = new Vec3F32(dx, dy, dz);
+            if (dir.Length > 0) dir = Vec3F32.Normalise(dir);
+
+            float mult = 1 / ModelInfo.GetRawScale(hit.Model);
+            float plScale = ModelInfo.GetRawScale(hit.Model);
+
+            Position newPos;
+            newPos.X = hit.Pos.X + (int)(hit.Pos.X - bot.Pos.X);
+            newPos.Y = hit.Pos.Y;// + 32;
+            newPos.Z = hit.Pos.Z + (int)(hit.Pos.Z - bot.Pos.Z);
+
+            Position newMidPos;
+            newMidPos.X = hit.Pos.X + (int)((hit.Pos.X - bot.Pos.X) / 2);
+            newMidPos.Y = hit.Pos.Y;// + 32;
+            newMidPos.Z = hit.Pos.Z + (int)((hit.Pos.Z - bot.Pos.Z) / 2);
+
+            if (hit.level.IsAirAt((ushort)newPos.BlockX, (ushort)newPos.BlockY, (ushort)newPos.BlockZ) && hit.level.IsAirAt((ushort)newPos.BlockX, (ushort)(newPos.BlockY - 1), (ushort)newPos.BlockZ) &&
+            hit.level.IsAirAt((ushort)newMidPos.BlockX, (ushort)newMidPos.BlockY, (ushort)newMidPos.BlockZ) && hit.level.IsAirAt((ushort)newMidPos.BlockX, (ushort)(newMidPos.BlockY - 1), (ushort)newMidPos.BlockZ))
+            {
+                hit.Pos = new Position(newPos.X, newPos.Y, newPos.Z);
+            }
+
+            int hp;
+            bool isNumber = int.TryParse(hit.Owner, out hp);
+            if (hit.Owner == null || !isNumber) return;
+
+            hit.Owner = (hp - damage).ToString();
+
+            if (hp <= 0)
+            {
+                // Despawn bot
+                //Command.Find("Effect").Use(p, "smoke " + bot.Pos.FeetBlockCoords.X + " " + bot.Pos.FeetBlockCoords.Y + " " + bot.Pos.FeetBlockCoords.Z + " 0 0 0 true");
+                PlayerBot.Remove(hit);
+            }
+        }
 		void HandleBlockClicked(Player p, MouseButton button, MouseAction action, ushort yaw, ushort pitch, byte entity, ushort x, ushort y, ushort z, TargetBlockFace face)
 		{
 			if (!maplist.Contains(p.level.name)) return;
@@ -666,11 +692,7 @@ namespace MCGalaxy {
 		void SendPlayerGui(Player p)
 		{
 			if (!maplist.Contains(p.level.name)) return;
-			p.SendCpeMessage(CpeMessageType.BottomRight1, GetHealthBar	(GetHealth	(p)));
-			p.SendCpeMessage(CpeMessageType.BottomRight2, GetAirBar		(GetAir		(p)));
-			
-			//p.Message("%c" + GetHealth(p).ToString() + " " + ((GetHealth(p)/Config.MaxHealth) * 100).ToString() + " " +GetHealthBar(GetHealth(p)));
-			///p.Message("%9" + GetAir(p).ToString()    + " " + ((GetAir(p)/Config.MaxAir) * 100).ToString() + " " + GetAirBar(GetAir(p)));
+			SetGuiText(p, GetHealthBar	(GetHealth	(p)),GetAirBar		(GetAir		(p)));
 		}
 		///////////////////////////////////////////////////////////////////////////
 		// UTILITIES
@@ -747,10 +769,14 @@ namespace MCGalaxy {
 			p.HandleDeath(reason, immediate: true);	
 			InitPlayer(p);
 		}
+		static void SetGuiText(Player p, string top, string bottom)
+		{
+			p.SendCpeMessage(CpeMessageType.Status1, top);
+			p.SendCpeMessage(CpeMessageType.Status2, bottom);
+		}
 		public void InitPlayer(Player p)
 		{
-			p.SendCpeMessage(CpeMessageType.Status1, "");
-			p.SendCpeMessage(CpeMessageType.Status2, "");
+			SetGuiText(p, "","");
 			p.Extras["SURVIVAL_HEALTH"] = Config.MaxHealth;
 			p.Extras["SURVIVAL_AIR"] = Config.MaxAir;
 			p.Extras["PVP_HIT_COOLDOWN"] = DateTime.UtcNow;
@@ -760,8 +786,7 @@ namespace MCGalaxy {
 		}
 		public static void ResetPlayerState(Player p)
         {
-			p.SendCpeMessage(CpeMessageType.Status1, "");
-			p.SendCpeMessage(CpeMessageType.Status2, "");
+			SetGuiText(p,"","");
             p.Extras["SURVIVAL_HEALTH"] = 10;
             p.Extras["SURVIVAL_AIR"] = 10;
         }
@@ -833,13 +858,14 @@ namespace MCGalaxy {
                 p.Message("Appended " + instruction + " instruction to bot AI &b" + ai);
             }
         }
-		public void SpawnEntity(Level level, string model, string ai, ushort x, ushort y, ushort z)
+		public void SpawnEntity(Level level, string model, string ai, ushort x, ushort y, ushort z, int health=10)
 		{
 			int uniqueMobId = level.Bots.Items.Length+1;
 			string uniqueName = "ssmob" + uniqueMobId;
 			PlayerBot bot = new PlayerBot(uniqueName, level);
 			bot.DisplayName = "";
 			bot.Model = model;
+			bot.Owner = health.ToString();
 			//+16 so that it's centered on the block instead of min corner
 			Position pos = Position.FromFeet((int)(x*32) +16, (int)(y*32), (int)(z*32) +16);
 			bot.SetInitialPos(pos);
