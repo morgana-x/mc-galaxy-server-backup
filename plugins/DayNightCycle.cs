@@ -31,94 +31,55 @@ namespace MCGalaxy
 		public static Dictionary<int, string> SkyColors = new Dictionary<int, string>()
         {
 			{0,   "#709DED"},
-			{10,  "#78A9FF"},
-			{60,  "#78A9FF"},
-			{80,  "#78A9FF"},
-			{90,  "#78A9FF"},
-			{95,  "#78A9FF"},
-			{96,  "#78A9FF"},
-			{97,  "#78A9FF"},
-			{100, "#78A9FF"},
-			{120, "#73a4fa"},
-			{130, "#486599"},
-			{135, "#3C547F"},
-			{140, "#2D4061"},
-			{145, "#212E46"},
+			{170, "#78A9FF"},
+			{175, "#212E46"},
 			{180, "#000000"},
-			{200, "#000000"},
-			{223, "#304365"},
-			{230, "#3C547F"},
-			{232, "#3C547F"},
-			{234, "#4C6BA2"},
-			{238, "#6F9CEC"},
+			{230, "#304365"},
+			{235, "#3C547F"},
+			{236, "#6F9CEC"},
 		};
 		public static Dictionary<int, string> CloudColors = new Dictionary<int, string>()
         {
 			{0,   "#FFFFFF"},
-			{10,  "#FFFFFF"},
-			{60,  "#FFFFFF"},
-			{80,  "#FFFFFF"},
-			{90,  "#FFFFFF"},
-			{100, "#FFFFFF"},
-			{120, "#FFFFFF"},
-			{127, "#926864"},
-			{130, "#2D4061"},
-			{180, "#000000"},
-			{223, "#212E46"},
+			{170, "#FFFFFF"},
+			{175, "#926864"},
+			{180, "#2D4061"},
 			{230, "#D15F36"},
-			{232, "#D15F36"},
-			{234, "#D15F36"},
-			{238, "#D15F36"},
 		};
 		public static Dictionary<int, string> LightingColors = new Dictionary<int, string>()
         {
 			{0,   "#FFFFFF"},
-			{130, "#5c5c5c"},
-			{180, "#333333"},
-			{230, "#5c5c5c"},
-			{235, "#fac3af"},
+			{180, "#5c5c5c"},
+			{190, "#333333"},
+			{200, "#5c5c5c"},
+			{230, "#fac3af"},
 		};
 		public static Dictionary<int, string> ShadowColors = new Dictionary<int, string>()
         {
 			{0,   "#9B9B9B"},
-			{130, "#2b2b2b"},
-			{180, "#1a1a1a"},
-			{230, "#2b2b2b"},
-			{235, "#757575"},
+			{180, "#2b2b2b"},
+			{190, "#1a1a1a"},
+			{200, "#2b2b2b"},
+			{230, "#757575"},
 		};
 		public static Dictionary<int, string> FogColors = new Dictionary<int, string>()
         {
 			{0,   "#FFFFFF"},
-			{10,  "#FFFFFF"},
-			{60,  "#FFFFFF"},
-			{70,  "#FFFFFF"},
-			{80,  "#FFFFFF"},
-			{90,  "#ffeae3"},
-			{100, "#ffeae3"},
-			{110, "#ffeae3"},
-			{115, "#ffc0ab"},
-			{120, "#d18469"},
-			{130, "#3b3b3b"},
-			{140, "#0f0f0f"},
-			{150, "#0f0f0f"},
-			{160, "#0f0f0f"},
-			{170, "#0f0f0f"},
+			{170, "#ffc0ab"},
+			{175, "#3b3b3b"},
 			{180, "#0f0f0f"},
-			{223, "#0f0f0f"},
+			{190, "#0f0f0f"},
 			{230, "#D15F36"},
-			{232, "#D15F36"},
-			{234, "#D15F36"},
-			{238, "#D15F36"},
 		};
 		ColorDesc GetColor(Dictionary<int, string> list, float hour)
 		{
-			int dist = 1005;
+			int dist = 50;
 			int oldColorKey = 0;
 			int newColorKey = 0;
 			foreach (var pair in list)
 			{
 				int d = (int)Math.Abs(pair.Key - hour);
-				if (d < dist)
+				if (hour > pair.Key)
 				{
 					dist = d;
 					oldColorKey = pair.Key;
@@ -154,7 +115,7 @@ namespace MCGalaxy
 			}
 			CommandParser.GetHex(Player.Console,list[newColorKey] ,ref newColor);
 			
-			float progress = ((float)hour - (float)oldColorKey) / ((float)newColorKey - (float)oldColorKey);
+			float progress = (newColorKey-oldColorKey)/(newColorKey-hour);
 			return LerpColor(oldColor, newColor, progress);
 		}
 		ColorDesc GetSkyColor(float hour)
