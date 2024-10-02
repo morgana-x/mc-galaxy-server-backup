@@ -41,7 +41,7 @@ namespace MCGalaxy {
 				TEXTURE_ID = 180,
 				BLOCK_ID = 75,
 				NAME = "Torch",
-				BRIGHTNESS = 10,
+				BRIGHTNESS = 15,
 				TEXTURE_SIDE = 180,
 				TEXTURE_BOTTOM = 4,
 				TEXTURE_TOP = 24,
@@ -74,7 +74,7 @@ namespace MCGalaxy {
 				ushort RawID = Id;
 				string Name = name;
 				byte Speed = 1;
-				byte CollideType = 2;
+				byte CollideType = 0;
 				bool BlocksLight = false;
 				byte WalkSound = 1;
 				bool FullBright = false;

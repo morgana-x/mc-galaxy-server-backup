@@ -504,14 +504,14 @@ namespace MCGalaxy {
         }
 		static bool CanHitMob(Player p, PlayerBot victim)
         {
+			if (victim.AIName == "")
+				return false;
             Vec3F32 delta = p.Pos.ToVec3F32() - victim.Pos.ToVec3F32();
             float reachSq = 12f; // 3.46410161514 block reach distance
 
             int ping = p.Session.Ping.AveragePing();
 
-            if (ping > 59 && ping <= 119) reachSq = 16f; // "okay"
-            if (ping > 119 && ping <= 180) reachSq = 16f; // "bad"
-            if (ping > 180) reachSq = 16f; // "horrible"
+            if (ping > 100) reachSq = 40f; // "horrible"
 
             // Don't allow clicking on players further away than their reach distance
             if (delta.LengthSquared > (reachSq + 1)) return false;
@@ -520,19 +520,7 @@ namespace MCGalaxy {
             //bool canKill = PvP.Config.GamemodeOnly == false ? true : p.Extras.GetBoolean("PVP_CAN_KILL");
             //if (!canKill) return false;
 
-            //if (p.Game.Referee || p.invincible ) return false; // Ref or invincible
-            //if (inSafeZone(p, p.level)) return false; // Either player is in a safezone
-
-            /*if (!string.IsNullOrWhiteSpace(p.Extras.GetString("TEAM")) && (p.Extras.GetString("TEAM") == victim.Extras.GetString("TEAM")))
-            {
-                return false; // Players are on the same team
-            }*/
-
-            BlockID b = p.GetHeldBlock();
-
-            if (Block.GetName(p, b).ToLower() == "bow") return false; // Bow damage comes from arrows, not player click
-
-            // If all checks are complete, return true to allow knockback and damage
+            if (p.Game.Referee || p.invincible ) return false; // Ref or invincible
             return true;
         }
 		Dictionary<PlayerBot, int> mobHealth = new Dictionary<PlayerBot, int>();
