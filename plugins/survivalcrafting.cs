@@ -29,6 +29,16 @@ namespace MCGalaxy {
 		public ushort ID;
 		public ushort ID_ON;
 	}
+	public class CustomBlock
+	{
+		public ushort TEXTURE_TOP;
+		public ushort TEXTURE_BOTTOM;
+		public ushort TEXTURE_SIDE;
+		public ushort TEXTURE_FRONT;
+		public string NAME;
+		public ushort ID;
+		public int BRIGHTNESS;
+	}
 	public class SurvivalCrafting : Plugin {
 		public override string name { get { return "SurvivalCrafting"; } }
 		public override string MCGalaxy_Version { get { return "1.9.1.2"; } }
@@ -62,6 +72,49 @@ namespace MCGalaxy {
 			ID = 77,
 			ID_ON = 78
 		};
+		private List<CustomBlock> customBlocks = new List<CustomBlock>(){
+			new CustomBlock()
+			{
+				NAME = "Glowstone",
+				TEXTURE_TOP = 99,
+				TEXTURE_BOTTOM = 99,
+				TEXTURE_SIDE = 99,
+				TEXTURE_FRONT = 99,
+				ID = 79,
+				BRIGHTNESS = 18
+			},
+			new CustomBlock()
+			{
+				NAME = "Pumpkin",
+				TEXTURE_TOP = 96,
+				TEXTURE_BOTTOM = 96,
+				TEXTURE_SIDE = 112,
+				TEXTURE_FRONT = 112,
+				ID = 80,
+				BRIGHTNESS = 0
+			},
+			new CustomBlock()
+			{
+				NAME = "Carved Pumpkin",
+				TEXTURE_TOP = 96,
+				TEXTURE_BOTTOM = 96,
+				TEXTURE_SIDE = 112,
+				TEXTURE_FRONT = 113,
+				ID = 81,
+				BRIGHTNESS = 0
+			},
+		    new CustomBlock()
+			{
+				NAME = "Lit Carved Pumpkin",
+				TEXTURE_TOP = 96,
+				TEXTURE_BOTTOM = 96,
+				TEXTURE_SIDE = 112,
+				TEXTURE_FRONT = 114,
+				ID = 82,
+				BRIGHTNESS = 10
+			}
+
+		};
 
 		public override void Load(bool startup) {
 			//LOAD YOUR PLUGIN WITH EVENTS OR OTHER THINGS!
@@ -71,6 +124,10 @@ namespace MCGalaxy {
 			AddBlockDef(crafttableblockconfig.NAME, crafttableblockconfig.ID, 0,0,0,16,16,16,crafttableblockconfig.TEXTURE_SIDE, crafttableblockconfig.TEXTURE_FRONT, crafttableblockconfig.TEXTURE_TOP, crafttableblockconfig.TEXTURE_BOTTOM, false);
 			AddBlockDef(furnaceblockconfig.NAME, furnaceblockconfig.ID, 0,0,0,16,16,16,furnaceblockconfig.TEXTURE_SIDE, furnaceblockconfig.TEXTURE_FRONT, furnaceblockconfig.TEXTURE_TOP, furnaceblockconfig.TEXTURE_BOTTOM, false);
 			AddBlockDef(furnaceblockconfig.NAME + "_ON", furnaceblockconfig.ID_ON, 0,0,0,16,16,16,furnaceblockconfig.TEXTURE_SIDE, furnaceblockconfig.TEXTURE_FRONT_ON, furnaceblockconfig.TEXTURE_TOP, furnaceblockconfig.TEXTURE_BOTTOM, false, 15);
+			foreach (var a in customBlocks)
+			{
+				AddBlockDef(a.NAME, a.ID, 0,0,0,16,16,16,a.TEXTURE_SIDE, a.TEXTURE_FRONT, a.TEXTURE_TOP, a.TEXTURE_BOTTOM, false, a.BRIGHTNESS);
+			}
 		    OnPlayerClickEvent.Register(HandleBlockClick, Priority.Low);
 		}
                         
