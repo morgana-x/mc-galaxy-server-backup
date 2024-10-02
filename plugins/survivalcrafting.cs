@@ -182,7 +182,7 @@ namespace MCGalaxy {
 				ushort LeftTex = TEXTURE_SIDE;
 				ushort RightTex = TEXTURE_SIDE;
 				ushort FrontTex = TEXTURE_FRONT;
-				ushort BackTex = TEXTURE_FRONT;
+				ushort BackTex = TEXTURE_SIDE;
 				ushort TopTex = TEXTURE_TOP;
 				ushort BottomTex = TEXTURE_BOTTOM;
 				int InventoryOrder = -1;
