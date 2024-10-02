@@ -691,7 +691,7 @@ namespace MCGalaxy
 
                 if (floor == Block.Grass)
                 {
-                    bot.level.UpdateBlock(Player.Console, (ushort)(bot.Pos.X / 32), (ushort)((bot.Pos.Y / 32) - 2), (ushort)(bot.Pos.Z / 32), Block.Dirt);
+                    //bot.level.UpdateBlock(Player.Console, (ushort)(bot.Pos.X / 32), (ushort)((bot.Pos.Y / 32) - 2), (ushort)(bot.Pos.Z / 32), Block.Dirt);
 
                     if (bot.Model.CaselessEq("sheep_nofur"))
                     {
