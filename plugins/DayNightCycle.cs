@@ -73,42 +73,18 @@ namespace MCGalaxy
 		public static Dictionary<int, string> LightingColors = new Dictionary<int, string>()
         {
 			{0,   "#FFFFFF"},
-			{10,  "#FFFFFF"},
-			{60,  "#FFFFFF"},
-			{80,  "#FFFFFF"},
-			{90,  "#FFFFFF"},
-			{100, "#FFFFFF"},
-			{112, "#FFFFFF"},
-			{120, "#FFFFFF"},
 			{130, "#5c5c5c"},
 			{180, "#333333"},
-			{190, "#333333"},
-			{200, "#333333"},
-			{210, "#333333"},
-			{220, "#333333"},
 			{230, "#5c5c5c"},
-			{234, "#fac3af"},
-			{238, "#fac3af"},
+			{235, "#fac3af"},
 		};
-			public static Dictionary<int, string> ShadowColors = new Dictionary<int, string>()
+		public static Dictionary<int, string> ShadowColors = new Dictionary<int, string>()
         {
 			{0,   "#9B9B9B"},
-			{10,  "#9B9B9B"},
-			{60,  "#9B9B9B"},
-			{80,  "#9B9B9B"},
-			{90,  "#9B9B9B"},
-			{100, "#9B9B9B"},
-			{112, "#9B9B9B"},
-			{120, "#9B9B9B"},
 			{130, "#2b2b2b"},
 			{180, "#1a1a1a"},
-			{190, "#1a1a1a"},
-			{200, "#1a1a1a"},
-			{210, "#1a1a1a"},
-			{220, "#1a1a1a"},
 			{230, "#2b2b2b"},
-			{234, "#333333"},
-			{238, "#757575"},
+			{235, "#757575"},
 		};
 		public static Dictionary<int, string> FogColors = new Dictionary<int, string>()
         {
