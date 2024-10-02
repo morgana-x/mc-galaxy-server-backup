@@ -54,6 +54,9 @@ namespace MCGalaxy {
 		SchedulerTask guiTask;
 		SchedulerTask regenTask;
 		SchedulerTask mobSpawningTask;
+		
+		Dictionary<ushort, ushort> toolDamage = new Dictionary<ushort, ushort>();
+		static Dictionary<ushort, float> toolKnockback = new Dictionary<ushort, float>();
 		public override void Load(bool startup) {
 			//LOAD YOUR PLUGIN WITH EVENTS OR OTHER THINGS!
 			
@@ -84,7 +87,16 @@ namespace MCGalaxy {
 				AddAi("roam", new string[] {"", "roam", "roam"});
 			}
 			mobHealth.Clear();
-	
+			toolDamage.Clear();
+			toolKnockback.Clear();
+			for (ushort i=90;i<110;i++)
+			{
+				toolDamage.Add(i, 8);
+			}
+			for (ushort i=90;i<110;i++)
+			{
+				toolKnockback.Add(i, 1.5f);
+			}
 		}
                         
 		public override void Unload(bool shutdown) {
@@ -524,7 +536,27 @@ namespace MCGalaxy {
             return true;
         }
 		Dictionary<PlayerBot, int> mobHealth = new Dictionary<PlayerBot, int>();
+		
+		
 
+		ushort getDamage(Player p)
+		{
+			ushort block = p.GetHeldBlock();
+			if (block >= 66)
+				block = (ushort)(block - 256);
+			if (!toolDamage.ContainsKey(block))
+				return 2;
+			return toolDamage[block];
+		}
+		static float getKnockback(Player p)
+		{
+			ushort block = p.GetHeldBlock();
+			if (block >= 66)
+				block = (ushort)(block - 256);
+			if (!toolKnockback.ContainsKey(block))
+				return 1f;
+			return toolKnockback[block];
+		}
 		void HandleAttackMob (Player p, byte entity)
 		{
 			if (!Config.CanKillMobs)
@@ -548,7 +580,7 @@ namespace MCGalaxy {
 			{
 				return;
 			}
-			HurtBot(4, mob, p);
+			HurtBot(getDamage(p), mob, p);
 		}
 	    public static void HurtBot(int damage, PlayerBot hit, Player bot)
         {
@@ -781,7 +813,7 @@ namespace MCGalaxy {
 		void DoHit(Player p, Player victim)
 		{
 			PushPlayer(p, victim); // Knock the victim back
-			int dmg = 1;
+			int dmg = getDamage(p);
 			if (GetHealth(victim)-dmg <= 0)
 			{
 				Die(victim, 4);
@@ -808,6 +840,7 @@ namespace MCGalaxy {
             if (dir.Length > 0) dir = Vec3F32.Normalise(dir);
 
             float mult = 1 / ModelInfo.GetRawScale(victim.Model);
+			mult = mult * getKnockback(p);
             float victimScale = ModelInfo.GetRawScale(victim.Model);
 
             if (victim.Supports(CpeExt.VelocityControl) && p.Supports(CpeExt.VelocityControl))

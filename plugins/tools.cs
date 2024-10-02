@@ -27,7 +27,7 @@ namespace MCGalaxy {
 			new SurvivalTool()
 			{
 				NAME = "Iron Sword",
-				TEXTURE = 100,
+				TEXTURE = 178,
 				ID = 90,
 			},
 			new SurvivalTool()
@@ -45,7 +45,7 @@ namespace MCGalaxy {
 			new SurvivalTool()
 			{
 				NAME = "Iron Shovel",
-				TEXTURE = 100,
+				TEXTURE = 162,
 				ID = 93,
 			},
 			new SurvivalTool()
@@ -56,16 +56,16 @@ namespace MCGalaxy {
 			},
 			new SurvivalTool()
 			{
-				NAME = "Stone Sword",
-				TEXTURE = 129,
-				ID = 94,
+				NAME = "Stone Axe",
+				TEXTURE = 177,
+				ID = 95,
 			},
 		};
 
 		public override void Load(bool startup) {
 			foreach (var a in customBlocks)
 			{
-				AddBlockDef(a.NAME, a.ID, 0,0,0,16,16,16,a.TEXTURE, 85, 85, 85, true);
+				AddBlockDef(a.NAME, a.ID, 0,0,0,16,16,16,a.TEXTURE, a.TEXTURE, 85, 85, true);
 			}
 		}
                         
@@ -98,7 +98,7 @@ namespace MCGalaxy {
 				ushort LeftTex = TEXTURE_SIDE;
 				ushort RightTex = TEXTURE_SIDE;
 				ushort FrontTex = TEXTURE_FRONT;
-				ushort BackTex = TEXTURE_SIDE;
+				ushort BackTex = TEXTURE_FRONT;
 				ushort TopTex = TEXTURE_TOP;
 				ushort BottomTex = TEXTURE_BOTTOM;
 				int InventoryOrder = -1;
@@ -125,12 +125,8 @@ namespace MCGalaxy {
 				
 				ushort block = Id;
 				 if (true) {
-					BlockPerms perms = BlockPerms.GetPlace(block);
-					perms.MinRank = (MCGalaxy.LevelPermission)999;
-				 }
-				 if (true) {
-					BlockPerms perms = BlockPerms.GetDelete(block);
-					perms.MinRank = (MCGalaxy.LevelPermission)999;
+					BlockPerms perms = BlockPerms.GetPlace((ushort)(block + 256));
+					perms.MinRank = LevelPermission.Nobody;
 				 }
 				BlockPerms.Save();
 				BlockPerms.ApplyChanges();
