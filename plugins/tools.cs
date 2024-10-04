@@ -169,7 +169,7 @@ namespace MCGalaxy {
 					AddBlockItem(a.ID, a.NAME, a.TEXTURE);
 					continue;
 				}
-				AddBlockDef(a.NAME, a.ID, 0,0,0,16,16,16,a.TEXTURE, a.TEXTURE, 85, 85, true);
+				AddBlockDef(a.NAME, a.ID, 16,0,0,16,16,16,a.TEXTURE, 85, 85, 85, true);
 			}
 			OnBlockChangingEvent.Register(HandleBlockChanged, Priority.Low);
 		}
@@ -225,7 +225,7 @@ namespace MCGalaxy {
 				ushort LeftTex = TEXTURE_SIDE;
 				ushort RightTex = TEXTURE_SIDE;
 				ushort FrontTex = TEXTURE_FRONT;
-				ushort BackTex = TEXTURE_FRONT;
+				ushort BackTex = TEXTURE_TOP;
 				ushort TopTex = TEXTURE_TOP;
 				ushort BottomTex = TEXTURE_BOTTOM;
 				int InventoryOrder = -1;
