@@ -14,6 +14,9 @@ namespace MCGalaxy {
 		public ushort TEXTURE;
 		public string NAME;
 		public ushort ID;
+		public bool IsSword=false;
+		public bool IsSprite = false;
+		public int Damage;
 	}
 	public class Tools : Plugin {
 		public override string name { get { return "Tools"; } }
@@ -29,47 +32,150 @@ namespace MCGalaxy {
 				NAME = "Iron Sword",
 				TEXTURE = 178,
 				ID = 90,
+				IsSword = true,
+				Damage = 6
 			},
 			new SurvivalTool()
 			{
 				NAME = "Iron Pickaxe",
 				TEXTURE = 146,
 				ID = 91,
+				IsSword = false,
+				Damage = 4,
 			},
 			new SurvivalTool()
 			{
 				NAME = "Iron Axe",
 				TEXTURE = 130,
 				ID = 92,
+				IsSword = false,
+				Damage = 5,
 			},
 			new SurvivalTool()
 			{
 				NAME = "Iron Shovel",
 				TEXTURE = 162,
 				ID = 93,
+				IsSword = false,
+				Damage = 5,
 			},
 			new SurvivalTool()
 			{
 				NAME = "Stone Sword",
 				TEXTURE = 129,
 				ID = 94,
+				IsSword = true,
+				Damage = 5,
 			},
 			new SurvivalTool()
 			{
 				NAME = "Stone Axe",
 				TEXTURE = 177,
 				ID = 95,
+				IsSword = false,
+				Damage = 4
+			},
+			new SurvivalTool()
+			{
+				NAME = "Stone Pickaxe",
+				TEXTURE = 161,
+				ID = 96,
+				IsSword = false,
+				Damage = 4
+			},
+			new SurvivalTool()
+			{
+				NAME = "Stone Shovel",
+				TEXTURE = 145,
+				ID = 97,
+				IsSword = false,
+				Damage = 4
+			},
+			new SurvivalTool()
+			{
+				NAME = "Wooden Sword",
+				TEXTURE = 128,
+				ID = 98,
+				IsSword = true,
+				Damage = 4
+			},
+			new SurvivalTool()
+			{
+				NAME = "Wooden Shovel",
+				TEXTURE = 144,
+				ID = 99,
+				IsSword = false,
+				Damage = 4
+			},
+			new SurvivalTool()
+			{
+				NAME = "Wooden Pickaxe",
+				TEXTURE = 160,
+				ID = 100,
+				IsSword = false,
+				Damage = 4
+			},
+			new SurvivalTool()
+			{
+				NAME = "Wooden Axe",
+				TEXTURE = 176,
+				ID = 101,
+				IsSword = false,
+				Damage = 4
+			},
+			new SurvivalTool()
+			{
+				NAME = "Diamond",
+				TEXTURE = 175,
+				ID = 110,
+				IsSword = false,
+				IsSprite = true,
+				Damage = 4
+			},
+			new SurvivalTool()
+			{
+				NAME = "Gold Bar",
+				TEXTURE = 159,
+				ID = 111,
+				IsSword = false,
+				IsSprite = true,
+				Damage = 4
+			},
+			new SurvivalTool()
+			{
+				NAME = "Iron Ignot",
+				TEXTURE = 143,
+				ID = 112,
+				IsSword = false,
+				IsSprite = true,
+				Damage = 4
+			},
+			new SurvivalTool()
+			{
+				NAME = "Coal",
+				TEXTURE = 127,
+				ID = 113,
+				IsSword = false,
+				Damage = 4,
+				IsSprite = true
 			},
 		};
 
 		public override void Load(bool startup) {
 			foreach (var a in customBlocks)
 			{
+				if (a.IsSprite)
+				{
+					AddBlockItem(a.ID, a.NAME, a.TEXTURE);
+					continue;
+				}
 				AddBlockDef(a.NAME, a.ID, 0,0,0,16,16,16,a.TEXTURE, a.TEXTURE, 85, 85, true);
 			}
+			OnBlockChangingEvent.Register(HandleBlockChanged, Priority.Low);
 		}
                         
 		public override void Unload(bool shutdown) {
+			OnBlockChangingEvent.Unregister(HandleBlockChanged);
 		}
                         
 		public override void Help(Player p) {
@@ -78,6 +184,27 @@ namespace MCGalaxy {
 		private void AddBlockDef(BlockDefinition def)
 		{
 			BlockDefinition.Add(def, BlockDefinition.GlobalDefs, null );
+		}
+		public void AddBlockItem(ushort Id, string Name, ushort Texture)
+		{
+			BlockDefinition def = new BlockDefinition();
+				def.RawID = Id; def.Name = Name;
+				def.Speed = 1; def.CollideType = 0;
+				def.TopTex = Texture; def.BottomTex = Texture;
+				
+				def.BlocksLight = false; def.WalkSound = 1;
+				def.FullBright = false; def.Shape = 0;
+				def.BlockDraw = 2; def.FallBack = 5;
+				
+				def.FogDensity = 0;
+				def.FogR = 0; def.FogG = 0; def.FogB = 0;
+				def.MinX = 0; def.MinY = 0; def.MinZ = 0;
+				def.MaxX = 0; def.MaxY = 0; def.MaxZ = 0;
+				
+				def.LeftTex = Texture; def.RightTex = Texture;
+				def.FrontTex = Texture; def.BackTex = Texture;
+				def.InventoryOrder = -1;
+			AddBlockDef(def);
 		}
 		public void AddBlockDef(string name, ushort Id, ushort MinX, ushort MinY, ushort MinZ, ushort MaxX, ushort MaxY, ushort MaxZ, ushort TEXTURE_SIDE, ushort TEXTURE_FRONT, ushort TEXTURE_TOP, ushort TEXTURE_BOTTOM, bool Transperant, int Brightness=0)
 		{
@@ -136,5 +263,34 @@ namespace MCGalaxy {
 				}            
 				//SetDoorBlockPerms(Id);
 		}
+		SurvivalTool getEgg(BlockID block)
+		{
+			foreach(SurvivalTool egg in customBlocks)
+			{
+				if ((ushort)(egg.ID) == (block-256))
+				{
+					return egg;
+				}
+			}
+			return null;
+		}
+		void HandleBlockChanged(Player p, ushort x, ushort y, ushort z, BlockID block, bool placing, ref bool cancel)
+        {
+			SurvivalTool egg = getEgg(block);
+			
+			if (egg == null){return;}
+			if (egg.IsSprite)
+				return;
+			if (placing)
+			{
+				cancel = true;
+				p.RevertBlock(x, y, z);
+				return;
+			}
+			if (!egg.IsSword)
+				return;
+			cancel = true;
+			p.RevertBlock(x, y, z);
+        }
 	}
 }

@@ -91,12 +91,18 @@ namespace MCGalaxy {
 			toolKnockback.Clear();
 			for (ushort i=90;i<110;i++)
 			{
-				toolDamage.Add(i, 8);
+				toolDamage.Add(i, 4);
 			}
+			toolDamage[90] = 7;
+			toolDamage[94] = 6;
+			toolDamage[99] = 5;
 			for (ushort i=90;i<110;i++)
 			{
-				toolKnockback.Add(i, 1.5f);
+				toolKnockback.Add(i, 1.2f);
 			}
+			toolKnockback[90] = 2f;
+			toolKnockback[94] = 1.6f;
+			toolKnockback[99] = 1.4f;
 		}
                         
 		public override void Unload(bool shutdown) {

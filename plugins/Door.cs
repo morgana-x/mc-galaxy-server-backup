@@ -618,7 +618,7 @@ namespace MCGalaxy {
 			{
 				return;
 			}
-			if (!(button == MouseButton.Left && action == MouseAction.Pressed ))
+			if (action != MouseAction.Pressed)
 			{
 				return;
 			}
