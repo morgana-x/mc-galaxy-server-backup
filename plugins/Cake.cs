@@ -140,7 +140,6 @@ namespace MCGalaxy {
 				if (!Block.IsPhysicsType(block)) {
 					BlockPerms.ResendAllBlockPermissions();
 				}            
-				//SetDoorBlockPerms(Id);
 		}
 		int getCakeStage(BlockID block)
 		{
