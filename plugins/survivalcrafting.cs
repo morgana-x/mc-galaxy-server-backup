@@ -112,8 +112,35 @@ namespace MCGalaxy {
 				TEXTURE_FRONT = 114,
 				ID = 82,
 				BRIGHTNESS = 10
-			}
-
+			},
+			new CustomBlock()
+			{
+				NAME = "Diamond Ore",
+				TEXTURE_TOP = 117,
+				TEXTURE_BOTTOM = 117,
+				TEXTURE_SIDE = 117,
+				TEXTURE_FRONT = 117,
+				ID = 78,
+			},
+			new CustomBlock()
+			{
+				NAME = "Redstone Ore",
+				TEXTURE_TOP = 118,
+				TEXTURE_BOTTOM = 118,
+				TEXTURE_SIDE = 118,
+				TEXTURE_FRONT = 118,
+				ID = 79,
+				BRIGHTNESS = 3
+			},
+			new CustomBlock()
+			{
+				NAME = "Diamond Block",
+				TEXTURE_TOP = 27,
+				TEXTURE_BOTTOM = 27,
+				TEXTURE_SIDE = 27,
+				TEXTURE_FRONT = 27,
+				ID = 86,
+			},
 		};
 
 		public override void Load(bool startup) {

@@ -44,8 +44,18 @@ namespace MCGalaxy {
 				BRIGHTNESS = 15,
 				TEXTURE_SIDE = 180,
 				TEXTURE_BOTTOM = 4,
-				TEXTURE_TOP = 24,
-			}
+				TEXTURE_TOP = 180,
+			},
+			new TorchItem()
+			{
+				TEXTURE_ID = 179,
+				BLOCK_ID = 85,
+				NAME = "Redstone Torch",
+				BRIGHTNESS = 5,
+				TEXTURE_SIDE = 179,
+				TEXTURE_BOTTOM = 4,
+				TEXTURE_TOP = 179,
+			},
 		};
 
 		
@@ -53,7 +63,7 @@ namespace MCGalaxy {
 			//LOAD YOUR PLUGIN WITH EVENTS OR OTHER THINGS!
 			foreach (TorchItem egg in SignConfigs)
 			{
-				AddTorchBlock(egg.NAME, egg.BLOCK_ID,  7, 7, 0, 9,9,10, egg.TEXTURE_SIDE,egg.TEXTURE_SIDE,egg.TEXTURE_TOP,egg.TEXTURE_BOTTOM, egg.BRIGHTNESS, false);
+				AddTorchBlock(egg.NAME, egg.BLOCK_ID,  7, 7, 0, 9,9,9, egg.TEXTURE_SIDE,egg.TEXTURE_SIDE,egg.TEXTURE_TOP,egg.TEXTURE_BOTTOM, egg.BRIGHTNESS, false);
 			}
 
 		}
