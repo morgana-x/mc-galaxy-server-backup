@@ -120,7 +120,7 @@ namespace MCGalaxy {
 				TEXTURE_BOTTOM = 117,
 				TEXTURE_SIDE = 117,
 				TEXTURE_FRONT = 117,
-				ID = 78,
+				ID = 87,
 			},
 			new CustomBlock()
 			{
@@ -129,7 +129,7 @@ namespace MCGalaxy {
 				TEXTURE_BOTTOM = 118,
 				TEXTURE_SIDE = 118,
 				TEXTURE_FRONT = 118,
-				ID = 79,
+				ID = 88,
 				BRIGHTNESS = 3
 			},
 			new CustomBlock()
