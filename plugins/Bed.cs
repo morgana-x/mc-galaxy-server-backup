@@ -8,6 +8,8 @@ using MCGalaxy.Network;
 using MCGalaxy.Bots;
 using System.Collections.Generic;
 using BlockID = System.UInt16;
+using System.IO;
+using System.Text;
 namespace MCGalaxy {
 	public class BedConfig
 	{
@@ -52,6 +54,100 @@ namespace MCGalaxy {
 			TEXTURE_HEAD_BACK=124
 			
 		};
+		public static string SaveFolder = "./plugins/SimpleSurvival/";
+		public static string SaveFile = "./plugins/SimpleSurvival/Bed.data";
+    static string readString(Stream stream)
+    {
+        byte[] bufferInteger = new byte[2];
+        stream.Read(bufferInteger, 0, 2);
+        int stringLength = BitConverter.ToUInt16(bufferInteger,0);
+        byte[] stringBytes = new byte[stringLength];
+        stream.Read(stringBytes, 0 , stringLength);
+        return Encoding.UTF8.GetString(stringBytes);
+    }
+    static void writeString(Stream stream, string text)
+    {
+        byte[] stringBytes = Encoding.UTF8.GetBytes(text);
+        byte[] stringBytesLength = BitConverter.GetBytes((ushort)stringBytes.Length);
+        stream.Write(stringBytesLength, 0, 2);
+        stream.Write(stringBytes, 0, stringBytes.Length);
+    }
+    static int readInt(Stream stream)
+    {
+        byte[] intBuffer = new byte[4];
+        stream.Read(intBuffer, 0 , 4);
+        return BitConverter.ToInt32(intBuffer, 0);
+    }
+    void LoadSavePoints( )
+    {
+        if (!File.Exists(SaveFile))
+            return;
+        FileStream fileStream = new FileStream(SaveFile, FileMode.Open, FileAccess.Read);
+        byte[] bufferLong = new byte[8];
+        byte[] bufferShort = new byte[2];
+
+        int numberOfLevelEntries = readInt(fileStream);
+
+        for (int i =0; i < numberOfLevelEntries; i++)
+        {
+            string levelName = readString(fileStream);
+            SavePoints.Add(levelName, new Dictionary<string, ushort[]>());
+
+            int numOfEntires = readInt(fileStream);
+            for (int x=0 ; x < numOfEntires; x++)
+            {
+                string playerName = readString(fileStream);
+                ushort[] pos = new ushort[3];
+                for (int b = 0; b < 3; b++)
+                {
+                    fileStream.Read(bufferShort, 0 , 2);
+                    pos[b] = BitConverter.ToUInt16(bufferShort,0);
+                }
+                if (!SavePoints[levelName].ContainsKey(playerName))
+                    SavePoints[levelName].Add(playerName, pos);
+            }
+
+        }
+
+        foreach(var pair in  SavePoints)
+        {
+            Player.Console.Message(pair.Key);
+            foreach( var pair2 in pair.Value)
+            {
+                 Player.Console.Message(" " + pair2.Key);
+                 Player.Console.Message("     " + string.Join(", " , pair2.Value));
+            }
+        }
+
+
+    }
+    static void SaveSavePoints(Dictionary<string, Dictionary<string, ushort[]>> SavePoints)
+    {
+        if (!Directory.Exists(SaveFolder))
+            Directory.CreateDirectory(SaveFolder);
+
+        FileStream headerStream = new FileStream(SaveFile, FileMode.Create, FileAccess.Write);
+        MemoryStream dataStream = new MemoryStream();
+
+        headerStream.Write(BitConverter.GetBytes(SavePoints.Keys.Count), 0, 4);
+
+        foreach (var pair in SavePoints)
+        {
+            writeString(dataStream, pair.Key); // Write Level Name
+            byte[] numOfEntries = BitConverter.GetBytes(pair.Value.Values.Count);
+            dataStream.Write(numOfEntries, 0, 4);
+            foreach (var pair2 in pair.Value)
+            {
+                writeString(dataStream, pair2.Key); // Write player Name
+                for (int i=0; i <3; i++)
+                {
+                    dataStream.Write(BitConverter.GetBytes(pair2.Value[i]),0,2);
+                }
+            }
+        }
+        headerStream.Write(dataStream.ToArray(),0, (int)dataStream.Length);
+        headerStream.Close();
+    }
 
 		public override void Load(bool startup) {
 
@@ -61,12 +157,16 @@ namespace MCGalaxy {
 			OnBlockChangingEvent.Register(HandleBlockChanged, Priority.Low);
 			OnPlayerClickEvent.Register(HandleBlockClicked, Priority.Low);
 			OnPlayerSpawningEvent.Register(HandlePlayerSpawning, Priority.High);
+			OnPlayerDisconnectEvent.Register(HandlePlayerDisconnect, Priority.Low);
+			LoadSavePoints();
 		}
                         
 		public override void Unload(bool shutdown) {
 			OnBlockChangingEvent.Unregister(HandleBlockChanged);
 			OnPlayerClickEvent.Unregister(HandleBlockClicked);
 			OnPlayerSpawningEvent.Unregister(HandlePlayerSpawning);
+			OnPlayerDisconnectEvent.Unregister(HandlePlayerDisconnect);
+			SaveSavePoints(SavePoints);
 		}
                         
 		public override void Help(Player p) {
@@ -100,6 +200,17 @@ namespace MCGalaxy {
 		public void AddBedBlockDef(ushort Id, ushort text_side_left, ushort text_side_right, ushort text_front, ushort text_back, ushort text_top)
 		{
 			AddBlockDef("", Id, 0,0,0,16,16,8, text_side_left, text_side_right,text_front, text_back, text_top, 85, true, 0);
+		}
+		void HandlePlayerDisconnect(Player p, string reason)
+        {
+			try
+			{
+				SaveSavePoints(SavePoints);
+			}
+			catch(Exception e)
+			{
+
+			}
 		}
 		public void AddBedBlockDef(ushort Id, int dir,  ushort text_side_left, ushort text_side_right, ushort text_front, ushort text_top)
 		{
@@ -236,7 +347,7 @@ namespace MCGalaxy {
 			if (!isBed(p.level.FastGetBlock(pos[0], pos[1], pos[2])))
 			{
 				p.Message("Cannot respawn at your bed because your bed is either missing or destroyed!");
-				SavePoints[p.level.name][p.name] = null;
+				SavePoints[p.level.name].Remove(p.name);
 				return nullPos;
 			}
 
