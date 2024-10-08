@@ -38,9 +38,12 @@ namespace Core
             OnPlayerConnectEvent.Unregister(HandlePlayerConnect);
             Server.MainScheduler.Cancel(Task);
         }
-
+        DateTime lastModelUpdate = DateTime.Now;
         void DoBlockLoop(SchedulerTask task)
         {
+            if (lastModelUpdate > DateTime.Now)
+                    return;
+            lastModelUpdate = DateTime.Now.AddMilliseconds(250);
             Player[] players = PlayerInfo.Online.Items;
 
             foreach (Player pl in players)

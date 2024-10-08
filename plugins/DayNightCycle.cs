@@ -43,22 +43,21 @@ namespace MCGalaxy
 			{0,   "#FFFFFF"},
 			{170, "#FFFFFF"},
 			{175, "#926864"},
-			{180, "#2D4061"},
+			{180, "#000000"},
 			{230, "#D15F36"},
 		};
 		public static Dictionary<int, string> LightingColors = new Dictionary<int, string>()
         {
 			{0,   "#FFFFFF"},
-			{180, "#5c5c5c"},
-			{190, "#333333"},
-			{200, "#5c5c5c"},
+			{175, "#5c5c5c"},
+			{180, "#1d1d1d"},
+			{225, "#5c5c5c"},
 			{230, "#fac3af"},
 		};
 		public static Dictionary<int, string> ShadowColors = new Dictionary<int, string>()
         {
 			{0,   "#9B9B9B"},
-			{180, "#2b2b2b"},
-			{190, "#1a1a1a"},
+			{180, "#0a0a0a"},
 			{200, "#2b2b2b"},
 			{230, "#757575"},
 		};

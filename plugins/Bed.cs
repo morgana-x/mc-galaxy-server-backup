@@ -11,11 +11,16 @@ using BlockID = System.UInt16;
 namespace MCGalaxy {
 	public class BedConfig
 	{
-		public ushort TEXTURE_FOOT_TOP;
-		public ushort TEXTURE_FOOT_SIDE;
+		public ushort TEXTURE_FOOT_TOP_UP;
+		public ushort TEXTURE_FOOT_TOP_DOWN;
+		public ushort TEXTURE_FOOT_TOP_LEFT;
+		public ushort TEXTURE_FOOT_TOP_RIGHT;
+		public ushort TEXTURE_FOOT_SIDE_LEFT;
+		public ushort TEXTURE_FOOT_SIDE_RIGHT;
 		public ushort TEXTURE_FOOT_BACK;
-		public ushort TEXTURE_HEAD_TOP;
-		public ushort TEXTURE_HEAD_SIDE;
+		public ushort TEXTURE_HEAD_TOP_UP;
+		public ushort TEXTURE_HEAD_SIDE_LEFT;
+		public ushort TEXTURE_HEAD_SIDE_RIGHT;
 		public ushort TEXTURE_HEAD_BACK;
 		public ushort TEXTURE_ITEM;
 		public string NAME;
@@ -37,11 +42,13 @@ namespace MCGalaxy {
 			ID=460,
 			NAME="Bed",
 			TEXTURE_ITEM=90,
-			TEXTURE_FOOT_TOP=106,
-			TEXTURE_FOOT_SIDE=122,
+			TEXTURE_FOOT_TOP_UP=106,
+			TEXTURE_FOOT_SIDE_LEFT=155,
+			TEXTURE_FOOT_SIDE_RIGHT=122,
 			TEXTURE_FOOT_BACK=121,
-			TEXTURE_HEAD_TOP=107,
-			TEXTURE_HEAD_SIDE=123,
+			TEXTURE_HEAD_TOP_UP=107,
+			TEXTURE_HEAD_SIDE_RIGHT=123,
+			TEXTURE_HEAD_SIDE_LEFT=154,
 			TEXTURE_HEAD_BACK=124
 			
 		};
@@ -49,8 +56,8 @@ namespace MCGalaxy {
 		public override void Load(bool startup) {
 
 			AddBlockItem(bedConfig.ITEM_ID, bedConfig.NAME, bedConfig.TEXTURE_ITEM);
-			AddBedBlockDef(bedConfig.ID, bedConfig.TEXTURE_FOOT_SIDE, bedConfig.TEXTURE_FOOT_BACK, bedConfig.TEXTURE_FOOT_TOP);
-			AddBedBlockDef((ushort)(bedConfig.ID+2), bedConfig.TEXTURE_HEAD_SIDE, bedConfig.TEXTURE_HEAD_BACK, bedConfig.TEXTURE_HEAD_TOP);
+			AddBedBlockDef(bedConfig.ID, bedConfig.TEXTURE_FOOT_SIDE_LEFT, bedConfig.TEXTURE_FOOT_SIDE_RIGHT, bedConfig.TEXTURE_FOOT_BACK, bedConfig.TEXTURE_FOOT_TOP_UP);
+			AddBedBlockDef((ushort)(bedConfig.ID+2), bedConfig.TEXTURE_HEAD_SIDE_LEFT, bedConfig.TEXTURE_HEAD_SIDE_RIGHT, bedConfig.TEXTURE_HEAD_BACK, bedConfig.TEXTURE_HEAD_TOP_UP);
 			OnBlockChangingEvent.Register(HandleBlockChanged, Priority.Low);
 			OnPlayerClickEvent.Register(HandleBlockClicked, Priority.Low);
 			OnPlayerSpawningEvent.Register(HandlePlayerSpawning, Priority.High);
@@ -92,17 +99,17 @@ namespace MCGalaxy {
 		}
 		public void AddBedBlockDef(ushort Id, ushort text_side_left, ushort text_side_right, ushort text_front, ushort text_back, ushort text_top)
 		{
-			AddBlockDef("", Id, 0,0,0,16,16,8, text_side_left, text_side_right,text_front, text_front, text_top, 85, true, 0);
+			AddBlockDef("", Id, 0,0,0,16,16,8, text_side_left, text_side_right,text_front, text_back, text_top, 85, true, 0);
 		}
-		public void AddBedBlockDef(ushort Id, int dir,  ushort text_side, ushort text_front, ushort text_top)
+		public void AddBedBlockDef(ushort Id, int dir,  ushort text_side_left, ushort text_side_right, ushort text_front, ushort text_top)
 		{
 			//                             Left      Right      Front       Back        Top
-			AddBedBlockDef((ushort)(Id  ), text_side,text_side, text_front, text_front, text_top );
-			AddBedBlockDef((ushort)(Id+1), text_front,text_front, text_side, text_side, text_top );
+			AddBedBlockDef((ushort)(Id  ), text_side_left,text_side_right, text_front, text_front, text_top );
+			AddBedBlockDef((ushort)(Id+1), text_front,text_front, text_side_left, text_side_right, text_top );
 		}
-		public void AddBedBlockDef(ushort Id, ushort text_side, ushort text_front, ushort text_top)
+		public void AddBedBlockDef(ushort Id,  ushort text_side_left, ushort text_side_right,  ushort text_front, ushort text_top)
 		{
-			AddBedBlockDef(Id, (int)0, text_side, text_front, text_top);
+			AddBedBlockDef(Id, (int)0, text_side_left, text_side_right, text_front, text_top);
 		}
 		public void AddBlockDef(string name, ushort Id, ushort MinX, ushort MinY, ushort MinZ, ushort MaxX, ushort MaxY, ushort MaxZ, ushort TEXTURE_SIDE_LEFT, ushort TEXTURE_SIDE_RIGHT, ushort TEXTURE_FRONT, ushort TEXTURE_BACK, ushort TEXTURE_TOP, ushort TEXTURE_BOTTOM, bool Transperant, int Brightness=0)
 		{
@@ -166,26 +173,32 @@ namespace MCGalaxy {
 		}
 		void PlaceBed(Level level, ushort[] pos, int dir)
 		{
+			if (level.FastGetBlock(pos[0], pos[1], pos[2]) != 0)
+				return;
 			ushort dirt = dir> 1 ? (ushort)1 : (ushort)0;
-			ushort blockFoot= (ushort)(bedConfig.ID + 256 + dirt);
-			ushort blockHead= (ushort)(bedConfig.ID + 256 + 2 + dirt);
-
-			level.UpdateBlock(Player.Console, pos[0], pos[1], pos[2], blockFoot);
+			ushort[] headPos = new ushort[]{pos[0], pos[1], pos[2]};
+			ushort[] footPos = new ushort[]{pos[0], pos[1], pos[2]};
 			switch (dir)
 			{
 			 	case 2:
-					level.UpdateBlock(Player.Console, (ushort)(pos[0]+1), pos[1], pos[2], blockHead);
+					headPos[0] = (ushort)(headPos[0]+1);
 					break;
 				case 3:
-					level.UpdateBlock(Player.Console, (ushort)(pos[0]-1), pos[1], pos[2], blockHead);
+					headPos[0] = (ushort)(headPos[0]-1);
 					break;
 				case 0:
-					level.UpdateBlock(Player.Console, pos[0], pos[1],  (ushort)(pos[2]+1), blockHead);
+					headPos[2] = (ushort)(headPos[2]+1);
 					break;
 				case 1:
-					level.UpdateBlock(Player.Console, pos[0], pos[1],  (ushort)(pos[2]-1), blockHead);
+					headPos[2] = (ushort)(headPos[2]-1);
 					break;
 			}
+			if (level.FastGetBlock(headPos[0], headPos[1], headPos[2]) != 0)
+				return;
+			ushort blockFoot= (ushort)(bedConfig.ID + 256 + dirt);
+			ushort blockHead= (ushort)(bedConfig.ID + 256 + 2 + dirt);
+			level.UpdateBlock(Player.Console, footPos[0], footPos[1], footPos[2], blockFoot);
+			level.UpdateBlock(Player.Console, headPos[0], headPos[1], headPos[2], blockHead);
 		}
 		void HandleBlockChanged(Player p, ushort x, ushort y, ushort z, BlockID block, bool placing, ref bool cancel)
         {
@@ -203,7 +216,11 @@ namespace MCGalaxy {
 				SavePoints.Add(level.name, new Dictionary<string, ushort[]>());
 			if (!SavePoints[level.name].ContainsKey(p.name))
 				SavePoints[level.name].Add(p.name, null);
-			SavePoints[level.name][p.name] = new ushort[]{pos[0], pos[1], pos[2]};
+			ushort[] newPos = new ushort[]{pos[0], pos[1], pos[2]};
+			ushort[] oldPos = SavePoints[level.name][p.name];
+			if (oldPos != null && oldPos[0] == newPos[0] && oldPos[1] == newPos[1] && oldPos[2] == newPos[2])
+				return;
+			SavePoints[level.name][p.name] = newPos;
 			p.Message("Your savepoint has been set to " + pos[0].ToString() + ", " + pos[1].ToString() + ", " + pos[2].ToString() + ".");
 		}
 		Position doBedSpawn(Player p)

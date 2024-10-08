@@ -16,7 +16,7 @@ namespace MCGalaxy {
 		public ushort ID;
 		public bool IsSword=false;
 		public bool IsSprite = false;
-		public int Damage;
+		public int Damage=2;
 	}
 	public class Tools : Plugin {
 		public override string name { get { return "Tools"; } }
@@ -30,96 +30,160 @@ namespace MCGalaxy {
 			new SurvivalTool()
 			{
 				NAME = "Iron Sword",
-				TEXTURE = 178,
-				ID = 90,
+				TEXTURE = 204,
+				ID = 91,
 				IsSword = true,
 				Damage = 6
 			},
 			new SurvivalTool()
 			{
 				NAME = "Iron Pickaxe",
-				TEXTURE = 146,
-				ID = 91,
+				TEXTURE = 236,
+				ID = 92,
 				IsSword = false,
 				Damage = 4,
 			},
 			new SurvivalTool()
 			{
 				NAME = "Iron Axe",
-				TEXTURE = 130,
-				ID = 92,
-				IsSword = false,
-				Damage = 5,
-			},
-			new SurvivalTool()
-			{
-				NAME = "Iron Shovel",
-				TEXTURE = 162,
+				TEXTURE = 252,
 				ID = 93,
 				IsSword = false,
 				Damage = 5,
 			},
 			new SurvivalTool()
 			{
-				NAME = "Stone Sword",
-				TEXTURE = 129,
+				NAME = "Iron Shovel",
+				TEXTURE = 220,
 				ID = 94,
+				IsSword = false,
+				Damage = 5,
+			},
+			new SurvivalTool()
+			{
+				NAME = "Stone Sword",
+				TEXTURE = 203,
+				ID = 95,
 				IsSword = true,
 				Damage = 5,
 			},
 			new SurvivalTool()
 			{
 				NAME = "Stone Axe",
-				TEXTURE = 177,
-				ID = 95,
-				IsSword = false,
-				Damage = 4
-			},
-			new SurvivalTool()
-			{
-				NAME = "Stone Pickaxe",
-				TEXTURE = 161,
+				TEXTURE = 251,
 				ID = 96,
 				IsSword = false,
 				Damage = 4
 			},
 			new SurvivalTool()
 			{
-				NAME = "Stone Shovel",
-				TEXTURE = 145,
+				NAME = "Stone Pickaxe",
+				TEXTURE = 235,
 				ID = 97,
 				IsSword = false,
 				Damage = 4
 			},
 			new SurvivalTool()
 			{
-				NAME = "Wooden Sword",
-				TEXTURE = 128,
+				NAME = "Stone Shovel",
+				TEXTURE = 219,
 				ID = 98,
+				IsSword = false,
+				Damage = 4
+			},
+			new SurvivalTool()
+			{
+				NAME = "Wooden Sword",
+				TEXTURE = 202,
+				ID = 99,
 				IsSword = true,
 				Damage = 4
 			},
 			new SurvivalTool()
 			{
 				NAME = "Wooden Shovel",
-				TEXTURE = 144,
-				ID = 99,
-				IsSword = false,
-				Damage = 4
-			},
-			new SurvivalTool()
-			{
-				NAME = "Wooden Pickaxe",
-				TEXTURE = 160,
+				TEXTURE = 218,
 				ID = 100,
 				IsSword = false,
 				Damage = 4
 			},
 			new SurvivalTool()
 			{
-				NAME = "Wooden Axe",
-				TEXTURE = 176,
+				NAME = "Wooden Pickaxe",
+				TEXTURE = 234,
 				ID = 101,
+				IsSword = false,
+				Damage = 4
+			},
+			new SurvivalTool()
+			{
+				NAME = "Wooden Axe",
+				TEXTURE = 250,
+				ID = 102,
+				IsSword = false,
+				Damage = 4
+			},
+			new SurvivalTool()
+			{
+				NAME = "Gold Sword",
+				TEXTURE = 206,
+				ID = 103,
+				IsSword = true,
+				Damage = 4
+			},
+			new SurvivalTool()
+			{
+				NAME = "Gold Shovel",
+				TEXTURE = 222,
+				ID = 104,
+				IsSword = false,
+				Damage = 4
+			},
+			new SurvivalTool()
+			{
+				NAME = "Gold Pickaxe",
+				TEXTURE = 238,
+				ID = 105,
+				IsSword = false,
+				Damage = 4
+			},
+			new SurvivalTool()
+			{
+				NAME = "Gold Axe",
+				TEXTURE = 254,
+				ID = 106,
+				IsSword = false,
+				Damage = 4
+			},
+			new SurvivalTool()
+			{
+				NAME = "Diamond Sword",
+				TEXTURE = 205,
+				ID = 107,
+				IsSword = true,
+				Damage = 4
+			},
+			new SurvivalTool()
+			{
+				NAME = "Diamond Shovel",
+				TEXTURE = 221,
+				ID = 108,
+				IsSword = false,
+				Damage = 4
+			},
+			new SurvivalTool()
+			{
+				NAME = "Diamond Pickaxe",
+				TEXTURE = 237,
+				ID = 109,
+				IsSword = false,
+				Damage = 4
+			},
+			new SurvivalTool()
+			{
+				NAME = "Diamond Axe",
+				TEXTURE = 253,
+				ID = 110,
 				IsSword = false,
 				Damage = 4
 			},
@@ -127,36 +191,64 @@ namespace MCGalaxy {
 			{
 				NAME = "Diamond",
 				TEXTURE = 175,
-				ID = 110,
+				ID = 111,
 				IsSword = false,
 				IsSprite = true,
-				Damage = 4
 			},
 			new SurvivalTool()
 			{
 				NAME = "Gold Bar",
 				TEXTURE = 159,
-				ID = 111,
+				ID = 112,
 				IsSword = false,
 				IsSprite = true,
-				Damage = 4
 			},
 			new SurvivalTool()
 			{
 				NAME = "Iron Ignot",
 				TEXTURE = 143,
-				ID = 112,
+				ID = 113,
 				IsSword = false,
 				IsSprite = true,
-				Damage = 4
 			},
 			new SurvivalTool()
 			{
 				NAME = "Coal",
 				TEXTURE = 127,
-				ID = 113,
+				ID = 114,
 				IsSword = false,
-				Damage = 4,
+				IsSprite = true
+			},
+			new SurvivalTool()
+			{
+				NAME = "Cookie",
+				TEXTURE = 201,
+				ID = 116,
+				IsSword = false,
+				IsSprite = true
+			},
+			new SurvivalTool()
+			{
+				NAME = "Beef",
+				TEXTURE = 214,
+				ID = 117,
+				IsSword = false,
+				IsSprite = true
+			},
+			new SurvivalTool()
+			{
+				NAME = "Steak",
+				TEXTURE = 215,
+				ID = 118,
+				IsSword = false,
+				IsSprite = true
+			},
+			new SurvivalTool()
+			{
+				NAME = "Apple",
+				TEXTURE = 229,
+				ID = 119,
+				IsSword = false,
 				IsSprite = true
 			},
 		};
