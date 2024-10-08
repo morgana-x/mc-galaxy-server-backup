@@ -339,7 +339,7 @@ namespace MCGalaxy {
 				return nullPos;
 			}
 
-			return new Position(pos[0] << 5, ((pos[1] + 5) << 5), pos[2] << 5);
+			return new Position(pos[0] << 5, ((pos[1] + 2) << 5), pos[2] << 5);
 		}
 		void HandleBlockClicked(Player p, MouseButton button, MouseAction action, ushort yaw, ushort pitch, byte entity, ushort x, ushort y, ushort z, TargetBlockFace face)
 		{
