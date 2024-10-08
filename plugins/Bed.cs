@@ -108,18 +108,6 @@ namespace MCGalaxy {
             }
 
         }
-
-        foreach(var pair in  SavePoints)
-        {
-            Player.Console.Message(pair.Key);
-            foreach( var pair2 in pair.Value)
-            {
-                 Player.Console.Message(" " + pair2.Key);
-                 Player.Console.Message("     " + string.Join(", " , pair2.Value));
-            }
-        }
-
-
     }
     static void SaveSavePoints(Dictionary<string, Dictionary<string, ushort[]>> SavePoints)
     {
