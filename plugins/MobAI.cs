@@ -371,8 +371,9 @@ namespace MCGalaxy
                 else meta.explodeTime = 0;
             }
 
-            else
+            else if (meta.explodeTime < 1)
             {
+				meta.explodeTime = 15;
                 // Check to see if positions collide
                 AABB playerBB = p.ModelBB.OffsetPosition(p.Pos);
                 AABB botBB = bot.ModelBB.OffsetPosition(bot.Pos);
@@ -384,6 +385,10 @@ namespace MCGalaxy
 
                 if (inRange) HitPlayer(bot, p, rot);
             }
+			else
+			{
+				meta.explodeTime--;
+			}
 
             bot.Rot = rot;
 
@@ -1676,6 +1681,7 @@ namespace MCGalaxy
         /// <summary> Applies this weapon to the given bot, and sets up necessary state. </summary>
         public static void Enable(PlayerBot bot, Player pl)
         {
+			if (true) return;
             if (shooting) return;
             shooting = true;
 
