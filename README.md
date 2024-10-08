@@ -13,6 +13,10 @@ Corpses on death
 
 Torches
 
+Beds (Glorified savepoints that can be destroyed, not able to be slept in yet)
+
+Cakes (eatable, working)
+
 Custom version of DayNightCycle with changing lighting
 
 etc!
