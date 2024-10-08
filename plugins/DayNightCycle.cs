@@ -57,7 +57,7 @@ namespace MCGalaxy
 		public static Dictionary<int, string> ShadowColors = new Dictionary<int, string>()
         {
 			{0,   "#9B9B9B"},
-			{180, "#0a0a0a"},
+			{180, "#090909"},
 			{200, "#2b2b2b"},
 			{230, "#757575"},
 		};

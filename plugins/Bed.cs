@@ -13,14 +13,17 @@ using System.Text;
 namespace MCGalaxy {
 	public class BedConfig
 	{
-		public ushort TEXTURE_FOOT_TOP_UP;
-		public ushort TEXTURE_FOOT_TOP_DOWN;
-		public ushort TEXTURE_FOOT_TOP_LEFT;
-		public ushort TEXTURE_FOOT_TOP_RIGHT;
+		public ushort TEXTURE_FOOT_TOP_NORTH;
+		public ushort TEXTURE_FOOT_TOP_SOUTH;
+		public ushort TEXTURE_FOOT_TOP_EAST;
+		public ushort TEXTURE_FOOT_TOP_WEST;
 		public ushort TEXTURE_FOOT_SIDE_LEFT;
 		public ushort TEXTURE_FOOT_SIDE_RIGHT;
 		public ushort TEXTURE_FOOT_BACK;
-		public ushort TEXTURE_HEAD_TOP_UP;
+		public ushort TEXTURE_HEAD_TOP_NORTH;
+		public ushort TEXTURE_HEAD_TOP_SOUTH;
+		public ushort TEXTURE_HEAD_TOP_EAST;
+		public ushort TEXTURE_HEAD_TOP_WEST;
 		public ushort TEXTURE_HEAD_SIDE_LEFT;
 		public ushort TEXTURE_HEAD_SIDE_RIGHT;
 		public ushort TEXTURE_HEAD_BACK;
@@ -44,11 +47,17 @@ namespace MCGalaxy {
 			ID=460,
 			NAME="Bed",
 			TEXTURE_ITEM=90,
-			TEXTURE_FOOT_TOP_UP=106,
+			TEXTURE_FOOT_TOP_NORTH=106,
+			TEXTURE_FOOT_TOP_SOUTH = 139,
+			TEXTURE_FOOT_TOP_EAST = 141,
+			TEXTURE_FOOT_TOP_WEST = 156,
 			TEXTURE_FOOT_SIDE_LEFT=155,
 			TEXTURE_FOOT_SIDE_RIGHT=122,
 			TEXTURE_FOOT_BACK=121,
-			TEXTURE_HEAD_TOP_UP=107,
+			TEXTURE_HEAD_TOP_NORTH=107,
+			TEXTURE_HEAD_TOP_SOUTH=138,
+			TEXTURE_HEAD_TOP_EAST=157,
+			TEXTURE_HEAD_TOP_WEST=140,
 			TEXTURE_HEAD_SIDE_RIGHT=123,
 			TEXTURE_HEAD_SIDE_LEFT=154,
 			TEXTURE_HEAD_BACK=124
@@ -140,8 +149,8 @@ namespace MCGalaxy {
 		public override void Load(bool startup) {
 
 			AddBlockItem(bedConfig.ITEM_ID, bedConfig.NAME, bedConfig.TEXTURE_ITEM);
-			AddBedBlockDef(bedConfig.ID, bedConfig.TEXTURE_FOOT_SIDE_LEFT, bedConfig.TEXTURE_FOOT_SIDE_RIGHT, bedConfig.TEXTURE_FOOT_BACK, bedConfig.TEXTURE_FOOT_TOP_UP);
-			AddBedBlockDef((ushort)(bedConfig.ID+2), bedConfig.TEXTURE_HEAD_SIDE_LEFT, bedConfig.TEXTURE_HEAD_SIDE_RIGHT, bedConfig.TEXTURE_HEAD_BACK, bedConfig.TEXTURE_HEAD_TOP_UP);
+			AddBedBlockDef(bedConfig.ID, bedConfig.TEXTURE_FOOT_SIDE_LEFT, bedConfig.TEXTURE_FOOT_SIDE_RIGHT, bedConfig.TEXTURE_FOOT_BACK, bedConfig.TEXTURE_FOOT_TOP_NORTH, bedConfig.TEXTURE_FOOT_TOP_SOUTH, bedConfig.TEXTURE_FOOT_TOP_EAST, bedConfig.TEXTURE_FOOT_TOP_WEST);
+			AddBedBlockDef((ushort)(bedConfig.ID+4), bedConfig.TEXTURE_HEAD_SIDE_LEFT, bedConfig.TEXTURE_HEAD_SIDE_RIGHT, bedConfig.TEXTURE_HEAD_BACK, bedConfig.TEXTURE_HEAD_TOP_NORTH, bedConfig.TEXTURE_HEAD_TOP_SOUTH, bedConfig.TEXTURE_HEAD_TOP_EAST, bedConfig.TEXTURE_HEAD_TOP_WEST);
 			OnBlockChangingEvent.Register(HandleBlockChanged, Priority.Low);
 			OnPlayerClickEvent.Register(HandleBlockClicked, Priority.Low);
 			OnPlayerSpawningEvent.Register(HandlePlayerSpawning, Priority.High);
@@ -200,11 +209,14 @@ namespace MCGalaxy {
 
 			}
 		}
-		public void AddBedBlockDef(ushort Id, int dir,  ushort text_side_left, ushort text_side_right, ushort text_front, ushort text_top)
+
+		public void AddBedBlockDef(ushort Id, ushort text_side_left, ushort text_side_right, ushort text_front, ushort text_top_north, ushort text_top_south, ushort text_top_east, ushort text_top_west )
 		{
-			//                             Left      Right      Front       Back        Top
-			AddBedBlockDef((ushort)(Id  ), text_side_left,text_side_right, text_front, text_front, text_top );
-			AddBedBlockDef((ushort)(Id+1), text_front,text_front, text_side_left, text_side_right, text_top );
+			//                             Left     			 Right      		Front       		Back        Top
+			AddBedBlockDef((ushort)(Id  ), text_front		,text_front , text_side_left	  , text_side_right	   , text_top_north ); // North
+			AddBedBlockDef((ushort)(Id+1), text_side_right			,text_side_left		 , text_front , text_front, text_top_east); // East
+			AddBedBlockDef((ushort)(Id+2), text_front	    ,text_front  , text_side_right , text_side_left, text_top_south ); // South
+			AddBedBlockDef((ushort)(Id+3), text_side_left			,text_side_right	 , text_front , text_front, text_top_west ); // West
 		}
 		public void AddBedBlockDef(ushort Id,  ushort text_side_left, ushort text_side_right,  ushort text_front, ushort text_top)
 		{
@@ -268,36 +280,50 @@ namespace MCGalaxy {
 		}
 		bool isBed(BlockID block)
 		{
-			return !(block<bedConfig.ID + 256 || block > bedConfig.ID + 256 + 4);
+			return !(block<bedConfig.ID + 256 || block > bedConfig.ID + 256 + 8);
 		}
 		void PlaceBed(Level level, ushort[] pos, int dir)
 		{
 			if (level.FastGetBlock(pos[0], pos[1], pos[2]) != 0)
 				return;
-			ushort dirt = dir> 1 ? (ushort)1 : (ushort)0;
+			ushort dirt = (ushort)dir;
 			ushort[] headPos = new ushort[]{pos[0], pos[1], pos[2]};
 			ushort[] footPos = new ushort[]{pos[0], pos[1], pos[2]};
 			switch (dir)
 			{
-			 	case 2:
-					headPos[0] = (ushort)(headPos[0]+1);
+			 	case 0:
+					headPos[0] = (ushort)(headPos[0]+1); // North
 					break;
-				case 3:
-					headPos[0] = (ushort)(headPos[0]-1);
-					break;
-				case 0:
-					headPos[2] = (ushort)(headPos[2]+1);
+				case 2:
+					headPos[0] = (ushort)(headPos[0]-1); // South
 					break;
 				case 1:
-					headPos[2] = (ushort)(headPos[2]-1);
+					headPos[2] = (ushort)(headPos[2]+1); // East
+					break;
+				case 3:
+					headPos[2] = (ushort)(headPos[2]-1); // West
 					break;
 			}
 			if (level.FastGetBlock(headPos[0], headPos[1], headPos[2]) != 0)
 				return;
 			ushort blockFoot= (ushort)(bedConfig.ID + 256 + dirt);
-			ushort blockHead= (ushort)(bedConfig.ID + 256 + 2 + dirt);
+			ushort blockHead= (ushort)(bedConfig.ID + 256 + 4 + dirt);
 			level.UpdateBlock(Player.Console, footPos[0], footPos[1], footPos[2], blockFoot);
 			level.UpdateBlock(Player.Console, headPos[0], headPos[1], headPos[2], blockHead);
+		}
+		int getDir(Player p )
+		{
+			byte angle = p.Rot.RotY;
+			if (angle < 90) // North
+				return 0;
+			if (angle < 180) // East
+				return 1;
+			if (angle < 200) // South
+				return 2;
+			if (angle < 255) // West
+				return 3;
+			return 3;
+
 		}
 		void HandleBlockChanged(Player p, ushort x, ushort y, ushort z, BlockID block, bool placing, ref bool cancel)
         {
@@ -307,7 +333,7 @@ namespace MCGalaxy {
 				return;
 			cancel = true;
 			p.RevertBlock(x, y, z);
-			PlaceBed(p.level, new ushort[]{x,y,z}, 2);
+			PlaceBed(p.level, new ushort[]{x,y,z}, getDir(p));
         }
 		void setBedSavePoint(Level level, Player p, ushort[] pos)
 		{
