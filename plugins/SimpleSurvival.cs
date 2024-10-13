@@ -13,8 +13,7 @@ using MCGalaxy.Network;
 using MCGalaxy.Commands;
 using MCGalaxy.Bots;
 namespace MCGalaxy {
-	
-	
+
 	public class SimpleSurvival : Plugin {
 		public override string name { get { return "SimpleSurvival"; } }
 		public override string MCGalaxy_Version { get { return "1.9.1.2"; } }
@@ -23,7 +22,61 @@ namespace MCGalaxy {
 		public override string creator { get { return "morgana, Venk"; } }
 		public override bool LoadAtStartup { get { return true; } }
 
-	
+		public class BlockMineConfig
+		{
+			public float PickaxeTimeMultiplier  = 1;
+			public float ShovelTimeMultiplier = 1;
+			public float AxeTimeMultiplier = 1;
+			public ushort MiningTime = 5;
+			public int overrideBlock = -1;
+			public BlockMineConfig(ushort time = 5)
+			{
+				this.MiningTime = time;
+			}
+		}
+		public class StoneMineConfig : BlockMineConfig
+		{
+			public StoneMineConfig(ushort time = 15)
+			{
+				PickaxeTimeMultiplier = 1.5f;
+				AxeTimeMultiplier = 0.2f;
+				ShovelTimeMultiplier = 0.2f;
+				MiningTime = time;
+			}
+		}
+		public class WoodMineConfig : BlockMineConfig
+		{
+			public WoodMineConfig(ushort time = 10)
+			{
+				AxeTimeMultiplier = 1.5f;
+				PickaxeTimeMultiplier = 1f;
+			    ShovelTimeMultiplier = 0.2f;
+			 	MiningTime = time;
+			}
+		}
+		public class DirtMineConfig : BlockMineConfig
+		{
+			public DirtMineConfig(ushort time = 4)
+			{
+				AxeTimeMultiplier = 0.2f;
+			 	PickaxeTimeMultiplier = 1f;
+				ShovelTimeMultiplier = 1.5f;
+				MiningTime = time;
+			}
+		}
+		public class CraftRecipe
+		{
+			public CraftRecipe(Dictionary<ushort,ushort> ingredients, ushort amountMultiplier = 1)
+			{
+				Ingredients = ingredients;
+				amountProduced = amountMultiplier;
+				//needCraftingTable = needcraftingTable;
+			}
+			public Dictionary<ushort,ushort> Ingredients = new Dictionary<ushort,ushort>();
+			public ushort amountProduced = 1;
+			//public bool needCraftingTable = false;
+			
+		}
 		public class Config {
 				// Player
 				public static int MaxHealth = 20;
@@ -43,10 +96,93 @@ namespace MCGalaxy {
 				public static bool CanKillMobs = true;
 				public static bool SpawnMobs = true; // Requires MobAI from https://github.com/ddinan/classicube-stuff/blob/master/MCGalaxy/Plugins/MobAI.cs
 				public static int MaxMobs = 50;
+
+				// Mining
+				public static bool MiningEnabled = true;
+
+				// Inventory
+				public static bool InventoryEnabled = true;
 		}
 		
-		
-		
+		ushort defaultMiningTime = 5;
+	
+		public Dictionary<ushort, BlockMineConfig> blockMiningTimes = new Dictionary<ushort, BlockMineConfig>()
+		{
+			// Stone
+			{1, new StoneMineConfig(){overrideBlock = 4}},
+			{2, new DirtMineConfig(){overrideBlock = 3}},
+			{3, new DirtMineConfig()},
+			{4, new StoneMineConfig()},
+			{5, new WoodMineConfig()},
+			{6, new BlockMineConfig(1)},
+			{12, new DirtMineConfig(3)},
+			{13, new DirtMineConfig(3)},
+			{14, new StoneMineConfig(30)},
+			{15, new StoneMineConfig(25)},
+			{16, new StoneMineConfig(){overrideBlock = 114}},
+			{17, new WoodMineConfig()},
+			{18, new DirtMineConfig(1)},
+			{19, new DirtMineConfig(1)},
+			{20, new DirtMineConfig(1)},
+			{34, new DirtMineConfig(1)},
+			{37, new DirtMineConfig(1)},
+			{38, new DirtMineConfig(1)},
+			{39, new DirtMineConfig(1)},
+			{41, new StoneMineConfig()},
+			{42, new StoneMineConfig()},
+			{43, new StoneMineConfig()},
+			{44, new StoneMineConfig()},
+			{45, new StoneMineConfig()},
+			{46, new DirtMineConfig(1)},
+			{47, new WoodMineConfig()},
+			{48, new StoneMineConfig()},
+			{49, new StoneMineConfig(30)},
+			{50, new StoneMineConfig()},
+			{53, new DirtMineConfig(1)},
+			{52, new StoneMineConfig()},
+			{60, new StoneMineConfig(10)},
+			{61, new StoneMineConfig()},
+			{62, new StoneMineConfig()},
+			{64, new WoodMineConfig()},
+			{54, new BlockMineConfig(0)},
+			{65, new StoneMineConfig()},
+			{75, new BlockMineConfig(1)},
+			{76, new WoodMineConfig()},
+			{77, new StoneMineConfig()},
+			{78, new StoneMineConfig(){overrideBlock = 77}},
+			{79, new StoneMineConfig(4)},
+			{80, new StoneMineConfig(4)},
+			{81, new StoneMineConfig(4)},
+			{82, new StoneMineConfig(4)},
+			{85, new BlockMineConfig(1)},
+			{86, new StoneMineConfig(25)},
+			{87, new StoneMineConfig(25)},
+			
+		};
+		public static Dictionary<ushort, CraftRecipe> craftingRecipies = new Dictionary<ushort, CraftRecipe>()
+		{
+			// Glass 											// Sand x1 (MOVE TO FURNACE LATER)
+			 {20, new CraftRecipe(new Dictionary<ushort, ushort>(){{12, 1}})},
+			// Furnace											// Cobblestone x8 = 1x Furnace
+			{77, new CraftRecipe(new Dictionary<ushort, ushort>(){{4, 8}})},
+			// Crafting Table									// Woodenblock x4 = 1x Crafting table
+			{76, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 4}})},
+			// Wood												// Log x 1 = 4x Wood planks
+			{5, new CraftRecipe(new Dictionary<ushort, ushort>(){{17, 1}}, 4)},
+			// Door												// Wood x 8 = 1x Wooden Door
+			{66, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 8}}, 1)},
+			// Stick												// Wood x 2 = 1x Stick
+			{115, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 2}}, 1)},
+			// Torch											// Stick x 1 + Coal x 1 = 4x Torches
+			{75, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 1}, {114, 1}}, 4)},
+			// Bed											// Wood x 3 + Wool x 3 = 1x Bed
+			{84, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 3}, {36, 3}})},
+			// Cake											// Wool x 3 = 1x Cake
+			{83, new CraftRecipe(new Dictionary<ushort, ushort>(){{36, 3}})},
+			// Wooden Sword									// Stick x 1 + wood x 2 = 1x Wooden sword
+			{99, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 1}, {5, 2}})},
+
+		};
 		
 		
 		
@@ -57,19 +193,26 @@ namespace MCGalaxy {
 		
 		Dictionary<ushort, ushort> toolDamage = new Dictionary<ushort, ushort>();
 		static Dictionary<ushort, float> toolKnockback = new Dictionary<ushort, float>();
+
+		public static Dictionary<string, Dictionary<string, Dictionary<ushort, ushort>>> playerInventories = new  Dictionary<string, Dictionary<string, Dictionary<ushort, ushort>>>();
+		public Dictionary<Player, ushort[]> playerMiningProgress = new Dictionary<Player, ushort[]>();
+
 		public override void Load(bool startup) {
 			//LOAD YOUR PLUGIN WITH EVENTS OR OTHER THINGS!
 			
 			OnPlayerClickEvent.Register(HandleBlockClicked, Priority.Low);
 			OnPlayerConnectEvent.Register(HandlePlayerConnect, Priority.Low);
+			OnBlockChangingEvent.Register(HandleBlockChanged, Priority.High);
 			OnPlayerMoveEvent.Register(HandlePlayerMove, Priority.High);
 			OnSentMapEvent.Register(HandleSentMap, Priority.Low);
 			OnPlayerDyingEvent.Register(HandlePlayerDying, Priority.High);
-			Server.MainScheduler.QueueRepeat(HandleDrown, null, TimeSpan.FromSeconds(1));
+			Server.MainScheduler.QueueRepeat(HandleDrown, null, TimeSpan.FromMilliseconds(500));
 			Server.MainScheduler.QueueRepeat(HandleGUI, null, TimeSpan.FromMilliseconds(100));
 			Server.MainScheduler.QueueRepeat(HandleRegeneration, null, TimeSpan.FromSeconds(4));
 			Server.MainScheduler.QueueRepeat(HandleMobSpawning, null, TimeSpan.FromSeconds(1));
 			Command.Register(new CmdPvP());
+			Command.Register(new CmdGiveBlock());
+			Command.Register(new CmdCraft());
 			
 			loadMaps();
 			foreach (Player p in PlayerInfo.Online.Items)
@@ -107,6 +250,12 @@ namespace MCGalaxy {
 			toolKnockback[99] = 1.2f;
 			toolKnockback[103] = 1.8f;
 			toolKnockback[107] = 2.2f;
+
+
+			foreach(Player p in PlayerInfo.Online.Items)
+			{
+				SendMiningUnbreakableMessage(p);
+			}
 		}
                         
 		public override void Unload(bool shutdown) {
@@ -114,6 +263,7 @@ namespace MCGalaxy {
 			OnPlayerClickEvent.Unregister(HandleBlockClicked);
 			OnPlayerConnectEvent.Unregister(HandlePlayerConnect);
 			OnPlayerMoveEvent.Unregister(HandlePlayerMove);
+			OnBlockChangingEvent.Unregister(HandleBlockChanged);
 			OnSentMapEvent.Unregister(HandleSentMap);
 			OnPlayerDyingEvent.Unregister(HandlePlayerDying);
 			
@@ -123,7 +273,8 @@ namespace MCGalaxy {
 			Server.MainScheduler.Cancel(mobSpawningTask);
 			
 			Command.Unregister(Command.Find("PvP"));
-			
+			Command.Unregister(Command.Find("GiveBlock"));
+			Command.Unregister(Command.Find("Craft"));
 			mobHealth.Clear();
 		}
 		public override void Help(Player p) {
@@ -145,8 +296,249 @@ namespace MCGalaxy {
                     }
                 }
             }
-            else File.Create(Config.Path + "maps.txt").Dispose();
+            else File.Create(Config.Path+ "maps.txt").Dispose();
         }
+
+		///////////////////////////////////////////////////////////
+		// Inventory
+		///////////////////////////////////////////////////////////
+		public Dictionary<ushort,ushort> getPlayerInventory(Player pl )
+		{
+			Dictionary<ushort, ushort> nullInventory = new Dictionary<ushort, ushort>();
+			if (!playerInventories.ContainsKey(pl.level.name))
+				return nullInventory;
+			if (!playerInventories[pl.level.name].ContainsKey(pl.name))
+				return nullInventory;
+			return playerInventories[pl.level.name][pl.name];
+		}
+		public void InventorySetBlock(Player pl, ushort block, ushort amount)
+		{
+			
+			if (!playerInventories.ContainsKey(pl.level.name))
+				playerInventories.Add(pl.level.name, new Dictionary<string, Dictionary<ushort, ushort>>());
+			if (!playerInventories[pl.level.name].ContainsKey(pl.name))
+				playerInventories[pl.level.name].Add(pl.name, new Dictionary<ushort, ushort>());
+			if (!playerInventories[pl.level.name][pl.name].ContainsKey(block))
+				playerInventories[pl.level.name][pl.name].Add(block, 0);
+			playerInventories[pl.level.name][pl.name][block] = amount;
+			SendMiningUnbreakableMessage(pl, block);
+		}
+
+		BlockMineConfig getBlockMineTime(ushort blockId)
+		{
+			if (blockId > 256)
+				blockId = (ushort)(blockId - 256);
+			if (!blockMiningTimes.ContainsKey(blockId))
+				return null;
+			return blockMiningTimes[blockId];
+		}
+		public static void InventoryAddBlocks(Player pl, ushort block, int amount)
+		{
+			if (amount < 0)
+			{
+				InventoryRemoveBlocks(pl, block, (ushort)(Math.Abs(amount)));
+				return;
+			}
+			InventoryAddBlocks(pl, block, (ushort)amount);
+		}
+		public static void InventoryAddBlocks(Player pl, ushort block, ushort amount)
+		{
+			ushort oldBlock = block;
+			if (block > 256)
+				block = (ushort)(block - 256);
+			if (!playerInventories.ContainsKey(pl.level.name))
+				playerInventories.Add(pl.level.name, new Dictionary<string, Dictionary<ushort, ushort>>());
+			if (!playerInventories[pl.level.name].ContainsKey(pl.name))
+				playerInventories[pl.level.name].Add(pl.name, new Dictionary<ushort, ushort>());
+			if (!playerInventories[pl.level.name][pl.name].ContainsKey(block))
+				playerInventories[pl.level.name][pl.name].Add(block, 0);
+			playerInventories[pl.level.name][pl.name][block] = (ushort)(playerInventories[pl.level.name][pl.name][block]  + amount);
+			SendMiningUnbreakableMessage(pl, block);
+		}
+		public static void InventoryRemoveBlocks(Player pl, ushort block, ushort amount)
+		{
+			ushort oldBlock = block;
+			if (block > 256)
+				block = (ushort)(block - 256);
+			if (!playerInventories.ContainsKey(pl.level.name))
+				return;
+			if (!playerInventories[pl.level.name].ContainsKey(pl.name))
+				return;
+			if (!playerInventories[pl.level.name][pl.name].ContainsKey(block))
+				return;
+			if (amount >= playerInventories[pl.level.name][pl.name][block])
+			{
+				playerInventories[pl.level.name][pl.name].Remove(block);
+				return;
+			}
+			playerInventories[pl.level.name][pl.name][block] = (ushort)(playerInventories[pl.level.name][pl.name][block] - amount);
+			SendMiningUnbreakableMessage(pl, block);
+		}
+		public static bool InventoryHasEnoughBlock(Player pl, ushort block, ushort amount=1)
+		{
+			return InventoryGetBlockAmount(pl, block) >= amount;
+		}
+		public static ushort InventoryGetBlockAmount(Player pl, ushort block)
+		{
+			if (block > 256)
+				block = (ushort)(block - 256);
+			if (!playerInventories.ContainsKey(pl.level.name))
+				return 0;
+			if (!playerInventories[pl.level.name].ContainsKey(pl.name))
+				return 0;
+			if (!playerInventories[pl.level.name][pl.name].ContainsKey(block))
+				return 0;
+			return playerInventories[pl.level.name][pl.name][block];
+		}
+		public static void Craft(Player pl, ushort block )
+		{
+			if (!craftingRecipies.ContainsKey(block))
+			{
+				pl.Message("Recipe doesn't exist for this block!");
+				return;
+			}
+			foreach(var pair in craftingRecipies[block].Ingredients)
+			{
+				if (!InventoryHasEnoughBlock(pl, pair.Key, pair.Value))
+				{
+					pl.Message("Not enough items!");
+					return;
+				}
+			}
+			foreach(var pair in craftingRecipies[block].Ingredients)
+			{
+				InventoryRemoveBlocks(pl, pair.Key, pair.Value);
+			}
+			InventoryAddBlocks(pl, block, craftingRecipies[block].amountProduced);
+			SetHeldBlock(pl, 0);
+			SetHeldBlock(pl, block);
+		}
+		public static Dictionary<ushort,CraftRecipe>  GenerateCraftOptions(Player pl)
+		{
+			Dictionary<ushort,CraftRecipe> validCraftables = new Dictionary<ushort,CraftRecipe> ();
+			foreach(var recipePair in craftingRecipies)
+			{
+				bool valid = true;
+				foreach(var pair in recipePair.Value.Ingredients)
+				{
+					if (!InventoryHasEnoughBlock(pl, pair.Key, pair.Value))
+					{
+						valid = false;
+						break;
+					}
+				}
+				if (!valid)
+					continue;
+				validCraftables.Add(recipePair.Key, recipePair.Value);
+			}
+			return validCraftables;
+		}
+		public static string GenerateCraftOptionsMessage(Player p)
+		{
+			Dictionary<ushort,CraftRecipe> validRecipes = GenerateCraftOptions(p);
+			string message = "Valid craftables:\n";
+			/*for (int i=0; i< validRecipes.Keys.Count; i++)
+			{
+				message += i.ToString() + ". " + validRecipes.Keys[i];
+			}*/
+			return message;
+		}
+		///////////////////////////////////////////////////////////
+		// Mining
+		///////////////////////////////////////////////////////////
+		private static void SendMiningUnbreakableMessage(Player p)
+		{
+			if (!Config.MiningEnabled)
+				return;
+			bool extBlocks = p.Session.hasExtBlocks;
+            int count = p.Session.MaxRawBlock + 1;
+            int size  = extBlocks ? 5 : 4;
+            byte[] bulk = new byte[count * size];
+            Level level = p.level;
+            for (int i = 0; i < count; i++) 
+            {
+                Packet.WriteBlockPermission((BlockID)i, i != 0 ? InventoryHasEnoughBlock(p, (ushort)i) : true, i == 0 ? true : false, p.Session.hasExtBlocks, bulk, i * size);
+            }
+            p.Send(bulk);
+		}
+		private static void SendMiningUnbreakableMessage(Player p, BlockID id)
+		{
+			if (!Config.MiningEnabled)
+				return;
+			bool extBlocks = p.Session.hasExtBlocks;
+            int count = 1;//p.Session.MaxRawBlock + 1;
+            int size  = extBlocks ? 5 : 4;
+            byte[] bulk = new byte[count * size];
+			if (id > 256)
+				id = (ushort)(id - 256);
+            Packet.WriteBlockPermission((BlockID)id, id != 0 ? InventoryHasEnoughBlock(p, (ushort)id) : true, id == 0 ? true : false, p.Session.hasExtBlocks, bulk, 0);
+            p.Send(bulk);
+		}
+		private void MineBlock(Player pl, ushort[] pos)
+		{
+			ushort blockType = pl.level.GetBlock(pos[0], pos[1], pos[2]);
+			ushort oldBlockType = blockType;
+			if (blockType == 0 || blockType == 0xff)
+				return;
+			BlockMineConfig blockMineData = getBlockMineTime(blockType);
+			if (blockMineData == null)
+				return;
+			if (!playerMiningProgress.ContainsKey(pl))
+			{
+				playerMiningProgress.Add(pl, new ushort[5]{blockType,0,pos[0], pos[1], pos[2]});
+				return;
+			}
+			ushort[] currentProgress = playerMiningProgress[pl];
+			if (currentProgress[0] != blockType || (pos[0] != currentProgress[2] || pos[1] != currentProgress[3] || pos[2] != currentProgress[4]))
+			{
+				playerMiningProgress[pl] = new ushort[5]{blockType,0,pos[0], pos[1], pos[2]};
+				return;
+			}
+			playerMiningProgress[pl][1] += 2;
+
+			if (playerMiningProgress[pl][1] < blockMineData.MiningTime)
+				return;
+			playerMiningProgress.Remove(pl);
+			pl.level.UpdateBlock(pl, pos[0], pos[1], pos[2], 0);
+			OnBlockChangedEvent.Call(Player.Console, pos[0], pos[1], pos[2], ChangeResult.Modified);
+			if (blockMineData.overrideBlock != -1)
+			{
+				blockType = (ushort)blockMineData.overrideBlock;
+				oldBlockType = blockType;
+				if (blockType > 256)
+					blockType = (ushort)(blockType -256);
+			}
+			InventoryAddBlocks(pl, blockType, 1);
+			if (InventoryGetBlockAmount(pl, blockType) == 1)
+			{
+				SetHeldBlock(pl, 0);
+				SetHeldBlock(pl, blockType);
+			}
+		}
+		private void UnMineBlock(Player pl)
+		{
+			if (!playerMiningProgress.ContainsKey(pl))
+				return;
+			ushort lastProg = 0;
+			try
+			{
+			 	lastProg = (ushort)pl.Extras["MINING_LASTPROG"];
+			}
+			catch
+			{
+				pl.Extras["MINING_LASTPROG"] = (ushort)0;
+			}
+			if (lastProg < playerMiningProgress[pl][1])
+			{
+				pl.Extras["MINING_LASTPROG"] = playerMiningProgress[pl][1];
+				return;
+			}
+			playerMiningProgress[pl][1]--;
+			pl.Extras["MINING_LASTPROG"] = playerMiningProgress[pl][1];
+			if (playerMiningProgress[pl][1] > 1)
+				return;
+			playerMiningProgress.Remove(pl);
+		}
 		///////////////////////////////////////////////////////////
 		// Handlers
 		///////////////////////////////////////////////////////////
@@ -201,12 +593,39 @@ namespace MCGalaxy {
 				SetGuiText(p,"","");
 				p.Extras["SURVIVAL_HEALTH"] = Config.MaxHealth;
 				p.Extras["SURVIVAL_AIR"] = Config.MaxAir;
+				p.Extras["MINING_LASTPROG"] = 0;
 				return;
 			}
 			InitPlayer(p);
 			p.Extras["SURVIVAL_HEALTH"] = Config.MaxHealth;
 			p.Extras["SURVIVAL_AIR"] = Config.MaxAir;
+			p.Extras["MINING_LASTPROG"] = 0;
 			SendPlayerGui(p);
+			SendMiningUnbreakableMessage(p);
+		}
+		void HandleBlockChanged(Player p, ushort x, ushort y, ushort z, BlockID block, bool placing, ref bool cancel)
+        {
+			if (p == Player.Console)
+				return;
+			if (placing == false && Config.MiningEnabled)
+			{
+				cancel = true;
+				p.RevertBlock(x,y,z);
+				return;
+			}
+			if (cancel || !placing)
+				return;
+			if (!Config.InventoryEnabled)
+				return;
+			if (!InventoryHasEnoughBlock(p, block))
+			{
+				cancel = true;
+				p.RevertBlock(x,y,z);
+				p.Message("Insufficent amount of block \"" + block.ToString() + "\".");
+				return;
+			}
+			InventoryRemoveBlocks(p, block, 1);
+			SendMiningUnbreakableMessage(p, block);
 		}
 		void HandleDrown(SchedulerTask task)
 		{
@@ -214,6 +633,7 @@ namespace MCGalaxy {
             foreach (Player p in PlayerInfo.Online.Items)
 			{
 				if (!maplist.Contains(p.level.name)) continue;
+				UnMineBlock(p);
 				if (p.invincible) continue;
 				if (IsDrowning(p))
 				{
@@ -297,6 +717,7 @@ namespace MCGalaxy {
 		{
 			if (!maplist.Contains(p.level.name)) return;
 			InitPlayer(p);
+			SendMiningUnbreakableMessage(p);
 		}
 		int GetLagCompensation(int ping)
 		{
@@ -336,6 +757,10 @@ namespace MCGalaxy {
 				{
 					PlayerBot.Remove(bot);
 					continue;
+				}
+				if (bot.Pos.BlockX > level.Width || bot.Pos.BlockY < 0 || bot.Pos.BlockZ > level.Length)
+				{
+					PlayerBot.Remove(bot);
 				}
 				BlockID gb = level.FastGetBlock((ushort)bot.Pos.BlockX, (ushort)(bot.Pos.BlockY+1), (ushort)bot.Pos.BlockZ);
 				if (gb == 9 || gb == 8 || gb == 10 || gb == 11) // water, lava etc
@@ -556,6 +981,8 @@ namespace MCGalaxy {
 				block = (ushort)(block - 256);
 			if (!toolDamage.ContainsKey(block))
 				return 2;
+			if (!InventoryHasEnoughBlock(p, block))
+				return 2;
 			return toolDamage[block];
 		}
 		static float getKnockback(Player p)
@@ -564,6 +991,8 @@ namespace MCGalaxy {
 			if (block >= 66)
 				block = (ushort)(block - 256);
 			if (!toolKnockback.ContainsKey(block))
+				return 1f;
+			if (!InventoryHasEnoughBlock(p, block))
 				return 1f;
 			return toolKnockback[block];
 		}
@@ -632,7 +1061,7 @@ namespace MCGalaxy {
                 PlayerBot.Remove(hit);
             }
         }
-		void HandleBlockClicked(Player p, MouseButton button, MouseAction action, ushort yaw, ushort pitch, byte entity, ushort x, ushort y, ushort z, TargetBlockFace face)
+		void AttemptPvp(Player p, MouseButton button, MouseAction action, ushort yaw, ushort pitch, byte entity, ushort x, ushort y, ushort z, TargetBlockFace face)
 		{
 			if (!maplist.Contains(p.level.name)) return;
 			if (button != MouseButton.Left) return;
@@ -675,6 +1104,12 @@ namespace MCGalaxy {
 			if (!CanHitPlayer(p, victim)) return;
 			DoHit(p, victim);
 			p.Extras["PVP_HIT_COOLDOWN"] = DateTime.UtcNow.AddMilliseconds(400 - GetLagCompensation(p.Session.Ping.AveragePing()));
+		}
+		void HandleBlockClicked(Player p, MouseButton button, MouseAction action, ushort yaw, ushort pitch, byte entity, ushort x, ushort y, ushort z, TargetBlockFace face)
+		{
+			if (Config.MiningEnabled && button == MouseButton.Left && entity == 255)
+				MineBlock(p, new ushort[]{x, y, z});
+			AttemptPvp(p, button, action, yaw, pitch, entity, x, y, z, face);
 		}
 		void HandleRegeneration(SchedulerTask task)
         {
@@ -719,10 +1154,40 @@ namespace MCGalaxy {
 			int repeat = air; //(int)Math.Round((double)(air/Config.MaxAir) * 10);
 			return ("%9" + new string('♥', repeat)+ "%8" + new string('♥', Config.MaxAir-air ));
 		}
+		string getHeldBlockAmount(Player p)
+		{
+			ushort block = p.GetHeldBlock();
+			if (block <= 0)
+				return "";
+			ushort amount = InventoryGetBlockAmount(p, block);
+			/*if (amount == 0)
+			{
+				//SetHeldBlock(p, 0);
+				return "";
+			}*/
+			return amount.ToString();
+		}
+		string getMiningProgressBar(Player p)
+		{
+			if (!playerMiningProgress.ContainsKey(p))
+				return "";
+			if (playerMiningProgress[p][0] == 255)
+				return "";
+			BlockMineConfig blockMineData = getBlockMineTime(playerMiningProgress[p][0]);
+			if (blockMineData == null)
+				return "";
+			if (playerMiningProgress[p][1] > blockMineData.MiningTime)
+				return "";
+			int amount =  Math.Min(10, (int) (( (float)playerMiningProgress[p][1] / (float)blockMineData.MiningTime) * 10));
+
+			return "%7" + new string('#', amount) + "%8" + new string('#', 10 - amount);
+		}
 		void SendPlayerGui(Player p)
 		{
 			if (!maplist.Contains(p.level.name)) return;
-			SetGuiText(p, GetHealthBar	(GetHealth	(p)),GetAirBar		(GetAir		(p)));
+			SetGuiText(p, GetHealthBar	(GetHealth	(p)),GetAirBar		(GetAir		(p)), getHeldBlockAmount(p));
+
+			p.SendCpeMessage(CpeMessageType.SmallAnnouncement, getMiningProgressBar(p));
 		}
 		///////////////////////////////////////////////////////////////////////////
 		// UTILITIES
@@ -750,6 +1215,12 @@ namespace MCGalaxy {
 		public void SetAir(Player p, int air)
 		{
 			p.Extras["SURVIVAL_AIR"] = air;
+		}
+		public static void SetHeldBlock(Player p, ushort blockId)
+		{
+			 if (!p.Supports(CpeExt.HeldBlock))
+			 	return;
+			p.Session.SendHoldThis(blockId, false);
 		}
 		public bool IsBurning(Player p)
 		{
@@ -799,10 +1270,11 @@ namespace MCGalaxy {
 			p.HandleDeath(reason, immediate: true);	
 			InitPlayer(p);
 		}
-		static void SetGuiText(Player p, string top, string bottom)
+		static void SetGuiText(Player p, string top, string bottom, string bottom2 = "")
 		{
 			p.SendCpeMessage(CpeMessageType.Status1, top);
 			p.SendCpeMessage(CpeMessageType.Status2, bottom);
+			p.SendCpeMessage(CpeMessageType.Status3, bottom2);
 		}
 		public void InitPlayer(Player p)
 		{
@@ -974,6 +1446,103 @@ namespace MCGalaxy {
                 }
             }
             return false;*/
+        }
+	}
+	public sealed class CmdGiveBlock : Command2
+    {
+        public override string name { get { return "GiveBlock"; } }
+        public override string type { get { return CommandTypes.Games; } }
+        public override LevelPermission defaultRank { get { return LevelPermission.Admin; } }
+
+        public override void Use(Player p, string message, CommandData data)
+        {
+            if (message.Length == 0 || message.SplitSpaces().Length < 2)
+            {
+                Help(p);
+                return;
+            }
+            string[] args = message.SplitSpaces();
+			int matches;
+            Player who = PlayerInfo.FindMatches(p, args[0], out matches);
+			if (who == null)
+			{
+				p.Message("Couldn't find player " + args[0]);
+				return;
+			}
+			ushort blockId = 0;
+			try
+			{
+				 blockId = ushort.Parse(args[1]);
+			}
+			catch(Exception e)
+			{
+				Help(p);
+				return;
+			}
+			ushort amount = 1;
+			if (args.Length > 2)
+			{
+				try
+				{
+					amount = ushort.Parse(args[2]);
+				}
+				catch(Exception e)
+				{
+					Help(p);
+					return;
+				}
+			}
+			MCGalaxy.SimpleSurvival.InventoryAddBlocks(p, blockId, amount);
+			p.Message("Gave " + who.name + " x" + args[2] + " " + args[1]);
+        }
+		public override void Help(Player p)
+        {
+            p.Message("%T/GiveBlock <Player> <BlockId> <Amount=1>");
+        }
+	}
+	public sealed class CmdCraft : Command2
+    {
+        public override string name { get { return "Craft"; } }
+        public override string type { get { return CommandTypes.Games; } }
+        public override LevelPermission defaultRank { get { return LevelPermission.Admin; } }
+
+        public override void Use(Player p, string message, CommandData data)
+        {
+            if (message.Length == 0 || message.SplitSpaces().Length < 2)
+            {
+                Help(p);
+                return;
+            }
+            string[] args = message.SplitSpaces();
+			ushort blockId = 0;
+			try
+			{
+				 blockId = ushort.Parse(args[0]);
+			}
+			catch(Exception e)
+			{
+				Help(p);
+				return;
+			}
+			ushort amount = 1;
+			if (args.Length > 1)
+			{
+				try
+				{
+					amount = ushort.Parse(args[1]);
+				}
+				catch(Exception e)
+				{
+					Help(p);
+					return;
+				}
+			}
+			MCGalaxy.SimpleSurvival.Craft(p, blockId);
+			p.Message("Crafted stuff");
+        }
+		public override void Help(Player p)
+        {
+            p.Message("%T/Craft <BlockId> <Amount=1>");
         }
 	}
 	public sealed class CmdPvP : Command2

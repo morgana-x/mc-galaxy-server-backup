@@ -221,6 +221,14 @@ namespace MCGalaxy {
 			},
 			new SurvivalTool()
 			{
+				NAME = "Stick",
+				TEXTURE = 255,
+				ID = 115,
+				IsSword = false,
+				IsSprite = true
+			},
+			new SurvivalTool()
+			{
 				NAME = "Cookie",
 				TEXTURE = 201,
 				ID = 116,
@@ -296,6 +304,17 @@ namespace MCGalaxy {
 				def.LeftTex = Texture; def.RightTex = Texture;
 				def.FrontTex = Texture; def.BackTex = Texture;
 				def.InventoryOrder = -1;
+			ushort block = Id;
+			 if (true) {
+					BlockPerms perms = BlockPerms.GetPlace((ushort)(block + 256));
+					perms.MinRank = LevelPermission.Nobody;
+				 }
+				BlockPerms.Save();
+				BlockPerms.ApplyChanges();
+
+				if (!Block.IsPhysicsType(block)) {
+					BlockPerms.ResendAllBlockPermissions();
+				}        
 			AddBlockDef(def);
 		}
 		public void AddBlockDef(string name, ushort Id, ushort MinX, ushort MinY, ushort MinZ, ushort MaxX, ushort MaxY, ushort MaxZ, ushort TEXTURE_SIDE, ushort TEXTURE_FRONT, ushort TEXTURE_TOP, ushort TEXTURE_BOTTOM, bool Transperant, int Brightness=0)

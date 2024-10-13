@@ -626,6 +626,8 @@ namespace MCGalaxy {
 		}
 		void HandleBlockChanged(Player p, ushort x, ushort y, ushort z, BlockID block, bool placing, ref bool cancel)
         {
+			if (cancel)
+				return;
 			if (IsDoor(p.level,x,y,z))
 			{
 				p.RevertBlock(x, y, z);

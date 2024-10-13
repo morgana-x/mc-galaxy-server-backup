@@ -150,6 +150,8 @@ namespace MCGalaxy {
 		}
 		void HandleBlockChanged(Player p, ushort x, ushort y, ushort z, BlockID block, bool placing, ref bool cancel)
         {
+			if (cancel)
+				return;
 			if (placing && block == cakeConfig.ITEM_ID+256)
 			{
 				
