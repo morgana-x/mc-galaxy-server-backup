@@ -124,7 +124,21 @@ namespace MCGalaxy {
 			{18, new DirtMineConfig(1)},
 			{19, new DirtMineConfig(1)},
 			{20, new DirtMineConfig(1)},
+			{21, new DirtMineConfig(1)},
+			{22, new DirtMineConfig(1)},
+			{23, new DirtMineConfig(1)},
+			{24, new DirtMineConfig(1)},
+			{25, new DirtMineConfig(1)},
+			{26, new DirtMineConfig(1)},
+			{27, new DirtMineConfig(1)},
+			{28, new DirtMineConfig(1)},
+			{29, new DirtMineConfig(1)},	
+			{30, new DirtMineConfig(1)},
+			{31, new DirtMineConfig(1)},
+			{32, new DirtMineConfig(1)},
 			{34, new DirtMineConfig(1)},
+			{35, new DirtMineConfig(1)},
+			{36, new DirtMineConfig(1)},
 			{37, new DirtMineConfig(1)},
 			{38, new DirtMineConfig(1)},
 			{39, new DirtMineConfig(1)},
@@ -169,12 +183,16 @@ namespace MCGalaxy {
 			{76, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 4}})},
 			// Wood												// Log x 1 = 4x Wood planks
 			{5, new CraftRecipe(new Dictionary<ushort, ushort>(){{17, 1}}, 4)},
+			// Brick
+			{45, new CraftRecipe(new Dictionary<ushort, ushort>(){{4, 2}}, 1)},
 			// Door												// Wood x 8 = 1x Wooden Door
 			{66, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 8}}, 1)},
 			// Stick												// Wood x 2 = 1x Stick
 			{115, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 2}}, 1)},
 			// Torch											// Stick x 1 + Coal x 1 = 4x Torches
 			{75, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 1}, {114, 1}}, 4)},
+			// Glowstone										// 9x torches = 4x glowstone
+			{79, new CraftRecipe(new Dictionary<ushort, ushort>(){{75, 9}}, 4)},
 			// Bed											// Wood x 3 + Wool x 3 = 1x Bed
 			{84, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 3}, {36, 3}})},
 			// Cake											// Wool x 3 = 1x Cake
@@ -390,7 +408,7 @@ namespace MCGalaxy {
 				return 0;
 			return playerInventories[pl.level.name][pl.name][block];
 		}
-		public static void Craft(Player pl, ushort block )
+		public static void Craft(Player pl, ushort block, ushort amount=1)
 		{
 			if (!craftingRecipies.ContainsKey(block))
 			{
@@ -399,7 +417,7 @@ namespace MCGalaxy {
 			}
 			foreach(var pair in craftingRecipies[block].Ingredients)
 			{
-				if (!InventoryHasEnoughBlock(pl, pair.Key, pair.Value))
+				if (!InventoryHasEnoughBlock(pl, pair.Key, (ushort)(pair.Value * amount)))
 				{
 					pl.Message("Not enough items!");
 					return;
@@ -407,9 +425,9 @@ namespace MCGalaxy {
 			}
 			foreach(var pair in craftingRecipies[block].Ingredients)
 			{
-				InventoryRemoveBlocks(pl, pair.Key, pair.Value);
+				InventoryRemoveBlocks(pl, pair.Key, (ushort)(pair.Value * amount));
 			}
-			InventoryAddBlocks(pl, block, craftingRecipies[block].amountProduced);
+			InventoryAddBlocks(pl, block, (ushort)(craftingRecipies[block].amountProduced * amount));
 			SetHeldBlock(pl, 0);
 			SetHeldBlock(pl, block);
 		}
@@ -1504,7 +1522,7 @@ namespace MCGalaxy {
     {
         public override string name { get { return "Craft"; } }
         public override string type { get { return CommandTypes.Games; } }
-        public override LevelPermission defaultRank { get { return LevelPermission.Admin; } }
+        public override LevelPermission defaultRank { get { return LevelPermission.Guest; } }
 
         public override void Use(Player p, string message, CommandData data)
         {
@@ -1537,7 +1555,7 @@ namespace MCGalaxy {
 					return;
 				}
 			}
-			MCGalaxy.SimpleSurvival.Craft(p, blockId);
+			MCGalaxy.SimpleSurvival.Craft(p, blockId, amount);
 			p.Message("Crafted stuff");
         }
 		public override void Help(Player p)
