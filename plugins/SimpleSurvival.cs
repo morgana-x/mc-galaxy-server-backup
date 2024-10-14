@@ -199,6 +199,10 @@ namespace MCGalaxy {
 			{83, new CraftRecipe(new Dictionary<ushort, ushort>(){{36, 3}})},
 			// Wooden Sword									// Stick x 1 + wood x 2 = 1x Wooden sword
 			{99, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 1}, {5, 2}})},
+			// Wooden Shovel									// Stick x 2 + wood x 1 = 1x Wooden Shovel
+			{100, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {5, 1}})},
+			// Wooden PIck									// Stick x 2 + wood x 1 = 1x Wooden Shovel
+			{101, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {5, 1}})},
 
 		};
 		
