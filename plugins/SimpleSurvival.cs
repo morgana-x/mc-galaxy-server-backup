@@ -207,6 +207,10 @@ namespace MCGalaxy {
 		{
 			// Glass 											// Sand x1 (MOVE TO FURNACE LATER)
 			 {20, new CraftRecipe(new Dictionary<ushort, ushort>(){{12, 1}})},
+			 // Iron Ingot										// Iron Orex1 (MOVE TO FURNACE LATER)
+			{113, new CraftRecipe(new Dictionary<ushort, ushort>(){{15, 1}})},
+			// Gold bar											// Gold Orex1 (MOVE TO FURNACE LATER)
+			{112, new CraftRecipe(new Dictionary<ushort, ushort>(){{14,1}})},
 			// Furnace											// Cobblestone x8 = 1x Furnace
 			{77, new CraftRecipe(new Dictionary<ushort, ushort>(){{4, 8}})},
 			// Crafting Table									// Woodenblock x4 = 1x Crafting table
@@ -231,9 +235,18 @@ namespace MCGalaxy {
 			{99, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 1}, {5, 2}})},
 			// Wooden Shovel									// Stick x 2 + wood x 1 = 1x Wooden Shovel
 			{100, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {5, 1}})},
-			// Wooden PIck									// Stick x 2 + wood x 1 = 1x Wooden Shovel
-			{101, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {5, 1}})},
-
+			// Wooden PIck									// Stick x 2 + wood x 3 = 1x Wooden Pick
+			{101, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {5, 3}})},
+			// Wooden Axe									// Stick x 2 + wood x 4 = 1x Wooden Axe
+			{102, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {5, 4}})},
+			// Stone Sword									// Stick x 1 + stone x 2 = 1x stone sword
+			{95, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 1}, {1, 2}})},
+			// Stone Shovel									// Stick x 2 + stone x 1 = 1x stone Shovel
+			{96, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {1, 1}})},
+			// Stone PIck									// Stick x 2 + stone x 3 = 1x stone Pick
+			{97, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {1, 3}})},
+			// Stone Axe									// Stick x 2 + stone x 4 = 1x stone Axe
+			{98, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {1, 4}})},
 		};
 		
 		
