@@ -36,7 +36,7 @@ namespace MCGalaxy {
 		}
 		public class StoneMineConfig : BlockMineConfig
 		{
-			public StoneMineConfig(ushort time = 15)
+			public StoneMineConfig(ushort time = 30)
 			{
 				PickaxeTimeMultiplier = 1.5f;
 				AxeTimeMultiplier = 0.2f;
@@ -46,7 +46,7 @@ namespace MCGalaxy {
 		}
 		public class WoodMineConfig : BlockMineConfig
 		{
-			public WoodMineConfig(ushort time = 10)
+			public WoodMineConfig(ushort time = 15)
 			{
 				AxeTimeMultiplier = 1.5f;
 				PickaxeTimeMultiplier = 1f;
@@ -56,9 +56,29 @@ namespace MCGalaxy {
 		}
 		public class DirtMineConfig : BlockMineConfig
 		{
-			public DirtMineConfig(ushort time = 4)
+			public DirtMineConfig(ushort time = 12)
 			{
 				AxeTimeMultiplier = 0.2f;
+			 	PickaxeTimeMultiplier = 1f;
+				ShovelTimeMultiplier = 1.5f;
+				MiningTime = time;
+			}
+		}
+		public class WoolMineConfig : BlockMineConfig
+		{
+			public WoolMineConfig(ushort time = 7)
+			{
+				AxeTimeMultiplier = 1f;
+			 	PickaxeTimeMultiplier = 1f;
+				ShovelTimeMultiplier = 1f;
+				MiningTime = time;
+			}
+		}
+		public class SandMineConfig : BlockMineConfig
+		{
+			public SandMineConfig(ushort time = 7)
+			{
+				AxeTimeMultiplier = 1f;
 			 	PickaxeTimeMultiplier = 1f;
 				ShovelTimeMultiplier = 1.5f;
 				MiningTime = time;
@@ -106,7 +126,7 @@ namespace MCGalaxy {
 		
 		ushort defaultMiningTime = 5;
 	
-		public Dictionary<ushort, BlockMineConfig> blockMiningTimes = new Dictionary<ushort, BlockMineConfig>()
+		public static Dictionary<ushort, BlockMineConfig> blockMiningTimes = new Dictionary<ushort, BlockMineConfig>()
 		{
 			// Stone
 			{1, new StoneMineConfig(){overrideBlock = 4}},
@@ -115,43 +135,44 @@ namespace MCGalaxy {
 			{4, new StoneMineConfig()},
 			{5, new WoodMineConfig()},
 			{6, new BlockMineConfig(1)},
-			{12, new DirtMineConfig(3)},
-			{13, new DirtMineConfig(3)},
+			{12, new SandMineConfig()},
+			{13, new SandMineConfig()},
 			{14, new StoneMineConfig(30)},
 			{15, new StoneMineConfig(25)},
 			{16, new StoneMineConfig(){overrideBlock = 114}},
 			{17, new WoodMineConfig()},
-			{18, new DirtMineConfig(1)},
-			{19, new DirtMineConfig(1)},
-			{20, new DirtMineConfig(1)},
-			{21, new DirtMineConfig(1)},
-			{22, new DirtMineConfig(1)},
-			{23, new DirtMineConfig(1)},
-			{24, new DirtMineConfig(1)},
-			{25, new DirtMineConfig(1)},
-			{26, new DirtMineConfig(1)},
-			{27, new DirtMineConfig(1)},
-			{28, new DirtMineConfig(1)},
-			{29, new DirtMineConfig(1)},	
-			{30, new DirtMineConfig(1)},
-			{31, new DirtMineConfig(1)},
-			{32, new DirtMineConfig(1)},
-			{34, new DirtMineConfig(1)},
-			{35, new DirtMineConfig(1)},
-			{36, new DirtMineConfig(1)},
-			{37, new DirtMineConfig(1)},
-			{38, new DirtMineConfig(1)},
-			{39, new DirtMineConfig(1)},
+			{18, new DirtMineConfig(2) {overrideBlock = 0}},
+			{19, new DirtMineConfig(4)},
+			{20, new DirtMineConfig(2)},
+			{21, new WoolMineConfig()},
+			{22, new WoolMineConfig()},
+			{23, new WoolMineConfig()},
+			{24, new WoolMineConfig()},
+			{25, new WoolMineConfig()},
+			{26, new WoolMineConfig()},
+			{27, new WoolMineConfig()},
+			{28, new WoolMineConfig()},
+			{29, new WoolMineConfig()},	
+			{30, new WoolMineConfig()},
+			{31, new WoolMineConfig()},
+			{32, new WoolMineConfig()},
+			{34, new WoolMineConfig()},
+			{35, new WoolMineConfig()},
+			{36, new WoolMineConfig()},
+			{37, new WoolMineConfig()},
+			{38, new WoolMineConfig()},
+			{39, new WoolMineConfig()},
 			{41, new StoneMineConfig()},
 			{42, new StoneMineConfig()},
 			{43, new StoneMineConfig()},
 			{44, new StoneMineConfig()},
 			{45, new StoneMineConfig()},
-			{46, new DirtMineConfig(1)},
+			{46, new DirtMineConfig(5)},
 			{47, new WoodMineConfig()},
 			{48, new StoneMineConfig()},
 			{49, new StoneMineConfig(30)},
 			{50, new StoneMineConfig()},
+			{51, new WoodMineConfig()},
 			{53, new DirtMineConfig(1)},
 			{52, new StoneMineConfig()},
 			{60, new StoneMineConfig(10)},
@@ -160,7 +181,7 @@ namespace MCGalaxy {
 			{64, new WoodMineConfig()},
 			{54, new BlockMineConfig(0)},
 			{65, new StoneMineConfig()},
-			{75, new BlockMineConfig(1)},
+			{75, new WoodMineConfig(5)}, // Torch
 			{76, new WoodMineConfig()},
 			{77, new StoneMineConfig()},
 			{78, new StoneMineConfig(){overrideBlock = 77}},
@@ -173,6 +194,15 @@ namespace MCGalaxy {
 			{87, new StoneMineConfig(25)},
 			
 		};
+		public static void SetMineTime(ushort blockId, BlockMineConfig config)
+		{
+			if (!blockMiningTimes.ContainsKey(blockId))
+			{
+				blockMiningTimes.Add(blockId, config);
+				return;
+			}
+			blockMiningTimes[blockId] = config;
+		}
 		public static Dictionary<ushort, CraftRecipe> craftingRecipies = new Dictionary<ushort, CraftRecipe>()
 		{
 			// Glass 											// Sand x1 (MOVE TO FURNACE LATER)
@@ -218,7 +248,7 @@ namespace MCGalaxy {
 
 		public static Dictionary<string, Dictionary<string, Dictionary<ushort, ushort>>> playerInventories = new  Dictionary<string, Dictionary<string, Dictionary<ushort, ushort>>>();
 		public Dictionary<Player, ushort[]> playerMiningProgress = new Dictionary<Player, ushort[]>();
-
+		public Dictionary<Player, PlayerBot> mineProgressIndicators = new Dictionary<Player, PlayerBot>();
 		public override void Load(bool startup) {
 			//LOAD YOUR PLUGIN WITH EVENTS OR OTHER THINGS!
 			
@@ -228,6 +258,8 @@ namespace MCGalaxy {
 			OnPlayerMoveEvent.Register(HandlePlayerMove, Priority.High);
 			OnSentMapEvent.Register(HandleSentMap, Priority.Low);
 			OnPlayerDyingEvent.Register(HandlePlayerDying, Priority.High);
+			OnPlayerDisconnectEvent.Register(HandlePlayerDisconnect, Priority.Low);
+			
 			Server.MainScheduler.QueueRepeat(HandleDrown, null, TimeSpan.FromMilliseconds(500));
 			Server.MainScheduler.QueueRepeat(HandleGUI, null, TimeSpan.FromMilliseconds(100));
 			Server.MainScheduler.QueueRepeat(HandleRegeneration, null, TimeSpan.FromSeconds(4));
@@ -235,7 +267,7 @@ namespace MCGalaxy {
 			Command.Register(new CmdPvP());
 			Command.Register(new CmdGiveBlock());
 			Command.Register(new CmdCraft());
-			
+			addBreakBlocks();
 			loadMaps();
 			foreach (Player p in PlayerInfo.Online.Items)
 			{
@@ -288,7 +320,7 @@ namespace MCGalaxy {
 			OnBlockChangingEvent.Unregister(HandleBlockChanged);
 			OnSentMapEvent.Unregister(HandleSentMap);
 			OnPlayerDyingEvent.Unregister(HandlePlayerDying);
-			
+			OnPlayerDisconnectEvent.Unregister(HandlePlayerDisconnect);
 			Server.MainScheduler.Cancel(drownTask);
 			Server.MainScheduler.Cancel(guiTask);
 			Server.MainScheduler.Cancel(regenTask);
@@ -298,6 +330,13 @@ namespace MCGalaxy {
 			Command.Unregister(Command.Find("GiveBlock"));
 			Command.Unregister(Command.Find("Craft"));
 			mobHealth.Clear();
+
+			foreach(var pair in mineProgressIndicators)
+			{
+				PlayerBot.Remove(pair.Value);
+			}
+			mineProgressIndicators.Clear();
+			playerMiningProgress.Clear();
 		}
 		public override void Help(Player p) {
 			//HELP INFO!
@@ -434,6 +473,7 @@ namespace MCGalaxy {
 			InventoryAddBlocks(pl, block, (ushort)(craftingRecipies[block].amountProduced * amount));
 			SetHeldBlock(pl, 0);
 			SetHeldBlock(pl, block);
+			pl.Message("Crafted " + amount.ToString() + "x " + block.ToString() + ".");
 		}
 		public static Dictionary<ushort,CraftRecipe>  GenerateCraftOptions(Player pl)
 		{
@@ -517,12 +557,16 @@ namespace MCGalaxy {
 				return;
 			}
 			playerMiningProgress[pl][1] += 2;
-
+			ushort amount =  (ushort)Math.Min(10, (int) (( (float)playerMiningProgress[pl][1] / (float)blockMineData.MiningTime) * 10));
+			setMineIndicator(pl, pos,amount);
 			if (playerMiningProgress[pl][1] < blockMineData.MiningTime)
 				return;
 			playerMiningProgress.Remove(pl);
+			destroyMineIndicator(pl);
 			pl.level.UpdateBlock(pl, pos[0], pos[1], pos[2], 0);
 			OnBlockChangedEvent.Call(Player.Console, pos[0], pos[1], pos[2], ChangeResult.Modified);
+			if (blockMineData.overrideBlock == 0)
+				return;
 			if (blockMineData.overrideBlock != -1)
 			{
 				blockType = (ushort)blockMineData.overrideBlock;
@@ -560,10 +604,105 @@ namespace MCGalaxy {
 			if (playerMiningProgress[pl][1] > 1)
 				return;
 			playerMiningProgress.Remove(pl);
+			destroyMineIndicator(pl);
+		}
+		private void destroyMineIndicator(Player p)
+		{
+			if (!mineProgressIndicators.ContainsKey(p))
+				return;
+			if (mineProgressIndicators[p] != null)
+				PlayerBot.Remove(mineProgressIndicators[p]);
+			mineProgressIndicators.Remove(p);
+		}
+		private void createMineIndicator(Player p)
+		{
+			if (mineProgressIndicators.ContainsKey(p))
+				destroyMineIndicator(p);
+			
+			string uniqueName = p.name + "_miningIndicator";
+			PlayerBot bot = new PlayerBot(uniqueName, p.level);
+			bot.DisplayName = "";
+			bot.Model = "break0|1.002";
+			bot.SetInitialPos(new Position(0, 0, 0));
+			
+			PlayerBot.Add(bot);
+			mineProgressIndicators.Add(p, bot);
+		}
+		private void setMineIndicator(Player pl, ushort[] pos, ushort amount)
+		{
+			if (!mineProgressIndicators.ContainsKey(pl))
+				createMineIndicator(pl);
+			mineProgressIndicators[pl].Pos = Position.FromFeet((int)(pos[0]*32) +16, (int)(pos[1]*32), (int)(pos[2]*32) +16); //new Position(pos[0] << 5, pos[1] << 5, pos[2] << 5);
+			mineProgressIndicators[pl].UpdateModel("break" + amount.ToString() + "|1.002");
+		}
+		private void addBreakBlocks()
+		{
+			for (ushort i =0; i < 10; i++)
+			{
+				AddBlockDef("break" + i.ToString(), (ushort)(490 + i), 0,0,0,16,16,16, (ushort)(240 + i));
+			}
+		}
+		public void AddBlockDef(string name, ushort Id, ushort MinX, ushort MinY, ushort MinZ, ushort MaxX, ushort MaxY, ushort MaxZ, ushort TEXTURE, bool Transperant=true, int Brightness=0)
+		{
+				ushort RawID = Id;
+				string Name = name;
+				byte Speed = 1;
+				byte CollideType = 2;
+				bool BlocksLight = false;
+				byte WalkSound = 1;
+				bool FullBright = false;
+				byte Shape = 16;
+				byte BlockDraw =  (byte)(Transperant ? 1 : 0);
+				byte FallBack = 5;
+				byte FogDensity = 0;
+				byte FogR = 0;
+				byte FogG = 0;
+				byte FogB = 0;
+				ushort LeftTex = TEXTURE;
+				ushort RightTex = TEXTURE;
+				ushort FrontTex = TEXTURE;
+				ushort BackTex = TEXTURE;
+				ushort TopTex = TEXTURE;
+				ushort BottomTex = TEXTURE;
+				int InventoryOrder = 0;
+				BlockDefinition def = new BlockDefinition();
+				def.RawID = RawID; def.Name = Name;
+				def.Speed = Speed; def.CollideType = CollideType;
+				def.TopTex = TopTex; def.BottomTex = BottomTex;
+				
+				def.BlocksLight = BlocksLight; def.WalkSound = WalkSound;
+				def.FullBright = FullBright; def.Shape = Shape;
+				def.BlockDraw = BlockDraw; def.FallBack = FallBack;
+				
+				def.FogDensity = FogDensity;
+				def.FogR = FogR; def.FogG = FogG; def.FogB = FogB;
+				def.MinX = (byte)MinX; def.MinY = (byte)MinY; def.MinZ = (byte)MinZ;
+				def.MaxX = (byte)MaxX; def.MaxY = (byte)MaxY; def.MaxZ = (byte)MaxZ;
+				
+				def.LeftTex = LeftTex; def.RightTex = RightTex;
+				def.FrontTex = FrontTex; def.BackTex = BackTex;
+				def.InventoryOrder = InventoryOrder;
+				def.UseLampBrightness = false;
+				def.Brightness = Brightness;
+				BlockDefinition.Add(def, BlockDefinition.GlobalDefs, null );
+				
+				ushort block = Id;
+				BlockPerms perms = BlockPerms.GetPlace((ushort)(block + 256));
+				perms.MinRank = LevelPermission.Nobody;
+				BlockPerms.Save();
+				BlockPerms.ApplyChanges();
+
+				if (!Block.IsPhysicsType(block)) {
+					BlockPerms.ResendAllBlockPermissions();
+				}            
 		}
 		///////////////////////////////////////////////////////////
 		// Handlers
 		///////////////////////////////////////////////////////////
+		void HandlePlayerDisconnect(Player p, string reason)
+        {
+			destroyMineIndicator(p);
+        }
 		void HandleGUI(SchedulerTask task)
         {
             guiTask = task;
@@ -655,7 +794,6 @@ namespace MCGalaxy {
             foreach (Player p in PlayerInfo.Online.Items)
 			{
 				if (!maplist.Contains(p.level.name)) continue;
-				UnMineBlock(p);
 				if (p.invincible) continue;
 				if (IsDrowning(p))
 				{
@@ -741,6 +879,7 @@ namespace MCGalaxy {
 			InitPlayer(p);
 			SendMiningUnbreakableMessage(p);
 		}
+
 		int GetLagCompensation(int ping)
 		{
 			int penalty = 0;
@@ -1083,10 +1222,10 @@ namespace MCGalaxy {
                 PlayerBot.Remove(hit);
             }
         }
-		void AttemptPvp(Player p, MouseButton button, MouseAction action, ushort yaw, ushort pitch, byte entity, ushort x, ushort y, ushort z, TargetBlockFace face)
+		bool AttemptPvp(Player p, MouseButton button, MouseAction action, ushort yaw, ushort pitch, byte entity, ushort x, ushort y, ushort z, TargetBlockFace face)
 		{
-			if (!maplist.Contains(p.level.name)) return;
-			if (button != MouseButton.Left) return;
+			if (!maplist.Contains(p.level.name)) return false;;
+			if (button != MouseButton.Left) return false;
 			//if (action != MouseAction.Released) return;
 			Player victim = null; // If not null, the player that is being hit
 
@@ -1113,7 +1252,7 @@ namespace MCGalaxy {
 				catch
 				{
 				}
-				return;
+				return false;
 			}
 			if (!p.Extras.Contains("PVP_HIT_COOLDOWN"))
 			{
@@ -1121,17 +1260,20 @@ namespace MCGalaxy {
 			}
 			DateTime lastClickTime = (DateTime)p.Extras.Get("PVP_HIT_COOLDOWN");
 
-			if (lastClickTime > DateTime.UtcNow) return;
+			if (lastClickTime > DateTime.UtcNow) return false;
 			
-			if (!CanHitPlayer(p, victim)) return;
+			if (!CanHitPlayer(p, victim)) return false;
 			DoHit(p, victim);
 			p.Extras["PVP_HIT_COOLDOWN"] = DateTime.UtcNow.AddMilliseconds(400 - GetLagCompensation(p.Session.Ping.AveragePing()));
+			return true;
 		}
 		void HandleBlockClicked(Player p, MouseButton button, MouseAction action, ushort yaw, ushort pitch, byte entity, ushort x, ushort y, ushort z, TargetBlockFace face)
 		{
-			if (Config.MiningEnabled && button == MouseButton.Left && entity == 255)
+			if (entity != 255 && AttemptPvp(p, button, action, yaw, pitch, entity, x, y, z, face))
+				return;
+			if (Config.MiningEnabled && button == MouseButton.Left)
 				MineBlock(p, new ushort[]{x, y, z});
-			AttemptPvp(p, button, action, yaw, pitch, entity, x, y, z, face);
+			
 		}
 		void HandleRegeneration(SchedulerTask task)
         {
@@ -1209,7 +1351,7 @@ namespace MCGalaxy {
 			if (!maplist.Contains(p.level.name)) return;
 			SetGuiText(p, GetHealthBar	(GetHealth	(p)),GetAirBar		(GetAir		(p)), getHeldBlockAmount(p));
 
-			p.SendCpeMessage(CpeMessageType.SmallAnnouncement, getMiningProgressBar(p));
+			//p.SendCpeMessage(CpeMessageType.SmallAnnouncement, getMiningProgressBar(p));
 		}
 		///////////////////////////////////////////////////////////////////////////
 		// UTILITIES
@@ -1560,7 +1702,6 @@ namespace MCGalaxy {
 				}
 			}
 			MCGalaxy.SimpleSurvival.Craft(p, blockId, amount);
-			p.Message("Crafted stuff");
         }
 		public override void Help(Player p)
         {
