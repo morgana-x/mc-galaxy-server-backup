@@ -20,3 +20,12 @@ Cakes (eatable, working)
 Custom version of DayNightCycle with changing lighting
 
 etc!
+
+
+## Todo
++ Reintegrate tools plugin into simplesurvival plugin, to make syncing damage bonus, mining bonus and whether they are shovels etc easier
++ Add tool bonuses into mining
++ Recipes command to show all craftable items
++ Saving inventory
++ Fix breaking blocks not triggering onchangedblockevent, causing the break check for doors not completing
++ add break check for beds so we cant get 2 bed items for 1 bed infinite glitch
