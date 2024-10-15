@@ -888,6 +888,14 @@ namespace MCGalaxy {
 				return 0;
 			return playerInventories[pl.level.name][pl.name][block];
 		}
+		static void SendMissingItems(Player pl, CraftRecipe recipe)
+		{
+			pl.Message("%cYou need:");
+			foreach(var pair in recipe.Ingredients)
+			{
+				pl.Message("  " + Block.GetName(pl, pair.Key > 65 ? (ushort)(pair.Key + 256) : pair.Key) + "%dx" + pair.Value.ToString());
+			}
+		}
 		public static void Craft(Player pl, ushort block, ushort amount=1)
 		{
 			if (!craftingRecipies.ContainsKey(block))
@@ -899,7 +907,8 @@ namespace MCGalaxy {
 			{
 				if (!InventoryHasEnoughBlock(pl, pair.Key, (ushort)(pair.Value * amount)))
 				{
-					pl.Message("Not enough items!");
+					pl.Message("%cNot enough items!");
+					SendMissingItems(pl, craftingRecipies[block]);
 					return;
 				}
 			}
@@ -947,7 +956,12 @@ namespace MCGalaxy {
 			string message = "Valid craftables:\n";
 			foreach( var pair in validRecipes)
 			{
-				message += "  %e[%d" + pair.Key + "%e] %b" + Block.GetName(p, pair.Key > 65 ? (ushort)(pair.Key + 256) : pair.Key) + "\n";
+				message += "  %e[%d" + pair.Key + "%e] %b" + Block.GetName(p, pair.Key > 65 ? (ushort)(pair.Key + 256) : pair.Key) + "%e ==";
+				foreach(var pair2 in pair.Value.Ingredients)
+				{
+					message += " %a" + Block.GetName(p, pair2.Key > 65 ? (ushort)(pair2.Key + 256) : pair2.Key) + "%dx" + pair2.Value.ToString();
+				}
+				message += "\n";
 			}
 			return message;
 		}
@@ -2144,7 +2158,7 @@ namespace MCGalaxy {
 			}
 			MCGalaxy.SimpleSurvival.InventoryAddBlocks(p, blockId, amount);
 			MCGalaxy.SimpleSurvival.SetHeldBlock(p, blockId);
-			p.Message("Gave " + who.name + " %d" + Block.GetName(p,blockId > 256 ? (ushort)(blockId-256) : blockId) + "%a x" + (args.Length > 2 ? args[2].ToString() : "1"));
+			p.Message("Gave " + who.name + " %d" + Block.GetName(p,blockId > 65 ? (ushort)(blockId + 256) : blockId) + "%a x" + (args.Length > 2 ? args[2].ToString() : "1"));
         }
 		public override void Help(Player p)
         {
@@ -2207,7 +2221,7 @@ namespace MCGalaxy {
 		public override void Help(Player p)
         {
             p.Message("%T/Craft <BlockId> <Amount=1>");
-			p.Message("%TType %a/Craft list%T to see a list of blocks you can craft!");
+			p.Message("%TType %d/Craft list%T to see a list of blocks you can craft!");
         }
 	}
 	public sealed class CmdPvP : Command2
