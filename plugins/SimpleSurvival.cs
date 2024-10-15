@@ -100,7 +100,18 @@ namespace MCGalaxy {
 		}
 		public class StoneMineConfig : BlockMineConfig
 		{
-			public StoneMineConfig(ushort time = 35)
+			public StoneMineConfig(ushort time = 60)
+			{
+				PickaxeTimeMultiplier = 1.5f;
+				AxeTimeMultiplier = 0.2f;
+				ShovelTimeMultiplier = 0.2f;
+				MiningTime = time;
+				RequirePickaxe = true;
+			}
+		}
+		public class ObsidianMineConfig : StoneMineConfig
+		{
+			public ObsidianMineConfig(ushort time = 250)
 			{
 				PickaxeTimeMultiplier = 1.5f;
 				AxeTimeMultiplier = 0.2f;
@@ -111,7 +122,7 @@ namespace MCGalaxy {
 		}
 		public class WoodMineConfig : BlockMineConfig
 		{
-			public WoodMineConfig(ushort time = 15)
+			public WoodMineConfig(ushort time = 17)
 			{
 				AxeTimeMultiplier = 1.5f;
 				PickaxeTimeMultiplier = 1f;
@@ -235,7 +246,7 @@ namespace MCGalaxy {
 			{46, new DirtMineConfig(5)},
 			{47, new WoodMineConfig()},
 			{48, new StoneMineConfig()},
-			{49, new StoneMineConfig(30)},
+			{49, new ObsidianMineConfig()},
 			{50, new StoneMineConfig()},
 			{51, new WoodMineConfig()},
 			{53, new DirtMineConfig(1)},
@@ -759,6 +770,9 @@ namespace MCGalaxy {
 				if (a.IsSprite)
 				{
 					AddBlockItem(a.ID, a.NAME, a.TEXTURE);
+					if (!blockMiningTimes.ContainsKey(a.ID))
+						blockMiningTimes.Add(a.ID, new BlockMineConfig(2));
+					blockMiningTimes[a.ID] = new BlockMineConfig(2);
 					continue;
 				}
 				AddBlockDef(a.NAME, a.ID, 16,0,0,16,16,16,a.TEXTURE, 85, 85, 85, true);
@@ -865,7 +879,7 @@ namespace MCGalaxy {
 			ushort block = Id;
 			 if (true) {
 					BlockPerms perms = BlockPerms.GetPlace((ushort)(block + 256));
-					perms.MinRank = LevelPermission.Nobody;
+					perms.MinRank = LevelPermission.Guest; // LevelPermission.Nobody
 				 }
 				BlockPerms.Save();
 				BlockPerms.ApplyChanges();
@@ -1262,7 +1276,7 @@ namespace MCGalaxy {
 			string uniqueName = p.name + "_miningIndicator";
 			PlayerBot bot = new PlayerBot(uniqueName, p.level);
 			bot.DisplayName = "";
-			bot.Model = "break0|1.003";
+			bot.Model = "break0|1.005";
 			bot.SetInitialPos(pos);
 			
 			PlayerBot.Add(bot);
@@ -1287,7 +1301,7 @@ namespace MCGalaxy {
 			if (!mineProgressIndicators.ContainsKey(pl))
 				createMineIndicator(pl, indicatorPosition);
 			mineProgressIndicators[pl].Pos=indicatorPosition;
-			mineProgressIndicators[pl].UpdateModel("break" + amount.ToString() + "|1.003");
+			mineProgressIndicators[pl].UpdateModel("break" + amount.ToString() + "|1.005");
 		}
 		private void addBreakBlocks()
 		{
