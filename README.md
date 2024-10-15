@@ -25,4 +25,3 @@ etc!
 ## Todo
 + Make certain blocks require certain tiers of tools
 + Saving inventory
-+ Only showing what you have in your inventory in blockmenu
