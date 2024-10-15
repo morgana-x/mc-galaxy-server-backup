@@ -956,6 +956,7 @@ namespace MCGalaxy {
 			if (craftingRecipies[block].NeedCraftingTable && !IsNearCraftingTable(pl))
 			{
 				pl.Message("You need to be near a crafting table to craft this!");
+				return;
 			}
 			foreach(var pair in craftingRecipies[block].Ingredients)
 			{
@@ -966,10 +967,32 @@ namespace MCGalaxy {
 			SetHeldBlock(pl, block);
 			pl.Message("Crafted " + amount.ToString() + "x " + Block.GetName(pl, block > 65 ? (ushort)(block + 256) : block) + ".");
 		}
-		public static bool IsNearCraftingTable(Player pl)
+		public static bool IsNearCraftingTable(Player p)
 		{
-			
-			return true;
+			int blockx = p.Pos.BlockX;
+			int blocky = p.Pos.BlockY;
+			int blockz = p.Pos.BlockZ;
+			for (int x = -1; x < 2; x++)
+			{
+				if (blockx + x < 0 || blockx + x >= p.level.Width)
+					continue;
+				for (int z=-1; z< 2; z++)
+				{
+					if (blockz + z < 0 || blockz + z >= p.level.Length)
+						continue;
+					for (int y=-1; y< 2; y++)
+					{
+						if (z ==0 && x ==0 && y == 0)
+							continue;
+						if (blocky + y < 0 || blocky + y >= p.level.Height)
+							continue;
+						ushort block = p.level.FastGetBlock((ushort)(blockx + x), (ushort)(blocky + y), (ushort)(blockz + z));
+						if (block == 76 + 256 )
+							return true;
+					}
+				}
+			}
+			return false;
 		}
 		public static Dictionary<ushort,CraftRecipe>  GenerateCraftOptions(Player pl)
 		{
