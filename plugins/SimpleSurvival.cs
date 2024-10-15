@@ -512,6 +512,7 @@ namespace MCGalaxy {
 			{84, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 3}, {36, 3}}, 1, true)},
 			// Cake											// Wool x 3 = 1x Cake
 			{83, new CraftRecipe(new Dictionary<ushort, ushort>(){{36, 3}})},
+
 			// Wooden Sword									// Stick x 1 + wood x 2 = 1x Wooden sword  [Need crafting table]
 			{99, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 1}, {5, 2}}, 1, true)},
 			// Wooden Shovel									// Stick x 2 + wood x 1 = 1x Wooden Shovel
@@ -520,6 +521,7 @@ namespace MCGalaxy {
 			{101, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {5, 3}}, 1, true)},
 			// Wooden Axe									// Stick x 2 + wood x 4 = 1x Wooden Axe
 			{102, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {5, 4}}, 1, true)},
+
 			// Stone Sword									// Stick x 1 + stone x 2 = 1x stone sword
 			{95, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 1}, {1, 2}}, 1, true)},
 			// Stone Shovel									// Stick x 2 + stone x 1 = 1x stone Shovel
@@ -528,6 +530,33 @@ namespace MCGalaxy {
 			{97, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {1, 3}}, 1, true)},
 			// Stone Axe									// Stick x 2 + stone x 4 = 1x stone Axe
 			{98, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {1, 4}}, 1, true)},
+
+			// Iron Sword									// Stick x 1 + Iron x 2 = 1x Iron sword
+			{91, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 1}, {113, 2}}, 1, true)},
+			// Iron Shovel									// Stick x 2 + Iron x 1 = 1x Iron Shovel
+			{94, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {113, 1}}, 1, true)},
+			// Iron PIck									// Stick x 2 + Iron x 3 = 1x Iron Pick
+			{92, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {113, 3}}, 1, true)},
+			// Iron Axe									// Stick x 2 + Iron x 4 = 1x Iron Axe
+			{93, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {113, 4}}, 1, true)},
+
+			// Gold Sword									// Stick x 1 + Gold x 2 = 1x Gold sword
+			{103, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 1}, {112, 2}}, 1, true)},
+			// Gold Shovel									// Stick x 2 + Gold x 1 = 1x Gold Shovel
+			{104, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {112, 1}}, 1, true)},
+			// Gold PIck									// Stick x 2 + Gold x 3 = 1x Gold Pick
+			{105, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {112, 3}}, 1, true)},
+			// Gold Axe									// Stick x 2 + Gold x 4 = 1x Gold Axe
+			{106, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {112, 4}}, 1, true)},
+
+			// Diamond Sword									// Stick x 1 + Diamond x 2 = 1x Diamond sword
+			{107, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 1}, {111, 2}}, 1, true)},
+			// Diamond Shovel									// Stick x 2 + Diamond x 1 = 1x Diamond Shovel
+			{108, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {111, 1}}, 1, true)},
+			// Diamond PIck									// Stick x 2 + Diamond x 3 = 1x Diamond Pick
+			{109, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {111, 3}}, 1, true)},
+			// Diamond Axe									// Stick x 2 + Diamond x 4 = 1x Diamond Axe
+			{110, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {111, 4}}, 1, true)},
 		};
 		
 		public class MiningProgress
@@ -636,6 +665,7 @@ namespace MCGalaxy {
 			}
 			mineProgressIndicators.Clear();
 			playerMiningProgress.Clear();
+			DespawnAllBots();
 		}
 		public override void Help(Player p) {
 			//HELP INFO!
@@ -884,7 +914,7 @@ namespace MCGalaxy {
 			InventoryAddBlocks(pl, block, (ushort)(craftingRecipies[block].amountProduced * amount));
 			SetHeldBlock(pl, 0);
 			SetHeldBlock(pl, block);
-			pl.Message("Crafted " + amount.ToString() + "x " + block.ToString() + ".");
+			pl.Message("Crafted " + amount.ToString() + "x " + Block.GetName(pl, block > 65 ? (ushort)(block + 256) : block) + ".");
 		}
 		public static bool IsNearCraftingTable(Player pl)
 		{
@@ -915,10 +945,10 @@ namespace MCGalaxy {
 		{
 			Dictionary<ushort,CraftRecipe> validRecipes = GenerateCraftOptions(p);
 			string message = "Valid craftables:\n";
-			/*for (int i=0; i< validRecipes.Keys.Count; i++)
+			foreach( var pair in validRecipes)
 			{
-				message += i.ToString() + ". " + validRecipes.Keys[i];
-			}*/
+				message += "  %e[%d" + pair.Key + "%e] %b" + Block.GetName(p, pair.Key > 65 ? (ushort)(pair.Key + 256) : pair.Key) + "\n";
+			}
 			return message;
 		}
 		///////////////////////////////////////////////////////////
@@ -1317,6 +1347,25 @@ namespace MCGalaxy {
 				players.Add(bot);
 			}
 			return players.ToArray();
+		}
+		void DespawnAllBots()
+		{
+			Level[] levels = LevelInfo.Loaded.Items;
+			foreach (Level level in levels)
+			{
+				if (!maplist.Contains(level.name))
+				{
+					continue;
+				}
+				foreach (PlayerBot bot in level.Bots.Items)
+				{
+					if (bot.DisplayName != "" || !bot.name.Contains("ssmob"))
+					{
+						continue;
+					}
+					PlayerBot.Remove(bot);
+				}
+			}
 		}
 		void CheckDespawn(Level level)
 		{
@@ -2072,8 +2121,13 @@ namespace MCGalaxy {
 			}
 			catch(Exception e)
 			{
-				Help(p);
-				return;
+				if (!CommandParser.GetBlock(p, args[1], out blockId))
+				{
+					p.Message("%cBlock %d\"" + args[1] + "\"%c doesn't exist!");
+					return;
+				}
+				if (blockId > 256)
+					blockId = (ushort)(blockId - 256);
 			}
 			ushort amount = 1;
 			if (args.Length > 2)
@@ -2090,7 +2144,7 @@ namespace MCGalaxy {
 			}
 			MCGalaxy.SimpleSurvival.InventoryAddBlocks(p, blockId, amount);
 			MCGalaxy.SimpleSurvival.SetHeldBlock(p, blockId);
-			p.Message("Gave " + who.name + " x" + args[2] + " " + args[1]);
+			p.Message("Gave " + who.name + " %d" + Block.GetName(p,blockId > 256 ? (ushort)(blockId-256) : blockId) + "%a x" + (args.Length > 2 ? args[2].ToString() : "1"));
         }
 		public override void Help(Player p)
         {
@@ -2105,12 +2159,20 @@ namespace MCGalaxy {
 
         public override void Use(Player p, string message, CommandData data)
         {
-            if (message.Length == 0 || message.SplitSpaces().Length < 2)
+            if (message.Length == 0)
             {
                 Help(p);
                 return;
             }
-            string[] args = message.SplitSpaces();
+			string[] args = message.SplitSpaces();
+			if (args[0] == "list")
+			{
+				string blockList = MCGalaxy.SimpleSurvival.GenerateCraftOptionsMessage(p);
+				string[] msgSplit = blockList.Split('\n');
+				foreach(var a in msgSplit)
+					p.Message(a);
+				return;
+			}
 			ushort blockId = 0;
 			try
 			{
@@ -2118,8 +2180,14 @@ namespace MCGalaxy {
 			}
 			catch(Exception e)
 			{
-				Help(p);
-				return;
+				
+				if (!CommandParser.GetBlock(p, args[0], out blockId))
+				{
+					p.Message("%cBlock %d\"" + args[0] + "\"%c doesn't exist!");
+					return;
+				}
+				if (blockId > 256)
+					blockId = (ushort)(blockId - 256);
 			}
 			ushort amount = 1;
 			if (args.Length > 1)
@@ -2139,6 +2207,7 @@ namespace MCGalaxy {
 		public override void Help(Player p)
         {
             p.Message("%T/Craft <BlockId> <Amount=1>");
+			p.Message("%TType %a/Craft list%T to see a list of blocks you can craft!");
         }
 	}
 	public sealed class CmdPvP : Command2
