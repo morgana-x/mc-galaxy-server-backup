@@ -41,7 +41,7 @@ namespace MCGalaxy {
 		public override bool LoadAtStartup { get { return true; } }
 
 		public Dictionary<string,Dictionary<string, ushort[]>> SavePoints = new Dictionary<string,Dictionary<string, ushort[]>>();
-		BedConfig bedConfig = new BedConfig()
+		public static BedConfig bedConfig = new BedConfig()
 		{
 			ITEM_ID=84,
 			ID=460,
@@ -151,7 +151,8 @@ namespace MCGalaxy {
 			AddBlockItem(bedConfig.ITEM_ID, bedConfig.NAME, bedConfig.TEXTURE_ITEM);
 			AddBedBlockDef(bedConfig.ID, bedConfig.TEXTURE_FOOT_SIDE_LEFT, bedConfig.TEXTURE_FOOT_SIDE_RIGHT, bedConfig.TEXTURE_FOOT_BACK, bedConfig.TEXTURE_FOOT_TOP_NORTH, bedConfig.TEXTURE_FOOT_TOP_SOUTH, bedConfig.TEXTURE_FOOT_TOP_EAST, bedConfig.TEXTURE_FOOT_TOP_WEST);
 			AddBedBlockDef((ushort)(bedConfig.ID+4), bedConfig.TEXTURE_HEAD_SIDE_LEFT, bedConfig.TEXTURE_HEAD_SIDE_RIGHT, bedConfig.TEXTURE_HEAD_BACK, bedConfig.TEXTURE_HEAD_TOP_NORTH, bedConfig.TEXTURE_HEAD_TOP_SOUTH, bedConfig.TEXTURE_HEAD_TOP_EAST, bedConfig.TEXTURE_HEAD_TOP_WEST);
-			OnBlockChangingEvent.Register(HandleBlockChanged, Priority.Low);
+			OnBlockChangingEvent.Register(HandleBlockChanging, Priority.Low);
+			OnBlockChangedEvent.Register(HandleBlockChanged, Priority.Low);
 			OnPlayerClickEvent.Register(HandleBlockClicked, Priority.Low);
 			OnPlayerSpawningEvent.Register(HandlePlayerSpawning, Priority.High);
 			OnPlayerDisconnectEvent.Register(HandlePlayerDisconnect, Priority.Low);
@@ -159,7 +160,8 @@ namespace MCGalaxy {
 		}
                         
 		public override void Unload(bool shutdown) {
-			OnBlockChangingEvent.Unregister(HandleBlockChanged);
+			OnBlockChangingEvent.Unregister(HandleBlockChanging);
+			OnBlockChangedEvent.Unregister(HandleBlockChanged);
 			OnPlayerClickEvent.Unregister(HandleBlockClicked);
 			OnPlayerSpawningEvent.Unregister(HandlePlayerSpawning);
 			OnPlayerDisconnectEvent.Unregister(HandlePlayerDisconnect);
@@ -325,8 +327,10 @@ namespace MCGalaxy {
 			return 3;
 
 		}
-		void HandleBlockChanged(Player p, ushort x, ushort y, ushort z, BlockID block, bool placing, ref bool cancel)
+		void HandleBlockChanging(Player p, ushort x, ushort y, ushort z, BlockID block, bool placing, ref bool cancel)
         {
+			if (cancel)
+				return;
 			if (!placing)
 				return;
 			if (block != bedConfig.ITEM_ID+256)
@@ -335,6 +339,38 @@ namespace MCGalaxy {
 			p.RevertBlock(x, y, z);
 			PlaceBed(p.level, new ushort[]{x,y,z}, getDir(p));
         }
+		ushort[] getNeighboringBed(Player p, ushort blockx, ushort blocky, ushort blockz)
+		{
+			for (int x = -1; x < 2; x++)
+			{
+				if (blockx + x < 0 || blockx + x >= p.level.Width)
+					continue;
+				for (int z=-1; z< 2; z++)
+				{
+					if (z ==0 && x ==0)
+						continue;
+					if (blockz + z < 0 || blockz + z >= p.level.Length)
+						continue;
+					ushort[] pos = new ushort[]{(ushort)(blockx + x), blocky, (ushort)(blockz + z)};
+					ushort block = p.level.FastGetBlock(pos[0],pos[1],pos[2]);
+					if (!isBed(block))
+						continue;
+					return pos;
+				}
+			}
+			return new ushort[]{0,0,0,0};
+		}
+		void HandleBlockChanged(Player p, ushort blockx, ushort blocky, ushort blockz, ChangeResult result)
+		{
+			ushort[] neighboringBed = getNeighboringBed(p, blockx, blocky, blockz);
+			if (neighboringBed.Length > 3)
+				return;
+			ushort[] neighboringBed2 = getNeighboringBed(p, neighboringBed[0], neighboringBed[1], neighboringBed[2]);
+			if (neighboringBed2.Length < 3)
+				return;
+			p.level.UpdateBlock(p, neighboringBed[0], neighboringBed[1], neighboringBed[2], 0);
+		}
+
 		void setBedSavePoint(Level level, Player p, ushort[] pos)
 		{
 			if (!SavePoints.ContainsKey(level.name))

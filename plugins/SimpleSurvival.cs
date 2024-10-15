@@ -13,6 +13,7 @@ using MCGalaxy.Network;
 using MCGalaxy.Commands;
 using MCGalaxy.Bots;
 //pluginref door.dll
+//pluginref bed.dll
 namespace MCGalaxy {
 
 	public class SimpleSurvival : Plugin {
@@ -493,6 +494,10 @@ namespace MCGalaxy {
 			}
 			blockMiningTimes[blockId] = config;
 		}
+		public static Dictionary<string, Dictionary<ushort, ushort>> mobLoot = new Dictionary<string, Dictionary<ushort, ushort>>()
+		{
+			{"sheep", new Dictionary<ushort, ushort>(){{36, 1}}}
+		};
 		public static Dictionary<ushort, CraftRecipe> craftingRecipies = new Dictionary<ushort, CraftRecipe>()
 		{
 			// Glass 											// Sand x1 (MOVE TO FURNACE LATER)
@@ -623,6 +628,7 @@ namespace MCGalaxy {
 				addBreakBlocks();
 				AddToolBlocks();
 				AddDoorBlocks();
+				AddBedBlocks();
 			}
 			catch (Exception e)
 			{
@@ -724,6 +730,12 @@ namespace MCGalaxy {
 					blockMiningTimes.Add(x, new WoodMineConfig(){overrideBlock = a.BLOCK_ITEM_ID});
 				i++;
 			}
+		}
+		private void AddBedBlocks()
+		{
+			BedConfig bedConfig = new BedConfig(){ITEM_ID = 84, ID =460}; //MCGalaxy.Bed.bedConfig;
+			for (ushort x=bedConfig.ID; x < (ushort)(bedConfig.ID+8); x++)
+				blockMiningTimes.Add(x, new WoodMineConfig(){overrideBlock = bedConfig.ITEM_ID});
 		}
 		private void AddBlockDef(BlockDefinition def)
 		{
@@ -1246,6 +1258,8 @@ namespace MCGalaxy {
         {
 			if (p == Player.Console)
 				return;
+			if (cancel)
+				return;
 			if (placing == false && Config.MiningEnabled)
 			{
 				cancel = true;
@@ -1739,7 +1753,15 @@ namespace MCGalaxy {
             {
                 // Despawn bot
                 //Command.Find("Effect").Use(p, "smoke " + bot.Pos.FeetBlockCoords.X + " " + bot.Pos.FeetBlockCoords.Y + " " + bot.Pos.FeetBlockCoords.Z + " 0 0 0 true");
+				if (mobLoot.ContainsKey(hit.Model))
+				{
+					foreach(var lootbox in mobLoot[hit.Model])
+					{
+						InventoryAddBlocks(bot, lootbox.Key, lootbox.Value);
+					}
+				}
                 PlayerBot.Remove(hit);
+				
             }
         }
 		bool AttemptPvp(Player p, MouseButton button, MouseAction action, ushort yaw, ushort pitch, byte entity, ushort x, ushort y, ushort z, TargetBlockFace face)
