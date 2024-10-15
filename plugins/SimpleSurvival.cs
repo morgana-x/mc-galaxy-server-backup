@@ -122,7 +122,7 @@ namespace MCGalaxy {
 		}
 		public class WoodMineConfig : BlockMineConfig
 		{
-			public WoodMineConfig(ushort time = 17)
+			public WoodMineConfig(ushort time = 25)
 			{
 				AxeTimeMultiplier = 1.5f;
 				PickaxeTimeMultiplier = 1f;
@@ -132,7 +132,7 @@ namespace MCGalaxy {
 		}
 		public class DirtMineConfig : BlockMineConfig
 		{
-			public DirtMineConfig(ushort time = 12)
+			public DirtMineConfig(ushort time = 15)
 			{
 				AxeTimeMultiplier = 0.2f;
 			 	PickaxeTimeMultiplier = 1f;
@@ -2419,8 +2419,8 @@ namespace MCGalaxy {
 					return;
 				}
 			}
-			MCGalaxy.SimpleSurvival.InventoryAddBlocks(p, blockId, amount);
-			MCGalaxy.SimpleSurvival.SetHeldBlock(p, blockId);
+			MCGalaxy.SimpleSurvival.InventoryAddBlocks(who, blockId, amount);
+			MCGalaxy.SimpleSurvival.SetHeldBlock(who, blockId);
 			p.Message("Gave " + who.name + " %d" + Block.GetName(p,blockId > 65 ? (ushort)(blockId + 256) : blockId) + "%a x" + (args.Length > 2 ? args[2].ToString() : "1"));
         }
 		public override void Help(Player p)
