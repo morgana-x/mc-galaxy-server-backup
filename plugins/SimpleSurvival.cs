@@ -540,7 +540,14 @@ namespace MCGalaxy {
 			{84, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 3}, {36, 3}}, 1, true)},
 			// Cake											// Wool x 3 = 1x Cake
 			{83, new CraftRecipe(new Dictionary<ushort, ushort>(){{36, 3}})},
-
+			// Cobblestone Slab
+			{50, new CraftRecipe(new Dictionary<ushort, ushort>(){{4, 3}}, 1, false)},
+			// Double Slab
+			{43, new CraftRecipe(new Dictionary<ushort, ushort>(){{4, 4}}, 1, false)},
+			//  Slab
+			{44, new CraftRecipe(new Dictionary<ushort, ushort>(){{43, 3}}, 1, false)},
+			//  Rope
+			{51, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 7}}, 4, false)},
 			// Wooden Sword									// Stick x 1 + wood x 2 = 1x Wooden sword  [Need crafting table]
 			{99, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 1}, {5, 2}}, 1, true)},
 			// Wooden Shovel									// Stick x 2 + wood x 1 = 1x Wooden Shovel
@@ -666,7 +673,9 @@ namespace MCGalaxy {
 			mobHealth.Clear();
 			foreach(Player p in PlayerInfo.Online.Items)
 			{
+				LoadInventory(p);
 				SendMiningUnbreakableMessage(p);
+				
 			}
 		}
                         
