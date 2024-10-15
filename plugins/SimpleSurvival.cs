@@ -616,7 +616,7 @@ namespace MCGalaxy {
 			
 			OnPlayerClickEvent.Register(HandleBlockClicked, Priority.Low);
 			OnPlayerConnectEvent.Register(HandlePlayerConnect, Priority.Low);
-			OnBlockChangingEvent.Register(HandleBlockChanged, Priority.High);
+			OnBlockChangingEvent.Register(HandleBlockChanged, Priority.Normal);
 			OnPlayerMoveEvent.Register(HandlePlayerMove, Priority.High);
 			OnSentMapEvent.Register(HandleSentMap, Priority.Low);
 			OnPlayerDyingEvent.Register(HandlePlayerDying, Priority.High);
@@ -861,6 +861,7 @@ namespace MCGalaxy {
 				playerInventories[pl.level.name][pl.name].Add(block, 0);
 			playerInventories[pl.level.name][pl.name][block] = amount;
 			SendMiningUnbreakableMessage(pl, block);
+			SendInventory(pl);
 		}
 
 		BlockMineConfig getBlockMineTime(ushort blockId)
@@ -893,6 +894,7 @@ namespace MCGalaxy {
 				playerInventories[pl.level.name][pl.name].Add(block, 0);
 			playerInventories[pl.level.name][pl.name][block] = (ushort)(playerInventories[pl.level.name][pl.name][block]  + amount);
 			SendMiningUnbreakableMessage(pl, block);
+			SendInventory(pl);
 		}
 		public static void InventoryRemoveBlocks(Player pl, ushort block, ushort amount)
 		{
@@ -912,15 +914,27 @@ namespace MCGalaxy {
 			}
 			playerInventories[pl.level.name][pl.name][block] = (ushort)(playerInventories[pl.level.name][pl.name][block] - amount);
 			SendMiningUnbreakableMessage(pl, block);
+			SendInventory(pl);
 		}
 		public static bool InventoryHasEnoughBlock(Player pl, ushort block, ushort amount=1)
 		{
 			return InventoryGetBlockAmount(pl, block) >= amount;
 		}
+
 		public static ushort InventoryGetBlockAmount(Player pl, ushort block)
 		{
 			if (block > 256)
 				block = (ushort)(block - 256);
+			if (!playerInventories.ContainsKey(pl.level.name))
+				return 0;
+			if (!playerInventories[pl.level.name].ContainsKey(pl.name))
+				return 0;
+			if (!playerInventories[pl.level.name][pl.name].ContainsKey(block))
+				return 0;
+			return playerInventories[pl.level.name][pl.name][block];
+		}
+		public static ushort InventoryGetBlockAmountRaw(Player pl, ushort block)
+		{
 			if (!playerInventories.ContainsKey(pl.level.name))
 				return 0;
 			if (!playerInventories[pl.level.name].ContainsKey(pl.name))
@@ -1043,7 +1057,7 @@ namespace MCGalaxy {
             Level level = p.level;
             for (int i = 0; i < count; i++) 
             {
-                Packet.WriteBlockPermission((BlockID)i, i != 0 ? InventoryHasEnoughBlock(p, (ushort)i) : true, i == 0 ? true : false, p.Session.hasExtBlocks, bulk, i * size);
+                Packet.WriteBlockPermission((BlockID)i, i != 0 ? InventoryHasEnoughBlock(p, (ushort)i) && ( i < p.group.CanPlace.Length && p.group.CanPlace[i]) : true, i == 0 ? true : false, p.Session.hasExtBlocks, bulk, i * size);
             }
             p.Send(bulk);
 		}
@@ -1055,9 +1069,10 @@ namespace MCGalaxy {
             int count = 1;//p.Session.MaxRawBlock + 1;
             int size  = extBlocks ? 5 : 4;
             byte[] bulk = new byte[count * size];
+			bool canPlace =  ( id < p.group.CanPlace.Length && p.group.CanPlace[id]);
 			if (id > 256)
 				id = (ushort)(id - 256);
-            Packet.WriteBlockPermission((BlockID)id, id != 0 ? InventoryHasEnoughBlock(p, (ushort)id) : true, id == 0 ? true : false, p.Session.hasExtBlocks, bulk, 0);
+            Packet.WriteBlockPermission((BlockID)id, id != 0 ? InventoryHasEnoughBlock(p, (ushort)id) && canPlace : true, id == 0 ? true : false, p.Session.hasExtBlocks, bulk, 0);
             p.Send(bulk);
 		}
 		private void MineBlock(Player pl, ushort[] pos)
@@ -1260,7 +1275,22 @@ namespace MCGalaxy {
 				SendPlayerGui(pl);
 			}
 		}
-		
+		static void SendInventory(Player p)
+		{
+			if (!Config.InventoryEnabled)
+				return;
+			ushort x=1;
+			for (ushort i=0; i < 767; i++)
+			{
+				if (InventoryGetBlockAmountRaw(p, i) < 1)
+				{
+					p.Send(Packet.SetInventoryOrder(Block.Air, (BlockID)i, p.Session.hasExtBlocks));
+					continue;
+				}
+				p.Send(Packet.SetInventoryOrder((BlockID)Convert.ToUInt16(i), (BlockID)x, p.Session.hasExtBlocks));
+				x++;
+			}
+		}
 		void HandlePlayerDying(Player p, BlockID deathblock, ref bool cancel)
         {
 			
@@ -1337,6 +1367,7 @@ namespace MCGalaxy {
 			}
 			InventoryRemoveBlocks(p, block, 1);
 			SendMiningUnbreakableMessage(p, block);
+			SendInventory(p);
 		}
 		void HandleDrown(SchedulerTask task)
 		{
@@ -2036,6 +2067,7 @@ namespace MCGalaxy {
 			p.Extras["FALL_START"] = p.Pos.Y;
 			SendPlayerGui(p);
 			SendMiningUnbreakableMessage(p);
+			SendInventory(p);
 		}
 		public static void ResetPlayerState(Player p)
         {
