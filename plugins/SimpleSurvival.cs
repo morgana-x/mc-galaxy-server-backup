@@ -12,6 +12,7 @@ using MCGalaxy.Blocks;
 using MCGalaxy.Network;
 using MCGalaxy.Commands;
 using MCGalaxy.Bots;
+//pluginref door.dll
 namespace MCGalaxy {
 
 	public class SimpleSurvival : Plugin {
@@ -45,6 +46,7 @@ namespace MCGalaxy {
 			public bool IsAxe = false;
 			public bool IsHoe = false;
 			public bool IsSprite = false;
+			public bool IsSheers = false;
 			public ushort Damage=2;
 			public float Knockback = 1f;
 			public float MiningBonus = 1f;
@@ -76,6 +78,13 @@ namespace MCGalaxy {
 				Damage = dmg;
 				knkback = knkback;
 				MiningBonus = mining;
+			}
+		}
+		public class SheerTool : SurvivalTool
+		{
+			public SheerTool()
+			{
+				IsSheers = true;
 			}
 		}
 		public class StoneMineConfig : BlockMineConfig
@@ -613,6 +622,7 @@ namespace MCGalaxy {
 			{
 				addBreakBlocks();
 				AddToolBlocks();
+				AddDoorBlocks();
 			}
 			catch (Exception e)
 			{
@@ -703,7 +713,18 @@ namespace MCGalaxy {
 				AddBlockDef(a.NAME, a.ID, 16,0,0,16,16,16,a.TEXTURE, 85, 85, 85, true);
 			}
 		}
-		
+		private void AddDoorBlocks()
+		{
+			ushort i = 0;
+			ushort storageId = 300;//(ushort)MCGalaxy.Door.DoorBlockIdStorageIndex;
+			foreach(MCGalaxy.DoorConfig a in MCGalaxy.Door.DoorConfigs)
+			{
+				ushort start = (ushort)(storageId + (i * 8));
+				for (ushort x=start; x < (ushort)(start+8); x++)
+					blockMiningTimes.Add(x, new WoodMineConfig(){overrideBlock = a.BLOCK_ITEM_ID});
+				i++;
+			}
+		}
 		private void AddBlockDef(BlockDefinition def)
 		{
 			BlockDefinition.Add(def, BlockDefinition.GlobalDefs, null );
@@ -1005,6 +1026,8 @@ namespace MCGalaxy {
 			BlockMineConfig blockMineData = getBlockMineTime(blockType);
 			if (blockMineData == null)
 				return;
+			if (inSafeZone(pl, pos[0], pos[1], pos[2]))
+				return;
 			if (!playerMiningProgress.ContainsKey(pl))
 			{
 				playerMiningProgress.Add(pl, new MiningProgress(blockType, pos));
@@ -1013,6 +1036,7 @@ namespace MCGalaxy {
 			var currentProgress = playerMiningProgress[pl];
 			if (currentProgress.BlockType != blockType || (pos[0] != currentProgress.Position[0]|| pos[1] !=  currentProgress.Position[1] || pos[2] != currentProgress.Position[2]))
 			{
+				//destroyMineIndicator(p);
 				playerMiningProgress[pl] = new MiningProgress(blockType, pos);
 				return;
 			}
@@ -1029,7 +1053,7 @@ namespace MCGalaxy {
 			playerMiningProgress.Remove(pl);
 			destroyMineIndicator(pl);
 			pl.level.UpdateBlock(pl, pos[0], pos[1], pos[2], 0);
-			OnBlockChangedEvent.Call(Player.Console, pos[0], pos[1], pos[2], ChangeResult.Modified);
+			OnBlockChangedEvent.Call(pl, pos[0], pos[1], pos[2], ChangeResult.Modified);
 			if (blockMineData.overrideBlock == 0)
 				return;
 			if (blockMineData.RequirePickaxe && (tool == null || !tool.IsPickaxe))
@@ -1073,7 +1097,7 @@ namespace MCGalaxy {
 			string uniqueName = p.name + "_miningIndicator";
 			PlayerBot bot = new PlayerBot(uniqueName, p.level);
 			bot.DisplayName = "";
-			bot.Model = "break0|1.002";
+			bot.Model = "break0|1.003";
 			bot.SetInitialPos(pos);
 			
 			PlayerBot.Add(bot);
@@ -1085,7 +1109,7 @@ namespace MCGalaxy {
 			if (!mineProgressIndicators.ContainsKey(pl))
 				createMineIndicator(pl, indicatorPosition);
 			mineProgressIndicators[pl].Pos=indicatorPosition;
-			mineProgressIndicators[pl].UpdateModel("break" + amount.ToString() + "|1.002");
+			mineProgressIndicators[pl].UpdateModel("break" + amount.ToString() + "|1.003");
 		}
 		private void addBreakBlocks()
 		{
@@ -2068,6 +2092,18 @@ namespace MCGalaxy {
 			
 		}
 		///////////////////////////////////////////////////////////////////////////
+		public static bool inSafeZone(Player p, ushort x, ushort y, ushort z)
+		{
+			Zone[] zones = p.level.Zones.Items;
+			foreach(Zone zone in zones)
+			{
+				if (zone.Contains(x, y, z))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
 		public static bool inSafeZone(Player p, Level level)
         {
 			Zone[] zones = level.Zones.Items;

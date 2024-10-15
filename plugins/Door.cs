@@ -40,9 +40,9 @@ namespace MCGalaxy {
 		public bool SoundEnabled = true; // Whether sound is enabled for CEF PLUGIN CLIENTS ONLY
 		public int SoundRange = 6; // How many blocks away can players hear doors opening (CEF PLUGIN CLIENTS ONLY)
 		
-		public ushort DoorBlockIdStorageIndex = 300; // Beggining of reserved Door slots will take up 8*Number of doors
+		public static ushort DoorBlockIdStorageIndex = 300; // Beggining of reserved Door slots will take up 8*Number of doors
 		
-		public List<DoorConfig> DoorConfigs = new List<DoorConfig>()
+		public static List<DoorConfig> DoorConfigs = new List<DoorConfig>()
 		{
 			new DoorConfig() // Just add more of these if you want more doors! (Make sure you have a unique id, that has 8 further free Ids after it)
 			{
@@ -78,7 +78,8 @@ namespace MCGalaxy {
 		
 		public override void Load(bool startup) {
 			//LOAD YOUR PLUGIN WITH EVENTS OR OTHER THINGS!
-			OnBlockChangingEvent.Register(HandleBlockChanged, Priority.Low);
+			OnBlockChangingEvent.Register(HandleBlockChanging, Priority.Low);
+			OnBlockChangedEvent.Register(HandleBlockChanged, Priority.Low);
 			OnPlayerClickEvent.Register(HandleBlockClicked, Priority.Low);
 			OnPlayerConnectEvent.Register(HandlePlayerConnect, Priority.Low);
 			OnSentMapEvent.Register(HandleSentMap, Priority.Low);
@@ -86,7 +87,6 @@ namespace MCGalaxy {
 			{
 				LoadDoor(d);
 			}
-			SendDoorPermsAll();
 			foreach (Player p in PlayerInfo.Online.Items)
 			{
 				InitCEF(p);
@@ -95,7 +95,8 @@ namespace MCGalaxy {
                     
 		public override void Unload(bool shutdown) {
 			//UNLOAD YOUR PLUGIN BY SAVING FILES OR DISPOSING OBJECTS!
-			OnBlockChangingEvent.Unregister(HandleBlockChanged);
+			OnBlockChangingEvent.Unregister(HandleBlockChanging);
+			OnBlockChangedEvent.Unregister(HandleBlockChanged);
 			OnPlayerClickEvent.Unregister(HandleBlockClicked);
 			OnPlayerConnectEvent.Unregister(HandlePlayerConnect);
 			OnSentMapEvent.Unregister(HandleSentMap);
@@ -111,7 +112,6 @@ namespace MCGalaxy {
 		}
 		void HandleSentMap( Player p, Level prevLevel, Level level)
 		{
-			SendDoorPerms(p);
 			InitCEF(p);
 		}
 		public void AddBlockItem(ushort Id, string Name, ushort Texture)
@@ -135,110 +135,18 @@ namespace MCGalaxy {
 				def.InventoryOrder = -1;
 			AddBlock(def);
 		}
-		List<BlockID> DisabledBlocks = new List<BlockID>();
 		public void SetDoorBlockPerms(ushort block)
 		{
-			DisabledBlocks.Add((BlockID)block);
-			SendDoorPermsAll();
-		}
-		internal unsafe static void SendLevelInventoryOrder(Player pl) {
-		   BlockDefinition[] defs = pl.level.CustomBlockDefs;
-		   int maxRaw = pl.Session.MaxRawBlock;
-		   int count  = maxRaw + 1;
+			BlockPerms perms = BlockPerms.GetPlace((ushort)(block + 256));
+			perms.MinRank = LevelPermission.Nobody;
+			BlockPerms.Save();
+			BlockPerms.ApplyChanges();
 
-		   int* order_to_blocks = stackalloc int[Block.ExtendedCount];
-		   int* block_to_orders = stackalloc int[Block.ExtendedCount];
-		   for (int b = 0; b < Block.ExtendedCount; b++) 
-		   {
-			   order_to_blocks[b] = -1;
-			   block_to_orders[b] = -1;
-		   }
-		   
-		   // Fill slots with explicit order
-		   for (int i = 0; i < defs.Length; i++) 
-		   {
-			   BlockDefinition def = defs[i];
-			   if (def == null || def.RawID > maxRaw) continue;
-			   if (def.InventoryOrder == -1) continue;
-			   
-			   if (def.InventoryOrder != 0) {
-				   if (order_to_blocks[def.InventoryOrder] != -1) continue;
-				   order_to_blocks[def.InventoryOrder] = def.RawID;
-			   }
-			   block_to_orders[def.RawID] = def.InventoryOrder;
-		   }
-		   
-		   // Put blocks into their default slot if slot is unused
-		   for (int i = 0; i < defs.Length; i++) 
-		   {
-			   BlockDefinition def = defs[i];
-			   int raw = def != null ? def.RawID : i;
-			   if (raw > maxRaw || (def == null && raw >= Block.CPE_COUNT)) continue;
-			   
-			   if (def != null && def.InventoryOrder >= 0) continue;
-			   if (order_to_blocks[raw] == -1) {
-				   order_to_blocks[raw] = raw;
-				   block_to_orders[raw] = raw;
-			   }
-		   }
-		   
-		   // Push blocks whose slots conflict with other blocks into free slots at end
-		   for (int i = defs.Length - 1; i >= 0; i--) 
-		   {
-			   BlockDefinition def = defs[i];
-			   int raw = def != null ? def.RawID : i;
-			   if (raw > maxRaw || (def == null && raw >= Block.CPE_COUNT)) continue;
-			   
-			   if (block_to_orders[raw] != -1) continue;
-			   for (int slot = count - 1; slot >= 1; slot--) {
-				   if (order_to_blocks[slot] != -1) continue;
-				   
-				   block_to_orders[raw]  = slot;
-				   order_to_blocks[slot] = raw;
-				   break;
-			   }
-		   }
-		   
-		   for (int raw = 0; raw < count; raw++) 
-		   {
-			   int order = block_to_orders[raw];
-			   if (order == -1) order = 0;
-			   
-			   BlockDefinition def = defs[Block.FromRaw((BlockID)raw)];
-			   if (def == null && raw >= Block.CPE_COUNT) continue;
-			   // Special case, don't want 255 getting hidden by default
-			   if (raw == 255 && def.InventoryOrder == -1) continue;
-			   
-			   pl.Send(Packet.SetInventoryOrder((BlockID)raw, (BlockID)order, pl.Session.hasExtBlocks));
-		   }
-	   }
-		void SendDoorPerms(Player p)
-		{
-			bool extBlocks = p.Session.hasExtBlocks;
-            int count = DisabledBlocks.Count;//p.Session.MaxRawBlock + 1;
-            int size  = extBlocks ? 5 : 4;
-            byte[] bulk = new byte[count * 5];
-            Level level = p.level;
-            for (int i = 0; i < count; i++) 
-            {
-				
-                BlockID block = (BlockID)(DisabledBlocks[i]);
-				if (block < DoorBlockIdStorageIndex)
-				{
-					return;
-				}					
-                Packet.WriteBlockPermission((BlockID)block, false, false, p.Session.hasExtBlocks, bulk, i * size);
-            }
-            p.Send(bulk);
-			SendLevelInventoryOrder(p);
+			if (!Block.IsPhysicsType(block)) {
+				BlockPerms.ResendAllBlockPermissions();
+			}            
 		}
-		void SendDoorPermsAll()
-		{
-			foreach (Player p in PlayerInfo.Online.Items)
-			{
-				SendDoorPerms(p);
-			}
-		}
+	
 		void InitCEF(Player p)
 		{
 			if (p.Session.ClientName().CaselessContains("cef"))
@@ -258,9 +166,7 @@ namespace MCGalaxy {
 		}
 		void HandlePlayerConnect(Player p)
         {
-            SendDoorPerms(p);
-			InitCEF(p);
-			
+			InitCEF(p);	
         }
 		void PlaySound(Player p, string sound)
 		{
@@ -599,6 +505,8 @@ namespace MCGalaxy {
 		}
 		void HandleBlockClicked(Player p, MouseButton button, MouseAction action, ushort yaw, ushort pitch, byte entity, ushort x, ushort y, ushort z, TargetBlockFace face)
 		{
+			if (button != MouseButton.Right)
+				return;
 			/*x /= 16;
 			y /= 16;
 			z /= 16;*/
@@ -624,7 +532,7 @@ namespace MCGalaxy {
 			}
 			ToggleDoor(p.level, x, y, z);
 		}
-		void HandleBlockChanged(Player p, ushort x, ushort y, ushort z, BlockID block, bool placing, ref bool cancel)
+		void HandleBlockChanging(Player p, ushort x, ushort y, ushort z, BlockID block, bool placing, ref bool cancel)
         {
 			if (cancel)
 				return;
@@ -645,26 +553,66 @@ namespace MCGalaxy {
 					//return true;
 				}
 			}
-			CheckShouldDoorBreak(p, x, y, z, block, placing);
         }
-		void CheckShouldDoorBreak(Player p, ushort x, ushort y, ushort z, BlockID block, bool placing)
+		void HandleBlockChanged(Player p, ushort x, ushort y, ushort z, MCGalaxy.ChangeResult result)
 		{
-			if (!(block == 0 || !placing))
-			{
-				return;
-			}
+			CheckShouldDoorBreak(p, x, y, z);
+		}
+		bool checkdoorbreakground(Player p, ushort x, ushort y, ushort z)
+		{
 			BlockID b = p.level.FastGetBlock((ushort)x, (ushort)(y+1), (ushort)z);
 			DoorBlock d = GetDoorFromBlock(b);
 			if (d == null)
 			{
-				return;
+				return false;
 			}
 			if (! ( b == d.Bottom_Block || b == d.Bottom_Block_Open || b == d.Bottom_Block_Inverse || b == d.Bottom_Block_Inverse_Open))
 			{
-				return;
+				return false;
 			}
 			p.level.UpdateBlock(Player.Console, x, (ushort)(y+1), z, 0);
 			p.level.UpdateBlock(Player.Console, x, (ushort)(y+2), z, 0);
+			return true;
+		}
+		bool checkdoorbreakbottom(Player p, ushort x, ushort y, ushort z)
+		{
+			BlockID b = p.level.FastGetBlock((ushort)x, (ushort)(y-1), (ushort)z);
+			DoorBlock d = GetDoorFromBlock(b);
+			if (d == null)
+			{
+				return false;
+			}
+			if (! ( b == d.Bottom_Block || b == d.Bottom_Block_Open || b == d.Bottom_Block_Inverse || b == d.Bottom_Block_Inverse_Open))
+			{
+				return false;
+			}
+			p.level.UpdateBlock(Player.Console, x, (ushort)(y-1), z, 0);
+			p.level.UpdateBlock(Player.Console, x, (ushort)(y), z, 0);
+			return true;
+		}
+		bool checkdoorbreaktop(Player p, ushort x, ushort y, ushort z)
+		{
+			BlockID b = p.level.FastGetBlock((ushort)x, (ushort)(y+1), (ushort)z);
+			DoorBlock d = GetDoorFromBlock(b);
+			if (d == null)
+			{
+				return false;
+			}
+			if (! ( b == d.Top_Block || b == d.Top_Block_Open || b == d.Top_Block_Inverse || b == d.Top_Block_Inverse_Open))
+			{
+				return false;
+			}
+			p.level.UpdateBlock(Player.Console, x, (ushort)(y+1), z, 0);
+			p.level.UpdateBlock(Player.Console, x, (ushort)(y), z, 0);
+			return true;
+		}
+		void CheckShouldDoorBreak(Player p, ushort x, ushort y, ushort z)
+		{
+			if (checkdoorbreakground(p, x, y, z))
+				return;
+			if (checkdoorbreakbottom(p, x,y,z))
+				return;
+			checkdoorbreaktop(p, x, y,z);
 		}
 	}
 }
