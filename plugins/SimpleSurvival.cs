@@ -524,12 +524,28 @@ namespace MCGalaxy {
 			{77, new CraftRecipe(new Dictionary<ushort, ushort>(){{4, 8}}, 1, true)},
 			// Crafting Table									// Woodenblock x4 = 1x Crafting table
 			{76, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 4}})},
+			// Bookshelve									// Woodenblock x6 = 1x Book Shelve
+			{47, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 6}})},
+			// Crate									// Woodenblock x8 = 1x Book Shelve
+			{64, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 8}})},
 			// Wood												// Log x 1 = 4x Wood planks
 			{5, new CraftRecipe(new Dictionary<ushort, ushort>(){{17, 1}}, 4)},
 			// Brick
 			{45, new CraftRecipe(new Dictionary<ushort, ushort>(){{4, 2}}, 1)},
+			// Sandstone
+			{52, new CraftRecipe(new Dictionary<ushort, ushort>(){{12, 2}}, 1)},
+			// Ironblock
+			{42, new CraftRecipe(new Dictionary<ushort, ushort>(){{113, 9}}, 1)},
+			// Goldblock
+			{41, new CraftRecipe(new Dictionary<ushort, ushort>(){{112, 9}}, 1)},
+			// Diamond block
+			{86, new CraftRecipe(new Dictionary<ushort, ushort>(){{111, 9}}, 1)},
 			// Door												// Wood x 8 = 1x Wooden Door
 			{66, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 8}}, 1, true)},
+			// Iron Door												// Wood x 8 = 1x Wooden Door
+			{67, new CraftRecipe(new Dictionary<ushort, ushort>(){{113, 8}}, 1, true)},
+			// Dark Oak Door												// Wood x 8 = 1x Wooden Door
+			{68, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 8}}, 1, true)},
 			// Stick												// Wood x 2 = 1x Stick
 			{115, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 2}}, 1)},
 			// Torch											// Stick x 1 + Coal x 1 = 4x Torches
@@ -548,6 +564,10 @@ namespace MCGalaxy {
 			{44, new CraftRecipe(new Dictionary<ushort, ushort>(){{43, 3}}, 1, false)},
 			//  Rope
 			{51, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 7}}, 4, false)},
+			//  Redwool									// Rose + wool
+			{21, new CraftRecipe(new Dictionary<ushort, ushort>(){{38, 1}, {36, 1}}, 1, false)},
+
+
 			// Wooden Sword									// Stick x 1 + wood x 2 = 1x Wooden sword  [Need crafting table]
 			{99, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 1}, {5, 2}}, 1, true)},
 			// Wooden Shovel									// Stick x 2 + wood x 1 = 1x Wooden Shovel
