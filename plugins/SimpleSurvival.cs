@@ -12,6 +12,7 @@ using MCGalaxy.Blocks;
 using MCGalaxy.Network;
 using MCGalaxy.Commands;
 using MCGalaxy.Bots;
+using MCGalaxy.SQL;
 //pluginref door.dll
 //pluginref bed.dll
 namespace MCGalaxy {
@@ -506,6 +507,11 @@ namespace MCGalaxy {
 		{
 			{"sheep", new Dictionary<ushort, ushort>(){{36, 1}}}
 		};
+		static ColumnDesc[] createInventories = new ColumnDesc[] {
+            new ColumnDesc("Name", ColumnType.VarChar, 16),
+            new ColumnDesc("Level", ColumnType.VarChar, 32),
+			new ColumnDesc("Inventory", ColumnType.VarChar, 200)
+        };
 		public static Dictionary<ushort, CraftRecipe> craftingRecipies = new Dictionary<ushort, CraftRecipe>()
 		{
 			// Glass 											// Sand x1 (MOVE TO FURNACE LATER)
@@ -629,8 +635,8 @@ namespace MCGalaxy {
 			Command.Register(new CmdPvP());
 			Command.Register(new CmdGiveBlock());
 			Command.Register(new CmdCraft());
-	
 			loadMaps();
+			SetupInventoryDB();
 			try
 			{
 				addBreakBlocks();
@@ -681,6 +687,8 @@ namespace MCGalaxy {
 			Command.Unregister(Command.Find("PvP"));
 			Command.Unregister(Command.Find("GiveBlock"));
 			Command.Unregister(Command.Find("Craft"));
+
+			SaveAllInventory();
 			mobHealth.Clear();
 
 			foreach(var pair in mineProgressIndicators)
@@ -850,7 +858,7 @@ namespace MCGalaxy {
 				return nullInventory;
 			return playerInventories[pl.level.name][pl.name];
 		}
-		public void InventorySetBlock(Player pl, ushort block, ushort amount)
+		public static void InventorySetBlock(Player pl, ushort block, ushort amount)
 		{
 			
 			if (!playerInventories.ContainsKey(pl.level.name))
@@ -863,7 +871,14 @@ namespace MCGalaxy {
 			SendMiningUnbreakableMessage(pl, block);
 			SendInventory(pl);
 		}
-
+		public static Dictionary<ushort, ushort> InventoryGet(Player pl, string level)
+		{
+			if (!playerInventories.ContainsKey(level))
+				return new Dictionary<ushort, ushort>();
+			if (!playerInventories[level].ContainsKey(pl.name))
+				return new Dictionary<ushort, ushort>();
+			return playerInventories[level][pl.name];
+		}
 		BlockMineConfig getBlockMineTime(ushort blockId)
 		{
 			if (blockId > 256)
@@ -1042,6 +1057,55 @@ namespace MCGalaxy {
 				message += "\n";
 			}
 			return message;
+		}
+		private static void LoadInventory(Player pl)
+		{
+			if (!maplist.Contains(pl.level.name))
+                return;
+ 			List<string[]> pRows = Database.GetRows("SurvivalInventory", "*", "WHERE Name=@0 AND Level=@1", pl.name, pl.level.name);
+			if (pRows.Count == 0) return;
+			string[] row = pRows[0];
+		 	if (row.Length < 3) return;
+			if (row[2].Length == 0)
+				return;
+			string[] inventoryEntries = row[2].Split(';');
+			for (int i=0; i<inventoryEntries.Length-2; i=i+2)
+			{
+				ushort block = UInt16.Parse(inventoryEntries[i]);
+				ushort amount = UInt16.Parse(inventoryEntries[i+1]);
+				InventorySetBlock(pl,block, amount );
+			}
+
+		}
+		private static void SaveInventory(Player pl, string level)
+		{
+			if (level == "")
+			{
+				return;
+			}
+			Dictionary<ushort, ushort> inv = InventoryGet(pl, level);
+			string saveInventoryString = "0;0;";
+			foreach(var pair in inv)
+			{
+				saveInventoryString += pair.Key.ToString() +";" + pair.Value.ToString() +";";
+			}
+ 			List<string[]> pRows = Database.GetRows("SurvivalInventory", "*", "WHERE Name=@0 AND Level=@1", pl.name, level);
+			
+            if (pRows.Count == 0)
+            {
+                Database.AddRow("SurvivalInventory", "Name,  Level", pl.name, level);
+            }
+			Database.UpdateRows("SurvivalInventory", "Inventory=@0", "WHERE Name=@1 AND Level=@2", saveInventoryString, pl.name , level);
+
+		}
+		private static void SaveAllInventory()
+		{
+			foreach (var pl in PlayerInfo.Online.Items)
+				SaveInventory(pl, pl.level.name);
+		}
+		private static void SetupInventoryDB()
+		{
+			   Database.CreateTable("SurvivalInventory", createInventories);
 		}
 		///////////////////////////////////////////////////////////
 		// Mining
@@ -1262,6 +1326,7 @@ namespace MCGalaxy {
 		///////////////////////////////////////////////////////////
 		void HandlePlayerDisconnect(Player p, string reason)
         {
+			SaveInventory(p, p.level.name);
 			destroyMineIndicator(p);
 			if (playerMiningProgress.ContainsKey(p))
 				playerMiningProgress.Remove(p);
@@ -1327,6 +1392,8 @@ namespace MCGalaxy {
         }
 		void HandleSentMap( Player p, Level prevLevel, Level level)
 		{
+			if (prevLevel != null && maplist.Contains(prevLevel.name))
+				SaveInventory(p, prevLevel.name);
 			if (!maplist.Contains(level.name))
 			{
 				SetGuiText(p,"","");
@@ -1335,6 +1402,8 @@ namespace MCGalaxy {
 				p.Extras["MINING_LASTPROG"] = 0;
 				return;
 			}
+			LoadInventory(p);
+			ClearHotbar(p);
 			InitPlayer(p);
 			p.Extras["SURVIVAL_HEALTH"] = Config.MaxHealth;
 			p.Extras["SURVIVAL_AIR"] = Config.MaxAir;
@@ -1458,6 +1527,7 @@ namespace MCGalaxy {
         void HandlePlayerConnect(Player p)
 		{
 			if (!maplist.Contains(p.level.name)) return;
+			LoadInventory(p);
 			InitPlayer(p);
 			SendMiningUnbreakableMessage(p);
 			ClearHotbar(p);
