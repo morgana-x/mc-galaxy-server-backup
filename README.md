@@ -24,4 +24,3 @@ etc!
 
 ## Todo
 + Make certain blocks require certain tiers of tools
-+ Saving inventory
