@@ -45,6 +45,7 @@ namespace MCGalaxy {
 			public bool IsSword=false;
 			public bool IsPickaxe=false;
 			public bool IsAxe = false;
+			public bool IsShovel = false;
 			public bool IsHoe = false;
 			public bool IsSprite = false;
 			public bool IsSheers = false;
@@ -67,7 +68,7 @@ namespace MCGalaxy {
 			{
 				IsSword = true;
 				Damage = dmg;
-				knkback = knkback;
+				Knockback = knkback;
 				MiningBonus = 0.1f;
 			}
 		}
@@ -77,7 +78,15 @@ namespace MCGalaxy {
 			{
 				IsAxe = true;
 				Damage = dmg;
-				knkback = knkback;
+				Knockback = knkback;
+				MiningBonus = mining;
+			}
+		}
+		public class ShovelTool : SurvivalTool
+		{
+			public ShovelTool(float mining=1.5f)
+			{
+				IsShovel = true;
 				MiningBonus = mining;
 			}
 		}
@@ -265,7 +274,6 @@ namespace MCGalaxy {
 				ID = 92,
 				IsSword = false,
 				Damage = 4,
-			
 			},
 			new AxeTool()
 			{
@@ -275,7 +283,7 @@ namespace MCGalaxy {
 				IsSword = false,
 				Damage = 5,
 			},
-			new SurvivalTool()
+			new ShovelTool(4f)
 			{
 				NAME = "Iron Shovel",
 				TEXTURE = 220,
@@ -307,7 +315,7 @@ namespace MCGalaxy {
 				IsSword = false,
 				Damage = 4
 			},
-			new SurvivalTool()
+			new ShovelTool(2f)
 			{
 				NAME = "Stone Shovel",
 				TEXTURE = 219,
@@ -323,7 +331,7 @@ namespace MCGalaxy {
 				IsSword = true,
 				Damage = 4
 			},
-			new SurvivalTool()
+			new ShovelTool(2f)
 			{
 				NAME = "Wooden Shovel",
 				TEXTURE = 218,
@@ -355,7 +363,7 @@ namespace MCGalaxy {
 				IsSword = true,
 				Damage = 7
 			},
-			new SurvivalTool()
+			new ShovelTool(4f)
 			{
 				NAME = "Gold Shovel",
 				TEXTURE = 222,
@@ -371,7 +379,7 @@ namespace MCGalaxy {
 				IsSword = false,
 				Damage = 5
 			},
-			new SurvivalTool()
+			new AxeTool()
 			{
 				NAME = "Gold Axe",
 				TEXTURE = 254,
@@ -387,7 +395,7 @@ namespace MCGalaxy {
 				IsSword = true,
 				Damage = 8
 			},
-			new SurvivalTool()
+			new ShovelTool(5f)
 			{
 				NAME = "Diamond Shovel",
 				TEXTURE = 221,
@@ -403,7 +411,7 @@ namespace MCGalaxy {
 				IsSword = false,
 				Damage = 6
 			},
-			new SurvivalTool()
+			new AxeTool()
 			{
 				NAME = "Diamond Axe",
 				TEXTURE = 253,
@@ -1056,12 +1064,26 @@ namespace MCGalaxy {
 			ushort heldBlock = pl.GetHeldBlock();
 			SurvivalTool tool = getTool(pl, heldBlock);
 			if (tool != null) miningBonus = tool.MiningBonus;
+			if (tool != null && tool.IsPickaxe)
+				miningBonus *= blockMineData.PickaxeTimeMultiplier;
+			if (tool != null && tool.IsShovel)
+				miningBonus *= blockMineData.ShovelTimeMultiplier;
+			if (tool != null && tool.IsAxe)
+				miningBonus *= blockMineData.AxeTimeMultiplier;
+			if (tool != null && tool.IsSword)
+				miningBonus *= 0.5f;
 			playerMiningProgress[pl].Progress += (ushort)(1 * miningBonus);
 			playerMiningProgress[pl].LastMine = DateTime.Now;
 			ushort amount =  (ushort)Math.Min(10, (int) (( (float)playerMiningProgress[pl].Progress / (float)blockMineData.MiningTime) * 10));
 			setMineIndicator(pl, pos,amount);
+			spawnMineParticles(pl, pos);
 			if (playerMiningProgress[pl].Progress < blockMineData.MiningTime)
 				return;
+			if (Config.UseGoodlyEffects)
+			{
+				// Despawn break particle
+				pl.Send(Packet.DefineEffect(200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1000, 0, 0, false, false, false, false, false));
+			}
 			playerMiningProgress.Remove(pl);
 			destroyMineIndicator(pl);
 			pl.level.UpdateBlock(pl, pos[0], pos[1], pos[2], 0);
@@ -1114,6 +1136,19 @@ namespace MCGalaxy {
 			
 			PlayerBot.Add(bot);
 			mineProgressIndicators.Add(p, bot);
+		}
+		private void spawnMineParticles(Player pl, ushort[] pos)
+		{
+			if (!Config.UseGoodlyEffects)
+				return;
+			if (true)
+				return;
+			float px = Convert.ToSingle(pos[0]), py = Convert.ToSingle(pos[1]), pz = Convert.ToSingle(pos[2]);
+			px += 0.5f;
+            pz += 0.5f;
+			// Spawn break particle
+			pl.Send(Packet.DefineEffect(200, 0, 105, 15, 120, 255, 255, 255, 10, 1, 28, 0, 0, 0, 0, 10f, 0, true, true, true, true, true));
+			pl.Send(Packet.SpawnEffect(200, px, py, pz, px, py, pz));
 		}
 		private void setMineIndicator(Player pl, ushort[] pos, ushort amount)
 		{
@@ -1811,6 +1846,7 @@ namespace MCGalaxy {
 		}
 		void HandleBlockClicked(Player p, MouseButton button, MouseAction action, ushort yaw, ushort pitch, byte entity, ushort x, ushort y, ushort z, TargetBlockFace face)
 		{
+			if (!maplist.Contains(p.level.name)) return;
 			if (entity != 255 && AttemptPvp(p, button, action, yaw, pitch, entity, x, y, z, face))
 				return;
 			if (Config.MiningEnabled && button == MouseButton.Left)
@@ -1860,7 +1896,7 @@ namespace MCGalaxy {
 			int repeat = air; //(int)Math.Round((double)(air/Config.MaxAir) * 10);
 			return ("%9" + new string('♥', repeat)+ "%8" + new string('♥', Config.MaxAir-air ));
 		}
-		string getHeldBlockAmount(Player p)
+		static string getHeldBlockAmount(Player p)
 		{
 			ushort block = p.GetHeldBlock();
 			if (block <= 0)
@@ -1873,7 +1909,7 @@ namespace MCGalaxy {
 			}*/
 			return amount.ToString();
 		}
-		void SendPlayerGui(Player p)
+		static void SendPlayerGui(Player p)
 		{
 			if (!maplist.Contains(p.level.name)) return;
 			SetGuiText(p, GetHealthBar	(GetHealth	(p)),GetAirBar		(GetAir		(p)), getHeldBlockAmount(p));
@@ -1889,19 +1925,19 @@ namespace MCGalaxy {
 			}
 			return (height-4);
 		}
-		public void SetHealth(Player p, int health)
+		public static void SetHealth(Player p, int health)
 		{
 			p.Extras["SURVIVAL_HEALTH"] = health;
 		}
-		public int GetHealth(Player p)
+		public static int GetHealth(Player p)
 		{
 			return p.Extras.GetInt("SURVIVAL_HEALTH");
 		}
-		public int GetAir(Player p)
+		public static int GetAir(Player p)
 		{
 			return p.Extras.GetInt("SURVIVAL_AIR");
 		}
-		public void SetAir(Player p, int air)
+		public static void SetAir(Player p, int air)
 		{
 			p.Extras["SURVIVAL_AIR"] = air;
 		}
@@ -1946,7 +1982,7 @@ namespace MCGalaxy {
 			}
 			return drowning;
 		}
-		public void Damage(Player p, int amount, BlockID reason = 0)
+		public static void Damage(Player p, int amount, BlockID reason = 0)
 		{
 			SetHealth(p, GetHealth(p) - amount);
 			if (GetHealth(p) <= 0)
@@ -1956,7 +1992,7 @@ namespace MCGalaxy {
 			}
 			SendPlayerGui(p);
 		}
-		public void Die(Player p, BlockID reason = 4)
+		public static void Die(Player p, BlockID reason = 4)
 		{
 			p.HandleDeath(reason, immediate: true);	
 			InitPlayer(p);
@@ -1967,7 +2003,7 @@ namespace MCGalaxy {
 			p.SendCpeMessage(CpeMessageType.Status2, bottom);
 			p.SendCpeMessage(CpeMessageType.Status3, bottom2);
 		}
-		public void InitPlayer(Player p)
+		public static void InitPlayer(Player p)
 		{
 			SetGuiText(p, "","");
 			p.Extras["SURVIVAL_HEALTH"] = Config.MaxHealth;
@@ -1976,6 +2012,7 @@ namespace MCGalaxy {
 			p.Extras["FALLING"] = false;
 			p.Extras["FALL_START"] = p.Pos.Y;
 			SendPlayerGui(p);
+			SendMiningUnbreakableMessage(p);
 		}
 		public static void ResetPlayerState(Player p)
         {
@@ -2347,6 +2384,7 @@ namespace MCGalaxy {
                 if (pl.level.name.ToLower() == args[1].ToLower())
                 {
                     SimpleSurvival.ResetPlayerState(pl);
+					SimpleSurvival.InitPlayer(pl);
                 }
             }
         }

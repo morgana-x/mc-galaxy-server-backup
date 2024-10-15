@@ -38,6 +38,7 @@ namespace VeryPlugins
         public const float coalChance = 1f;
         public const float ironChance = 1f / 4f;
         public const float goldChance = 1f / 8f;
+        public const float diamondChance = 1f/16f;
 
         /// <summary>
         /// Returns true if seed and offsets were successfully found
@@ -370,7 +371,7 @@ namespace VeryPlugins
                             if (lvl.FastGetBlock((ushort)x, (ushort)y, (ushort)z) == biome.Ground &&
                                 lvl.FastGetBlock((ushort)x, (ushort)(y + 1), (ushort)z) == Block.Air)
                             {
-                                int height = r.Next(0, 8);
+                                int height = r.Next(3, 8);
                                 if (r.Next(0, 50) == 0 && !Tree.TreeCheck(lvl, (ushort)x, (ushort)y, (ushort)z, (short)height) && lvl.IsAirAt((ushort)x, (ushort)(y + 10), (ushort)z))
                                 {
 
@@ -422,6 +423,7 @@ namespace VeryPlugins
                             TryGenOre(x, y, z, coalDepth, coalChance, 16);
                             TryGenOre(x, y, z, ironDepth, ironChance, 15);
                             TryGenOre(x, y, z, goldDepth, goldChance, 14);
+                            TryGenOre(x, y, z, goldDepth, diamondChance, (ushort)(87+256));
                         }
             }
             bool TryGenOre(int x, int y, int z, int oreDepth, float oreChance, BlockID oreID)
