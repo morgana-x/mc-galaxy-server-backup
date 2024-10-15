@@ -29,19 +29,64 @@ namespace MCGalaxy {
 			public float AxeTimeMultiplier = 1;
 			public ushort MiningTime = 5;
 			public int overrideBlock = -1;
+			public bool RequirePickaxe = false;
 			public BlockMineConfig(ushort time = 5)
 			{
 				this.MiningTime = time;
 			}
 		}
+		public class SurvivalTool
+		{
+			public ushort TEXTURE;
+			public string NAME;
+			public ushort ID;
+			public bool IsSword=false;
+			public bool IsPickaxe=false;
+			public bool IsAxe = false;
+			public bool IsHoe = false;
+			public bool IsSprite = false;
+			public ushort Damage=2;
+			public float Knockback = 1f;
+			public float MiningBonus = 1f;
+
+		}
+		public class PickaxeTool : SurvivalTool
+		{
+			public PickaxeTool(float mining=1.5f)
+			{
+				IsPickaxe = true;
+				MiningBonus = mining;
+			}
+		}
+		public class SwordTool : SurvivalTool
+		{
+			public SwordTool(ushort dmg =2, float knkback =1f)
+			{
+				IsSword = true;
+				Damage = dmg;
+				knkback = knkback;
+				MiningBonus = 0.1f;
+			}
+		}
+		public class AxeTool : SurvivalTool
+		{
+			public AxeTool(ushort dmg =2, float knkback =1f, float mining=1.5f)
+			{
+				IsAxe = true;
+				Damage = dmg;
+				knkback = knkback;
+				MiningBonus = mining;
+			}
+		}
 		public class StoneMineConfig : BlockMineConfig
 		{
-			public StoneMineConfig(ushort time = 30)
+			public StoneMineConfig(ushort time = 35)
 			{
 				PickaxeTimeMultiplier = 1.5f;
 				AxeTimeMultiplier = 0.2f;
 				ShovelTimeMultiplier = 0.2f;
 				MiningTime = time;
+				RequirePickaxe = true;
 			}
 		}
 		public class WoodMineConfig : BlockMineConfig
@@ -86,15 +131,15 @@ namespace MCGalaxy {
 		}
 		public class CraftRecipe
 		{
-			public CraftRecipe(Dictionary<ushort,ushort> ingredients, ushort amountMultiplier = 1)
+			public CraftRecipe(Dictionary<ushort,ushort> ingredients, ushort amountMultiplier = 1, bool needCraftingTable = false)
 			{
 				Ingredients = ingredients;
 				amountProduced = amountMultiplier;
-				//needCraftingTable = needcraftingTable;
+				NeedCraftingTable = needCraftingTable;
 			}
 			public Dictionary<ushort,ushort> Ingredients = new Dictionary<ushort,ushort>();
 			public ushort amountProduced = 1;
-			//public bool needCraftingTable = false;
+			public bool NeedCraftingTable = false;
 			
 		}
 		public class Config {
@@ -194,6 +239,242 @@ namespace MCGalaxy {
 			{87, new StoneMineConfig(25)},
 			
 		};
+		public static List<SurvivalTool> customTools = new List<SurvivalTool>(){
+			new SwordTool()
+			{
+				NAME = "Iron Sword",
+				TEXTURE = 204,
+				ID = 91,
+				IsSword = true,
+				Damage = 6
+			},
+			new PickaxeTool(5f)
+			{
+				NAME = "Iron Pickaxe",
+				TEXTURE = 236,
+				ID = 92,
+				IsSword = false,
+				Damage = 4,
+			
+			},
+			new AxeTool()
+			{
+				NAME = "Iron Axe",
+				TEXTURE = 252,
+				ID = 93,
+				IsSword = false,
+				Damage = 5,
+			},
+			new SurvivalTool()
+			{
+				NAME = "Iron Shovel",
+				TEXTURE = 220,
+				ID = 94,
+				IsSword = false,
+				Damage = 6,
+			},
+			new SwordTool()
+			{
+				NAME = "Stone Sword",
+				TEXTURE = 203,
+				ID = 95,
+				IsSword = true,
+				Damage = 5,
+			},
+			new SurvivalTool()
+			{
+				NAME = "Stone Axe",
+				TEXTURE = 251,
+				ID = 96,
+				IsSword = false,
+				Damage = 4
+			},
+			new PickaxeTool(4f)
+			{
+				NAME = "Stone Pickaxe",
+				TEXTURE = 235,
+				ID = 97,
+				IsSword = false,
+				Damage = 4
+			},
+			new SurvivalTool()
+			{
+				NAME = "Stone Shovel",
+				TEXTURE = 219,
+				ID = 98,
+				IsSword = false,
+				Damage = 4
+			},
+			new SwordTool()
+			{
+				NAME = "Wooden Sword",
+				TEXTURE = 202,
+				ID = 99,
+				IsSword = true,
+				Damage = 4
+			},
+			new SurvivalTool()
+			{
+				NAME = "Wooden Shovel",
+				TEXTURE = 218,
+				ID = 100,
+				IsSword = false,
+				Damage = 3
+			},
+			new PickaxeTool(2f)
+			{
+				NAME = "Wooden Pickaxe",
+				TEXTURE = 234,
+				ID = 101,
+				IsSword = false,
+				Damage = 3
+			},
+			new AxeTool()
+			{
+				NAME = "Wooden Axe",
+				TEXTURE = 250,
+				ID = 102,
+				IsSword = false,
+				Damage = 4
+			},
+			new SurvivalTool()
+			{
+				NAME = "Gold Sword",
+				TEXTURE = 206,
+				ID = 103,
+				IsSword = true,
+				Damage = 7
+			},
+			new SurvivalTool()
+			{
+				NAME = "Gold Shovel",
+				TEXTURE = 222,
+				ID = 104,
+				IsSword = false,
+				Damage = 5
+			},
+			new PickaxeTool(7f)
+			{
+				NAME = "Gold Pickaxe",
+				TEXTURE = 238,
+				ID = 105,
+				IsSword = false,
+				Damage = 5
+			},
+			new SurvivalTool()
+			{
+				NAME = "Gold Axe",
+				TEXTURE = 254,
+				ID = 106,
+				IsSword = false,
+				Damage = 6
+			},
+			new SurvivalTool()
+			{
+				NAME = "Diamond Sword",
+				TEXTURE = 205,
+				ID = 107,
+				IsSword = true,
+				Damage = 8
+			},
+			new SurvivalTool()
+			{
+				NAME = "Diamond Shovel",
+				TEXTURE = 221,
+				ID = 108,
+				IsSword = false,
+				Damage = 6
+			},
+			new PickaxeTool(8f)
+			{
+				NAME = "Diamond Pickaxe",
+				TEXTURE = 237,
+				ID = 109,
+				IsSword = false,
+				Damage = 6
+			},
+			new SurvivalTool()
+			{
+				NAME = "Diamond Axe",
+				TEXTURE = 253,
+				ID = 110,
+				IsSword = false,
+				Damage = 7
+			},
+			new SurvivalTool()
+			{
+				NAME = "Diamond",
+				TEXTURE = 175,
+				ID = 111,
+				IsSword = false,
+				IsSprite = true,
+			},
+			new SurvivalTool()
+			{
+				NAME = "Gold Bar",
+				TEXTURE = 159,
+				ID = 112,
+				IsSword = false,
+				IsSprite = true,
+			},
+			new SurvivalTool()
+			{
+				NAME = "Iron Ignot",
+				TEXTURE = 143,
+				ID = 113,
+				IsSword = false,
+				IsSprite = true,
+			},
+			new SurvivalTool()
+			{
+				NAME = "Coal",
+				TEXTURE = 127,
+				ID = 114,
+				IsSword = false,
+				IsSprite = true
+			},
+			new SurvivalTool()
+			{
+				NAME = "Stick",
+				TEXTURE = 255,
+				ID = 115,
+				IsSword = false,
+				IsSprite = true
+			},
+			new SurvivalTool()
+			{
+				NAME = "Cookie",
+				TEXTURE = 201,
+				ID = 116,
+				IsSword = false,
+				IsSprite = true
+			},
+			new SurvivalTool()
+			{
+				NAME = "Beef",
+				TEXTURE = 214,
+				ID = 117,
+				IsSword = false,
+				IsSprite = true
+			},
+			new SurvivalTool()
+			{
+				NAME = "Steak",
+				TEXTURE = 215,
+				ID = 118,
+				IsSword = false,
+				IsSprite = true
+			},
+			new SurvivalTool()
+			{
+				NAME = "Apple",
+				TEXTURE = 229,
+				ID = 119,
+				IsSword = false,
+				IsSprite = true
+			},
+		};
+
 		public static void SetMineTime(ushort blockId, BlockMineConfig config)
 		{
 			if (!blockMiningTimes.ContainsKey(blockId))
@@ -212,7 +493,7 @@ namespace MCGalaxy {
 			// Gold bar											// Gold Orex1 (MOVE TO FURNACE LATER)
 			{112, new CraftRecipe(new Dictionary<ushort, ushort>(){{14,1}})},
 			// Furnace											// Cobblestone x8 = 1x Furnace
-			{77, new CraftRecipe(new Dictionary<ushort, ushort>(){{4, 8}})},
+			{77, new CraftRecipe(new Dictionary<ushort, ushort>(){{4, 8}}, 1, true)},
 			// Crafting Table									// Woodenblock x4 = 1x Crafting table
 			{76, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 4}})},
 			// Wood												// Log x 1 = 4x Wood planks
@@ -220,47 +501,64 @@ namespace MCGalaxy {
 			// Brick
 			{45, new CraftRecipe(new Dictionary<ushort, ushort>(){{4, 2}}, 1)},
 			// Door												// Wood x 8 = 1x Wooden Door
-			{66, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 8}}, 1)},
+			{66, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 8}}, 1, true)},
 			// Stick												// Wood x 2 = 1x Stick
 			{115, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 2}}, 1)},
 			// Torch											// Stick x 1 + Coal x 1 = 4x Torches
 			{75, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 1}, {114, 1}}, 4)},
 			// Glowstone										// 9x torches = 4x glowstone
-			{79, new CraftRecipe(new Dictionary<ushort, ushort>(){{75, 9}}, 4)},
+			{79, new CraftRecipe(new Dictionary<ushort, ushort>(){{75, 9}}, 4, true)},
 			// Bed											// Wood x 3 + Wool x 3 = 1x Bed
-			{84, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 3}, {36, 3}})},
+			{84, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 3}, {36, 3}}, 1, true)},
 			// Cake											// Wool x 3 = 1x Cake
 			{83, new CraftRecipe(new Dictionary<ushort, ushort>(){{36, 3}})},
-			// Wooden Sword									// Stick x 1 + wood x 2 = 1x Wooden sword
-			{99, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 1}, {5, 2}})},
+			// Wooden Sword									// Stick x 1 + wood x 2 = 1x Wooden sword  [Need crafting table]
+			{99, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 1}, {5, 2}}, 1, true)},
 			// Wooden Shovel									// Stick x 2 + wood x 1 = 1x Wooden Shovel
-			{100, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {5, 1}})},
+			{100, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {5, 1}}, 1, true)},
 			// Wooden PIck									// Stick x 2 + wood x 3 = 1x Wooden Pick
-			{101, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {5, 3}})},
+			{101, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {5, 3}}, 1, true)},
 			// Wooden Axe									// Stick x 2 + wood x 4 = 1x Wooden Axe
-			{102, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {5, 4}})},
+			{102, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {5, 4}}, 1, true)},
 			// Stone Sword									// Stick x 1 + stone x 2 = 1x stone sword
-			{95, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 1}, {1, 2}})},
+			{95, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 1}, {1, 2}}, 1, true)},
 			// Stone Shovel									// Stick x 2 + stone x 1 = 1x stone Shovel
-			{96, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {1, 1}})},
+			{96, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {1, 1}}, 1, true)},
 			// Stone PIck									// Stick x 2 + stone x 3 = 1x stone Pick
-			{97, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {1, 3}})},
+			{97, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {1, 3}}, 1, true)},
 			// Stone Axe									// Stick x 2 + stone x 4 = 1x stone Axe
-			{98, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {1, 4}})},
+			{98, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {1, 4}}, 1, true)},
 		};
 		
-		
+		public class MiningProgress
+		{
+			public ushort BlockType;
+			public ushort Progress = 0;
+			public ushort[] Position;
+			public DateTime LastMine;
+
+			public bool IsExpired()
+			{
+				return DateTime.Now.Subtract(LastMine).TotalMilliseconds > 700;
+			}
+
+
+			public MiningProgress(ushort block, ushort[] pos)
+			{
+				BlockType = block;
+				Position = pos;
+				LastMine = DateTime.Now;
+			}
+		}
 		
 		SchedulerTask drownTask;
 		SchedulerTask guiTask;
 		SchedulerTask regenTask;
 		SchedulerTask mobSpawningTask;
 		
-		Dictionary<ushort, ushort> toolDamage = new Dictionary<ushort, ushort>();
-		static Dictionary<ushort, float> toolKnockback = new Dictionary<ushort, float>();
 
 		public static Dictionary<string, Dictionary<string, Dictionary<ushort, ushort>>> playerInventories = new  Dictionary<string, Dictionary<string, Dictionary<ushort, ushort>>>();
-		public Dictionary<Player, ushort[]> playerMiningProgress = new Dictionary<Player, ushort[]>();
+		public Dictionary<Player, MiningProgress> playerMiningProgress = new Dictionary<Player, MiningProgress>();
 		public Dictionary<Player, PlayerBot> mineProgressIndicators = new Dictionary<Player, PlayerBot>();
 		public override void Load(bool startup) {
 			//LOAD YOUR PLUGIN WITH EVENTS OR OTHER THINGS!
@@ -280,8 +578,18 @@ namespace MCGalaxy {
 			Command.Register(new CmdPvP());
 			Command.Register(new CmdGiveBlock());
 			Command.Register(new CmdCraft());
-			addBreakBlocks();
+	
 			loadMaps();
+			try
+			{
+				addBreakBlocks();
+				AddToolBlocks();
+			}
+			catch (Exception e)
+			{
+				Player.Console.Message(e.ToString());
+				Player.Console.Message("WARNING YOU NEED THE INF ID VERSION OF MCGALAXY TO ACCESS FULL FEATURES OF SIMPLESURVIVAL!!");
+			}
 			foreach (Player p in PlayerInfo.Online.Items)
 			{
 				InitPlayer(p);
@@ -297,28 +605,6 @@ namespace MCGalaxy {
 				AddAi("roam", new string[] {"", "roam", "roam"});
 			}
 			mobHealth.Clear();
-			toolDamage.Clear();
-			toolKnockback.Clear();
-			for (ushort i=90;i<=110;i++)
-			{
-				toolDamage.Add(i, 3);
-			}
-			toolDamage[91] = 6; // iron
-			toolDamage[95] = 5; // stone
-			toolDamage[99] = 4; // wood
-			toolDamage[103] = 7; // gold
-			toolDamage[107] = 8; // diamond
-			for (ushort i=90;i<=110;i++)
-			{
-				toolKnockback.Add(i, 1.1f);
-			}
-			toolKnockback[91] = 1.6f;
-			toolKnockback[95] = 1.4f;
-			toolKnockback[99] = 1.2f;
-			toolKnockback[103] = 1.8f;
-			toolKnockback[107] = 2.2f;
-
-
 			foreach(Player p in PlayerInfo.Online.Items)
 			{
 				SendMiningUnbreakableMessage(p);
@@ -372,7 +658,115 @@ namespace MCGalaxy {
             }
             else File.Create(Config.Path+ "maps.txt").Dispose();
         }
+		//////////
+		// Tools
+		///
+		private void AddToolBlocks()
+		{
+			foreach (var a in customTools)
+			{
+				if (a.IsSprite)
+				{
+					AddBlockItem(a.ID, a.NAME, a.TEXTURE);
+					continue;
+				}
+				AddBlockDef(a.NAME, a.ID, 16,0,0,16,16,16,a.TEXTURE, 85, 85, 85, true);
+			}
+		}
+		
+		private void AddBlockDef(BlockDefinition def)
+		{
+			BlockDefinition.Add(def, BlockDefinition.GlobalDefs, null );
+		}
+		public void AddBlockDef(string name, ushort Id, ushort MinX, ushort MinY, ushort MinZ, ushort MaxX, ushort MaxY, ushort MaxZ, ushort TEXTURE_SIDE, ushort TEXTURE_FRONT, ushort TEXTURE_TOP, ushort TEXTURE_BOTTOM, bool Transperant, int Brightness=0)
+		{
+				ushort RawID = Id;
+				string Name = name;
+				byte Speed = 1;
+				byte CollideType = 0;
+				bool BlocksLight = false;
+				byte WalkSound = 1;
+				bool FullBright = false;
+				byte Shape = 16;
+				byte BlockDraw =  (byte)(Transperant ? 1 : 0);
+				byte FallBack = 5;
+				byte FogDensity = 0;
+				byte FogR = 0;
+				byte FogG = 0;
+				byte FogB = 0;
+				ushort LeftTex = TEXTURE_SIDE;
+				ushort RightTex = TEXTURE_SIDE;
+				ushort FrontTex = TEXTURE_FRONT;
+				ushort BackTex = TEXTURE_TOP;
+				ushort TopTex = TEXTURE_TOP;
+				ushort BottomTex = TEXTURE_BOTTOM;
+				int InventoryOrder = -1;
+				BlockDefinition def = new BlockDefinition();
+				def.RawID = RawID; def.Name = Name;
+				def.Speed = Speed; def.CollideType = CollideType;
+				def.TopTex = TopTex; def.BottomTex = BottomTex;
+				
+				def.BlocksLight = BlocksLight; def.WalkSound = WalkSound;
+				def.FullBright = FullBright; def.Shape = Shape;
+				def.BlockDraw = BlockDraw; def.FallBack = FallBack;
+				
+				def.FogDensity = FogDensity;
+				def.FogR = FogR; def.FogG = FogG; def.FogB = FogB;
+				def.MinX = (byte)MinX; def.MinY = (byte)MinY; def.MinZ = (byte)MinZ;
+				def.MaxX = (byte)MaxX; def.MaxY = (byte)MaxY; def.MaxZ = (byte)MaxZ;
+				
+				def.LeftTex = LeftTex; def.RightTex = RightTex;
+				def.FrontTex = FrontTex; def.BackTex = BackTex;
+				def.InventoryOrder = InventoryOrder;
+				def.UseLampBrightness = false;
+				def.Brightness = Brightness;
+				AddBlockDef(def);
+				
+				ushort block = Id;
+				 if (true) {
+					BlockPerms perms = BlockPerms.GetPlace((ushort)(block + 256));
+					perms.MinRank = LevelPermission.Nobody;
+				 }
+				BlockPerms.Save();
+				BlockPerms.ApplyChanges();
 
+				if (!Block.IsPhysicsType(block)) {
+					BlockPerms.ResendAllBlockPermissions();
+				}            
+				//SetDoorBlockPerms(Id);
+		}
+		public void AddBlockItem(ushort Id, string Name, ushort Texture)
+		{
+			BlockDefinition def = new BlockDefinition();
+				def.RawID = Id; def.Name = Name;
+				def.Speed = 1; def.CollideType = 0;
+				def.TopTex = Texture; def.BottomTex = Texture;
+				
+				def.BlocksLight = false; def.WalkSound = 1;
+				def.FullBright = false; def.Shape = 0;
+				def.BlockDraw = 2; def.FallBack = 5;
+				
+				def.FogDensity = 0;
+				def.FogR = 0; def.FogG = 0; def.FogB = 0;
+				def.MinX = 0; def.MinY = 0; def.MinZ = 0;
+				def.MaxX = 0; def.MaxY = 0; def.MaxZ = 0;
+				
+				def.LeftTex = Texture; def.RightTex = Texture;
+				def.FrontTex = Texture; def.BackTex = Texture;
+				def.InventoryOrder = -1;
+			ushort block = Id;
+			 if (true) {
+					BlockPerms perms = BlockPerms.GetPlace((ushort)(block + 256));
+					perms.MinRank = LevelPermission.Nobody;
+				 }
+				BlockPerms.Save();
+				BlockPerms.ApplyChanges();
+
+				if (!Block.IsPhysicsType(block)) {
+					BlockPerms.ResendAllBlockPermissions();
+				}        
+			AddBlockDef(def);
+		}
 		///////////////////////////////////////////////////////////
 		// Inventory
 		///////////////////////////////////////////////////////////
@@ -479,6 +873,10 @@ namespace MCGalaxy {
 					return;
 				}
 			}
+			if (craftingRecipies[block].NeedCraftingTable && !IsNearCraftingTable(pl))
+			{
+				pl.Message("You need to be near a crafting table to craft this!");
+			}
 			foreach(var pair in craftingRecipies[block].Ingredients)
 			{
 				InventoryRemoveBlocks(pl, pair.Key, (ushort)(pair.Value * amount));
@@ -487,6 +885,11 @@ namespace MCGalaxy {
 			SetHeldBlock(pl, 0);
 			SetHeldBlock(pl, block);
 			pl.Message("Crafted " + amount.ToString() + "x " + block.ToString() + ".");
+		}
+		public static bool IsNearCraftingTable(Player pl)
+		{
+			
+			return true;
 		}
 		public static Dictionary<ushort,CraftRecipe>  GenerateCraftOptions(Player pl)
 		{
@@ -560,25 +963,32 @@ namespace MCGalaxy {
 				return;
 			if (!playerMiningProgress.ContainsKey(pl))
 			{
-				playerMiningProgress.Add(pl, new ushort[5]{blockType,0,pos[0], pos[1], pos[2]});
+				playerMiningProgress.Add(pl, new MiningProgress(blockType, pos));
 				return;
 			}
-			ushort[] currentProgress = playerMiningProgress[pl];
-			if (currentProgress[0] != blockType || (pos[0] != currentProgress[2] || pos[1] != currentProgress[3] || pos[2] != currentProgress[4]))
+			var currentProgress = playerMiningProgress[pl];
+			if (currentProgress.BlockType != blockType || (pos[0] != currentProgress.Position[0]|| pos[1] !=  currentProgress.Position[1] || pos[2] != currentProgress.Position[2]))
 			{
-				playerMiningProgress[pl] = new ushort[5]{blockType,0,pos[0], pos[1], pos[2]};
+				playerMiningProgress[pl] = new MiningProgress(blockType, pos);
 				return;
 			}
-			playerMiningProgress[pl][1] += 2;
-			ushort amount =  (ushort)Math.Min(10, (int) (( (float)playerMiningProgress[pl][1] / (float)blockMineData.MiningTime) * 10));
+			float miningBonus = 1f;
+			ushort heldBlock = pl.GetHeldBlock();
+			SurvivalTool tool = getTool(pl, heldBlock);
+			if (tool != null) miningBonus = tool.MiningBonus;
+			playerMiningProgress[pl].Progress += (ushort)(1 * miningBonus);
+			playerMiningProgress[pl].LastMine = DateTime.Now;
+			ushort amount =  (ushort)Math.Min(10, (int) (( (float)playerMiningProgress[pl].Progress / (float)blockMineData.MiningTime) * 10));
 			setMineIndicator(pl, pos,amount);
-			if (playerMiningProgress[pl][1] < blockMineData.MiningTime)
+			if (playerMiningProgress[pl].Progress < blockMineData.MiningTime)
 				return;
 			playerMiningProgress.Remove(pl);
 			destroyMineIndicator(pl);
 			pl.level.UpdateBlock(pl, pos[0], pos[1], pos[2], 0);
 			OnBlockChangedEvent.Call(Player.Console, pos[0], pos[1], pos[2], ChangeResult.Modified);
 			if (blockMineData.overrideBlock == 0)
+				return;
+			if (blockMineData.RequirePickaxe && (tool == null || !tool.IsPickaxe))
 				return;
 			if (blockMineData.overrideBlock != -1)
 			{
@@ -598,23 +1008,7 @@ namespace MCGalaxy {
 		{
 			if (!playerMiningProgress.ContainsKey(pl))
 				return;
-			ushort lastProg = 0;
-			try
-			{
-			 	lastProg = (ushort)pl.Extras["MINING_LASTPROG"];
-			}
-			catch
-			{
-				pl.Extras["MINING_LASTPROG"] = (ushort)0;
-			}
-			if (lastProg < playerMiningProgress[pl][1])
-			{
-				pl.Extras["MINING_LASTPROG"] = playerMiningProgress[pl][1];
-				return;
-			}
-			playerMiningProgress[pl][1]--;
-			pl.Extras["MINING_LASTPROG"] = playerMiningProgress[pl][1];
-			if (playerMiningProgress[pl][1] > 1)
+			if (!playerMiningProgress[pl].IsExpired())
 				return;
 			playerMiningProgress.Remove(pl);
 			destroyMineIndicator(pl);
@@ -627,7 +1021,7 @@ namespace MCGalaxy {
 				PlayerBot.Remove(mineProgressIndicators[p]);
 			mineProgressIndicators.Remove(p);
 		}
-		private void createMineIndicator(Player p)
+		private void createMineIndicator(Player p, Position pos)
 		{
 			if (mineProgressIndicators.ContainsKey(p))
 				destroyMineIndicator(p);
@@ -636,16 +1030,17 @@ namespace MCGalaxy {
 			PlayerBot bot = new PlayerBot(uniqueName, p.level);
 			bot.DisplayName = "";
 			bot.Model = "break0|1.002";
-			bot.SetInitialPos(new Position(0, 0, 0));
+			bot.SetInitialPos(pos);
 			
 			PlayerBot.Add(bot);
 			mineProgressIndicators.Add(p, bot);
 		}
 		private void setMineIndicator(Player pl, ushort[] pos, ushort amount)
 		{
+			Position indicatorPosition =  Position.FromFeet((int)(pos[0]*32) +16, (int)(pos[1]*32), (int)(pos[2]*32) +16); //new Position(pos[0] << 5, pos[1] << 5, pos[2] << 5);
 			if (!mineProgressIndicators.ContainsKey(pl))
-				createMineIndicator(pl);
-			mineProgressIndicators[pl].Pos = Position.FromFeet((int)(pos[0]*32) +16, (int)(pos[1]*32), (int)(pos[2]*32) +16); //new Position(pos[0] << 5, pos[1] << 5, pos[2] << 5);
+				createMineIndicator(pl, indicatorPosition);
+			mineProgressIndicators[pl].Pos=indicatorPosition;
 			mineProgressIndicators[pl].UpdateModel("break" + amount.ToString() + "|1.002");
 		}
 		private void addBreakBlocks()
@@ -715,6 +1110,8 @@ namespace MCGalaxy {
 		void HandlePlayerDisconnect(Player p, string reason)
         {
 			destroyMineIndicator(p);
+			if (playerMiningProgress.ContainsKey(p))
+				playerMiningProgress.Remove(p);
         }
 		void HandleGUI(SchedulerTask task)
         {
@@ -807,6 +1204,7 @@ namespace MCGalaxy {
             foreach (Player p in PlayerInfo.Online.Items)
 			{
 				if (!maplist.Contains(p.level.name)) continue;
+				UnMineBlock(p);
 				if (p.invincible) continue;
 				if (IsDrowning(p))
 				{
@@ -891,6 +1289,7 @@ namespace MCGalaxy {
 			if (!maplist.Contains(p.level.name)) return;
 			InitPlayer(p);
 			SendMiningUnbreakableMessage(p);
+			ClearHotbar(p);
 		}
 
 		int GetLagCompensation(int ping)
@@ -932,10 +1331,12 @@ namespace MCGalaxy {
 					PlayerBot.Remove(bot);
 					continue;
 				}
-				if (bot.Pos.BlockX > level.Width || bot.Pos.BlockY < 0 || bot.Pos.BlockZ > level.Length)
+				if (bot.Pos.BlockX >= level.Length || bot.Pos.BlockY < 0 || bot.Pos.BlockY+1 > level.Height || bot.Pos.BlockZ >= level.Width ||  bot.Pos.BlockX < 0 || bot.Pos.BlockZ < 0)
 				{
 					PlayerBot.Remove(bot);
+					return;
 				}
+			
 				BlockID gb = level.FastGetBlock((ushort)bot.Pos.BlockX, (ushort)(bot.Pos.BlockY+1), (ushort)bot.Pos.BlockZ);
 				if (gb == 9 || gb == 8 || gb == 10 || gb == 11) // water, lava etc
 				{
@@ -1147,28 +1548,47 @@ namespace MCGalaxy {
 		Dictionary<PlayerBot, int> mobHealth = new Dictionary<PlayerBot, int>();
 		
 		
-
-		ushort getDamage(Player p)
+		static SurvivalTool getTool(ushort blockId)
+		{
+			if (blockId > 256)
+				blockId = (ushort)(blockId-256);
+			foreach (var tool in customTools)
+			{
+				if (tool.ID == blockId)
+					return tool;
+			}
+			return null;
+		}
+		static SurvivalTool getTool(Player p, ushort blockId)
+		{
+			if (!InventoryHasEnoughBlock(p, blockId))
+				return null;
+			return getTool(blockId);
+		}
+		static ushort getDamage(Player p)
 		{
 			ushort block = p.GetHeldBlock();
 			if (block >= 66)
 				block = (ushort)(block - 256);
-			if (!toolDamage.ContainsKey(block))
-				return 2;
 			if (!InventoryHasEnoughBlock(p, block))
 				return 2;
-			return toolDamage[block];
+			SurvivalTool tool = getTool(block);
+			if (tool == null)
+				return 2;
+			return (ushort)tool.Damage;
 		}
+
 		static float getKnockback(Player p)
 		{
 			ushort block = p.GetHeldBlock();
 			if (block >= 66)
 				block = (ushort)(block - 256);
-			if (!toolKnockback.ContainsKey(block))
-				return 1f;
 			if (!InventoryHasEnoughBlock(p, block))
 				return 1f;
-			return toolKnockback[block];
+			SurvivalTool tool = getTool(block);
+			if (tool == null)
+				return 1f;
+			return tool.Knockback;
 		}
 		void HandleAttackMob (Player p, byte entity)
 		{
@@ -1344,27 +1764,10 @@ namespace MCGalaxy {
 			}*/
 			return amount.ToString();
 		}
-		string getMiningProgressBar(Player p)
-		{
-			if (!playerMiningProgress.ContainsKey(p))
-				return "";
-			if (playerMiningProgress[p][0] == 255)
-				return "";
-			BlockMineConfig blockMineData = getBlockMineTime(playerMiningProgress[p][0]);
-			if (blockMineData == null)
-				return "";
-			if (playerMiningProgress[p][1] > blockMineData.MiningTime)
-				return "";
-			int amount =  Math.Min(10, (int) (( (float)playerMiningProgress[p][1] / (float)blockMineData.MiningTime) * 10));
-
-			return "%7" + new string('#', amount) + "%8" + new string('#', 10 - amount);
-		}
 		void SendPlayerGui(Player p)
 		{
 			if (!maplist.Contains(p.level.name)) return;
 			SetGuiText(p, GetHealthBar	(GetHealth	(p)),GetAirBar		(GetAir		(p)), getHeldBlockAmount(p));
-
-			//p.SendCpeMessage(CpeMessageType.SmallAnnouncement, getMiningProgressBar(p));
 		}
 		///////////////////////////////////////////////////////////////////////////
 		// UTILITIES
@@ -1397,6 +1800,8 @@ namespace MCGalaxy {
 		{
 			 if (!p.Supports(CpeExt.HeldBlock))
 			 	return;
+			if (blockId > 65 && blockId < 256)
+				blockId = (ushort)(blockId + 256);
 			p.Session.SendHoldThis(blockId, false);
 		}
 		public bool IsBurning(Player p)
@@ -1486,6 +1891,20 @@ namespace MCGalaxy {
 				}
 			}
 			Damage(victim, dmg, 4);
+		}
+		public static void SetHotbar(Player p, byte slot, ushort block)
+		{
+			byte[] buffer = Packet.SetHotbar(block, slot, p.Session.hasExtBlocks);
+			p.Send(buffer);
+
+		}
+
+		private static void ClearHotbar(Player p)
+		{
+			for (byte i=0; i <9; i++)
+			{
+				SetHotbar(p, i, 0);
+			}
 		}
 		static void PushPlayer(Player p, Player victim)
         {
@@ -1670,6 +2089,7 @@ namespace MCGalaxy {
 				}
 			}
 			MCGalaxy.SimpleSurvival.InventoryAddBlocks(p, blockId, amount);
+			MCGalaxy.SimpleSurvival.SetHeldBlock(p, blockId);
 			p.Message("Gave " + who.name + " x" + args[2] + " " + args[1]);
         }
 		public override void Help(Player p)
