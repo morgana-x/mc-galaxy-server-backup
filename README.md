@@ -1,3 +1,5 @@
+## This requires the inf id version of mcgalaxy
+
 Reccomended MOTD for a survival level, also do `/pvp add [levelname]` to add survival to a level on top of this
 ```
 daynightcycle=true +hold -speed maxspeed=1.47 -hax +thirdperson
