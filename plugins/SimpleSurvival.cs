@@ -588,14 +588,14 @@ namespace MCGalaxy {
 			// Wooden Axe									// Stick x 2 + wood x 4 = 1x Wooden Axe
 			{102, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {5, 4}}, 1, true)},
 
-			// Stone Sword									// Stick x 1 + stone x 2 = 1x stone sword
-			{95, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 1}, {1, 2}}, 1, true)},
-			// Stone Shovel									// Stick x 2 + stone x 1 = 1x stone Shovel
-			{96, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {1, 1}}, 1, true)},
-			// Stone PIck									// Stick x 2 + stone x 3 = 1x stone Pick
-			{97, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {1, 3}}, 1, true)},
-			// Stone Axe									// Stick x 2 + stone x 4 = 1x stone Axe
-			{98, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {1, 4}}, 1, true)},
+			// Stone Sword									// Stick x 1 + Cobblestone x 2 = 1x stone sword
+			{95, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 1}, {4, 2}}, 1, true)},
+			// Stone Shovel									// Stick x 2 + Cobblestone x 1 = 1x stone Shovel
+			{96, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {4, 1}}, 1, true)},
+			// Stone PIck									// Stick x 2 + Cobblestone x 3 = 1x stone Pick
+			{97, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {4, 3}}, 1, true)},
+			// Stone Axe									// Stick x 2 + Cobblestone x 4 = 1x stone Axe
+			{98, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {4, 4}}, 1, true)},
 
 			// Iron Sword									// Stick x 1 + Iron x 2 = 1x Iron sword
 			{91, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 1}, {113, 2}}, 1, true)},
@@ -1198,7 +1198,10 @@ namespace MCGalaxy {
 				playerMiningProgress.Add(pl, new MiningProgress(blockType, pos));
 				return;
 			}
+			
 			var currentProgress = playerMiningProgress[pl];
+			if (DateTime.Now.Subtract(currentProgress.LastMine).TotalMilliseconds < 200) // avoid fast mining cheat
+				return;
 			if (currentProgress.BlockType != blockType || (pos[0] != currentProgress.Position[0]|| pos[1] !=  currentProgress.Position[1] || pos[2] != currentProgress.Position[2]))
 			{
 				//destroyMineIndicator(p);
