@@ -1164,7 +1164,8 @@ namespace MCGalaxy {
             Level level = p.level;
             for (int i = 0; i < count; i++) 
             {
-                Packet.WriteBlockPermission((BlockID)i, i != 0 ? InventoryHasEnoughBlock(p, (ushort)i) && ( i < p.group.CanPlace.Length && p.group.CanPlace[i]) : true, i == 0 ? true : false, p.Session.hasExtBlocks, bulk, i * size);
+				bool canPlace = ( i < p.group.CanPlace.Length && p.group.CanPlace[i]) || (i > 65 && i+256 < p.group.CanPlace.Length && p.group.CanPlace[i+256]);
+                Packet.WriteBlockPermission((BlockID)i, i != 0 ? InventoryHasEnoughBlock(p, (ushort)i) && canPlace : true, i == 0 ? true : false, p.Session.hasExtBlocks, bulk, i * size);
             }
             p.Send(bulk);
 		}
