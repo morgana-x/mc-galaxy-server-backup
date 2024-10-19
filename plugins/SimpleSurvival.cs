@@ -536,7 +536,7 @@ namespace MCGalaxy {
 			// Crafting Table									// Woodenblock x4 = 1x Crafting table
 			{76, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 4}})},
 			// Bookshelve									// Woodenblock x6 = 1x Book Shelve
-			{47, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 6}})},
+			{47, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 6}}, 1, true)},
 			// Crate									// Woodenblock x8 = 1x Book Shelve
 			{64, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 8}})},
 			// Wood												// Log x 1 = 4x Wood planks
@@ -775,7 +775,7 @@ namespace MCGalaxy {
 					blockMiningTimes[a.ID] = new BlockMineConfig(2);
 					continue;
 				}
-				AddBlockDef(a.NAME, a.ID, 16,0,0,16,16,16,a.TEXTURE, 85, 85, 85, true);
+				AddBlockDef(a.NAME, a.ID, 16,0,0,16,16,16,a.TEXTURE, 85, 85, 85, true, 0, admin:true);
 			}
 		}
 		private void AddDoorBlocks()
@@ -800,7 +800,7 @@ namespace MCGalaxy {
 		{
 			BlockDefinition.Add(def, BlockDefinition.GlobalDefs, null );
 		}
-		public void AddBlockDef(string name, ushort Id, ushort MinX, ushort MinY, ushort MinZ, ushort MaxX, ushort MaxY, ushort MaxZ, ushort TEXTURE_SIDE, ushort TEXTURE_FRONT, ushort TEXTURE_TOP, ushort TEXTURE_BOTTOM, bool Transperant, int Brightness=0)
+		public void AddBlockDef(string name, ushort Id, ushort MinX, ushort MinY, ushort MinZ, ushort MaxX, ushort MaxY, ushort MaxZ, ushort TEXTURE_SIDE, ushort TEXTURE_FRONT, ushort TEXTURE_TOP, ushort TEXTURE_BOTTOM, bool Transperant, int Brightness=0, bool admin=false)
 		{
 				ushort RawID = Id;
 				string Name = name;
@@ -845,19 +845,19 @@ namespace MCGalaxy {
 				AddBlockDef(def);
 				
 				ushort block = Id;
-				 if (true) {
+				 if (admin) {
 					BlockPerms perms = BlockPerms.GetPlace((ushort)(block + 256));
 					perms.MinRank = LevelPermission.Nobody;
-				 }
-				BlockPerms.Save();
-				BlockPerms.ApplyChanges();
+					BlockPerms.Save();
+					BlockPerms.ApplyChanges();
 
-				if (!Block.IsPhysicsType(block)) {
-					BlockPerms.ResendAllBlockPermissions();
-				}            
+					if (!Block.IsPhysicsType(block)) {
+						BlockPerms.ResendAllBlockPermissions();
+					}    
+				 }        
 				//SetDoorBlockPerms(Id);
 		}
-		public void AddBlockItem(ushort Id, string Name, ushort Texture)
+		public void AddBlockItem(ushort Id, string Name, ushort Texture, bool admin=false)
 		{
 			BlockDefinition def = new BlockDefinition();
 				def.RawID = Id; def.Name = Name;
@@ -877,7 +877,7 @@ namespace MCGalaxy {
 				def.FrontTex = Texture; def.BackTex = Texture;
 				def.InventoryOrder = -1;
 			ushort block = Id;
-			 if (true) {
+			 if (admin) {
 					BlockPerms perms = BlockPerms.GetPlace((ushort)(block + 256));
 					perms.MinRank = LevelPermission.Guest; // LevelPermission.Nobody
 				 }
@@ -1069,8 +1069,11 @@ namespace MCGalaxy {
 		public static Dictionary<ushort,CraftRecipe>  GenerateCraftOptions(Player pl)
 		{
 			Dictionary<ushort,CraftRecipe> validCraftables = new Dictionary<ushort,CraftRecipe> ();
+			bool nearCraftingtable = IsNearCraftingTable(pl);
 			foreach(var recipePair in craftingRecipies)
 			{
+				if (!nearCraftingtable && recipePair.Value.NeedCraftingTable)
+					continue;
 				bool valid = true;
 				foreach(var pair in recipePair.Value.Ingredients)
 				{
@@ -1089,7 +1092,8 @@ namespace MCGalaxy {
 		public static string GenerateCraftOptionsMessage(Player p)
 		{
 			Dictionary<ushort,CraftRecipe> validRecipes = GenerateCraftOptions(p);
-			string message = "Valid craftables:\n";
+			string message = "Craftable Items:\n";
+			bool nearCraftingtable = IsNearCraftingTable(p);
 			foreach( var pair in validRecipes)
 			{
 				message += "  %e[%d" + pair.Key + "%e] %b" + Block.GetName(p, pair.Key > 65 ? (ushort)(pair.Key + 256) : pair.Key) + "%e ==";
@@ -1099,6 +1103,8 @@ namespace MCGalaxy {
 				}
 				message += "\n";
 			}
+			if (!nearCraftingtable)
+				message += "%cStand near a crafting table to see items that require one!";
 			return message;
 		}
 		private static void LoadInventory(Player pl)
@@ -1249,10 +1255,12 @@ namespace MCGalaxy {
 					blockType = (ushort)(blockType -256);
 			}
 			InventoryAddBlocks(pl, blockType, 1);
-			if (InventoryGetBlockAmount(pl, blockType) == 1)
+			if ( true || InventoryGetBlockAmount(pl, blockType) == 1)
 			{
 				SetHeldBlock(pl, 0);
 				SetHeldBlock(pl, blockType);
+				if (heldBlock != 0)
+					SetHeldBlock(pl, heldBlock);
 			}
 		}
 		private void UnMineBlock(Player pl)
@@ -1311,8 +1319,10 @@ namespace MCGalaxy {
 		{
 			for (ushort i =0; i < 10; i++)
 			{
-				AddBlockDef("break" + i.ToString(), (ushort)(490 + i), 0,0,0,16,16,16, (ushort)(240 + i));
+				AddBlockDef("break" + i.ToString(), (ushort)(490 + i), 0,0,0,16,16,16, (ushort)(240 + i), true);
 			}
+			// AddBlockItem(ushort Id, string Name, ushort Texture, bool admin=false)
+			AddBlockItem((ushort)256, "", 85, true );
 		}
 		public void AddBlockDef(string name, ushort Id, ushort MinX, ushort MinY, ushort MinZ, ushort MaxX, ushort MaxY, ushort MaxZ, ushort TEXTURE, bool Transperant=true, int Brightness=0)
 		{
@@ -2073,9 +2083,10 @@ namespace MCGalaxy {
 			if (block <= 0)
 				return "";
 			ushort amount = InventoryGetBlockAmount(p, block);
-			/*if (amount == 0)
+			/*if (block != 256 && amount == 0)
 			{
-				//SetHeldBlock(p, 0);
+				SetHeldBlock(p, (ushort)(256+256));
+				SetHeldBlock(p, (ushort)(5));
 				return "";
 			}*/
 			return amount.ToString();
@@ -2112,13 +2123,13 @@ namespace MCGalaxy {
 		{
 			p.Extras["SURVIVAL_AIR"] = air;
 		}
-		public static void SetHeldBlock(Player p, ushort blockId)
+		public static void SetHeldBlock(Player p, ushort blockId, bool locked=false)
 		{
 			 if (!p.Supports(CpeExt.HeldBlock))
 			 	return;
 			if (blockId > 65 && blockId < 256)
 				blockId = (ushort)(blockId + 256);
-			p.Session.SendHoldThis(blockId, false);
+			p.Session.SendHoldThis(blockId, locked);
 		}
 		public bool IsBurning(Player p)
 		{
