@@ -49,8 +49,8 @@ namespace MCGalaxy
 		public static Dictionary<int, string> LightingColors = new Dictionary<int, string>()
         {
 			{0,   "#FFFFFF"},
-			{175, "#5c5c5c"},
-			{180, "#1d1d1d"},
+			{177, "#5c5c5c"},
+			{180, "#202020"},
 			{225, "#5c5c5c"},
 			{230, "#fac3af"},
 		};
@@ -58,7 +58,6 @@ namespace MCGalaxy
         {
 			{0,   "#9B9B9B"},
 			{180, "#090909"},
-			{200, "#2b2b2b"},
 			{230, "#757575"},
 		};
 		public static Dictionary<int, string> FogColors = new Dictionary<int, string>()
