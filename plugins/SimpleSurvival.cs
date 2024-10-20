@@ -601,7 +601,7 @@ namespace MCGalaxy {
 			// Double Slab
 			{43, new CraftRecipe(new Dictionary<ushort, ushort>(){{4, 4}}, 1, false)},
 			//  Slab
-			{44, new CraftRecipe(new Dictionary<ushort, ushort>(){{43, 3}}, 6, false)},
+			{44, new CraftRecipe(new Dictionary<ushort, ushort>(){{43, 1}}, 2, false)},
 			//  Rope
 			{51, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 7}}, 4, false)},
 			//  Redwool									// Rose + wool
