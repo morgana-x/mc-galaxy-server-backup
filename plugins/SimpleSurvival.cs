@@ -203,7 +203,7 @@ namespace MCGalaxy {
 				// MOBS
 				public static bool CanKillMobs = true;
 				public static bool SpawnMobs = true; // Requires MobAI from https://github.com/ddinan/classicube-stuff/blob/master/MCGalaxy/Plugins/MobAI.cs
-				public static int MaxMobs = 25;
+				public static int MaxMobs = 18;
 
 				// Mining
 				public static bool MiningEnabled = true;
@@ -1128,10 +1128,10 @@ namespace MCGalaxy {
 			bool nearCraftingtable = IsNearCraftingTable(p);
 			foreach( var pair in validRecipes)
 			{
-				message += "  %e[%5" + pair.Key + "%e] %b" + Block.GetName(p, pair.Key > 65 ? (ushort)(pair.Key + 256) : pair.Key) + "%e ==";
+				message += /*"  %e[%5" + pair.Key + "%e] */"    %3" + Block.GetName(p, pair.Key > 65 ? (ushort)(pair.Key + 256) : pair.Key) + "%7 ==";
 				foreach(var pair2 in pair.Value.Ingredients)
 				{
-					message += " %a" + Block.GetName(p, pair2.Key > 65 ? (ushort)(pair2.Key + 256) : pair2.Key) + "%5x" + pair2.Value.ToString();
+					message += " %2" + Block.GetName(p, pair2.Key > 65 ? (ushort)(pair2.Key + 256) : pair2.Key) + "%dx" + pair2.Value.ToString();
 				}
 				message += "\n";
 			}
@@ -1510,6 +1510,13 @@ namespace MCGalaxy {
 				return;
 			if (cancel)
 				return;
+			var tool = getTool(block);
+			if (tool != null && !tool.IsSprite)
+			{
+				cancel = true;
+				p.RevertBlock(x,y,z);
+				return;
+			}
 			if (p.level.Config.MOTD.ToLower().Contains("-inventory")) return;
 			if ((placing == false || block == 0) && Config.MiningEnabled)
 			{
