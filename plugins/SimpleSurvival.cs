@@ -112,13 +112,14 @@ namespace MCGalaxy {
 		}
 		public class ObsidianMineConfig : StoneMineConfig
 		{
-			public ObsidianMineConfig(ushort time = 250)
+			public ObsidianMineConfig(ushort time = 1300)
 			{
-				PickaxeTimeMultiplier = 1.5f;
-				AxeTimeMultiplier = 0.2f;
-				ShovelTimeMultiplier = 0.2f;
+				PickaxeTimeMultiplier = 1f;
+				AxeTimeMultiplier = 0.01f;
+				ShovelTimeMultiplier = 0.01f;
 				MiningTime = time;
 				RequirePickaxe = true;
+				RequiredToolTier = 3;
 			}
 		}
 		public class OreMineConfig : StoneMineConfig
@@ -154,7 +155,7 @@ namespace MCGalaxy {
 		}
 		public class WoolMineConfig : BlockMineConfig
 		{
-			public WoolMineConfig(ushort time = 7)
+			public WoolMineConfig(ushort time = 4)
 			{
 				AxeTimeMultiplier = 1f;
 			 	PickaxeTimeMultiplier = 1f;
@@ -597,7 +598,7 @@ namespace MCGalaxy {
 			// Cake											// Wool x 3 = 1x Cake
 			{83, new CraftRecipe(new Dictionary<ushort, ushort>(){{36, 3}})},
 			// Cobblestone Slab
-			{50, new CraftRecipe(new Dictionary<ushort, ushort>(){{4, 3}}, 1, false)},
+			{50, new CraftRecipe(new Dictionary<ushort, ushort>(){{4, 1}}, 2, false)},
 			// Double Slab
 			{43, new CraftRecipe(new Dictionary<ushort, ushort>(){{4, 4}}, 1, false)},
 			//  Slab
