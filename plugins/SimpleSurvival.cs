@@ -1038,7 +1038,7 @@ namespace MCGalaxy {
 			pl.Message("%cYou need:");
 			foreach(var pair in recipe.Ingredients)
 			{
-				pl.Message("  " + Block.GetName(pl, pair.Key > 65 ? (ushort)(pair.Key + 256) : pair.Key) + "%dx" + pair.Value.ToString());
+				pl.Message("  " + Block.GetName(pl, pair.Key > 65 ? (ushort)(pair.Key + 256) : pair.Key) + "%5x" + pair.Value.ToString());
 			}
 		}
 		public static void Craft(Player pl, ushort block, ushort amount=1)
@@ -1128,10 +1128,10 @@ namespace MCGalaxy {
 			bool nearCraftingtable = IsNearCraftingTable(p);
 			foreach( var pair in validRecipes)
 			{
-				message += "  %e[%d" + pair.Key + "%e] %b" + Block.GetName(p, pair.Key > 65 ? (ushort)(pair.Key + 256) : pair.Key) + "%e ==";
+				message += "  %e[%5" + pair.Key + "%e] %b" + Block.GetName(p, pair.Key > 65 ? (ushort)(pair.Key + 256) : pair.Key) + "%e ==";
 				foreach(var pair2 in pair.Value.Ingredients)
 				{
-					message += " %a" + Block.GetName(p, pair2.Key > 65 ? (ushort)(pair2.Key + 256) : pair2.Key) + "%dx" + pair2.Value.ToString();
+					message += " %a" + Block.GetName(p, pair2.Key > 65 ? (ushort)(pair2.Key + 256) : pair2.Key) + "%5x" + pair2.Value.ToString();
 				}
 				message += "\n";
 			}
@@ -2455,7 +2455,7 @@ namespace MCGalaxy {
 			{
 				if (!CommandParser.GetBlock(p, args[1], out blockId))
 				{
-					p.Message("%cBlock %d\"" + args[1] + "\"%c doesn't exist!");
+					p.Message("%cBlock %5\"" + args[1] + "\"%c doesn't exist!");
 					return;
 				}
 				if (blockId > 256)
@@ -2476,7 +2476,7 @@ namespace MCGalaxy {
 			}
 			MCGalaxy.SimpleSurvival.InventoryAddBlocks(who, blockId, amount);
 			MCGalaxy.SimpleSurvival.SetHeldBlock(who, blockId);
-			p.Message("Gave " + who.name + " %d" + Block.GetName(p,blockId > 65 ? (ushort)(blockId + 256) : blockId) + "%a x" + (args.Length > 2 ? args[2].ToString() : "1"));
+			p.Message("Gave " + who.name + " %5" + Block.GetName(p,blockId > 65 ? (ushort)(blockId + 256) : blockId) + "%a x" + (args.Length > 2 ? args[2].ToString() : "1"));
         }
 		public override void Help(Player p)
         {
@@ -2520,7 +2520,7 @@ namespace MCGalaxy {
 				
 				if (!CommandParser.GetBlock(p, args[0], out blockId))
 				{
-					p.Message("%cBlock %d\"" + args[0] + "\"%c doesn't exist!");
+					p.Message("%cBlock %5\"" + args[0] + "\"%c doesn't exist!");
 					return;
 				}
 				if (blockId > 256)
@@ -2544,7 +2544,7 @@ namespace MCGalaxy {
 		public override void Help(Player p)
         {
             p.Message("%T/Craft <BlockId> <Amount=1>");
-			p.Message("%TType %d/Craft list%T to see a list of blocks you can craft!");
+			p.Message("%TType %5/Craft list%T to see a list of blocks you can craft!");
         }
 	}
 	public sealed class CmdPvP : Command2
