@@ -586,8 +586,8 @@ namespace MCGalaxy {
 			{67, new CraftRecipe(new Dictionary<ushort, ushort>(){{113, 8}}, 1, true)},
 			// Dark Oak Door												// Wood x 8 = 1x Wooden Door
 			{68, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 8}}, 1, true)},
-			// Stick												// Wood x 2 = 1x Stick
-			{115, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 2}}, 1)},
+			// Stick												// Wood x 2 = 4x Stick
+			{115, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 2}}, 4)},
 			// Torch											// Stick x 1 + Coal x 1 = 4x Torches
 			{75, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 1}, {114, 1}}, 4)},
 			// Glowstone										// 9x torches = 4x glowstone
