@@ -423,7 +423,7 @@ namespace VeryPlugins
                             TryGenOre(x, y, z, coalDepth, coalChance, 16);
                             TryGenOre(x, y, z, ironDepth, ironChance, 15);
                             TryGenOre(x, y, z, goldDepth, goldChance, 14);
-                            TryGenOre(x, y, z, goldDepth, diamondChance, (ushort)(87+256));
+                            TryGenOre(x, y, z, goldDepth, diamondChance, (ushort)(87));
                         }
             }
             bool TryGenOre(int x, int y, int z, int oreDepth, float oreChance, BlockID oreID)

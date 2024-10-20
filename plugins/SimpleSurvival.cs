@@ -634,7 +634,7 @@ namespace MCGalaxy {
 
 			public bool IsExpired()
 			{
-				return DateTime.Now.Subtract(LastMine).TotalMilliseconds > 700;
+				return DateTime.Now.Subtract(LastMine).TotalMilliseconds > 1200;
 			}
 
 
@@ -932,6 +932,7 @@ namespace MCGalaxy {
 		}
 		public static void InventoryAddBlocks(Player pl, ushort block, int amount)
 		{
+			if (pl.level.Config.MOTD.ToLower().Contains("-inventory")) return;
 			if (amount < 0)
 			{
 				InventoryRemoveBlocks(pl, block, (ushort)(Math.Abs(amount)));
@@ -968,6 +969,8 @@ namespace MCGalaxy {
 			if (amount >= playerInventories[pl.level.name][pl.name][block])
 			{
 				playerInventories[pl.level.name][pl.name].Remove(block);
+				if (pl.GetHeldBlock() == block)
+					SetHeldBlock(pl, 0);
 				return;
 			}
 			playerInventories[pl.level.name][pl.name][block] = (ushort)(playerInventories[pl.level.name][pl.name][block] - amount);
@@ -1163,6 +1166,7 @@ namespace MCGalaxy {
 		{
 			if (!Config.MiningEnabled)
 				return;
+			if (p.level.Config.MOTD.ToLower().Contains("-inventory")) return;
 			bool extBlocks = p.Session.hasExtBlocks;
             int count = p.Session.MaxRawBlock + 1;
             int size  = extBlocks ? 5 : 4;
@@ -1170,7 +1174,7 @@ namespace MCGalaxy {
             Level level = p.level;
             for (int i = 0; i < count; i++) 
             {
-				bool canPlace = ( i < p.group.CanPlace.Length && p.group.CanPlace[i]) || (i > 65 && i+256 < p.group.CanPlace.Length && p.group.CanPlace[i+256]);
+				bool canPlace = (( i < p.group.CanPlace.Length && p.group.CanPlace[i]) || (i > 65 && i+256 < p.group.CanPlace.Length && p.group.CanPlace[i+256]));
                 Packet.WriteBlockPermission((BlockID)i, i != 0 ? InventoryHasEnoughBlock(p, (ushort)i) && canPlace : true, i == 0 ? true : false, p.Session.hasExtBlocks, bulk, i * size);
             }
             p.Send(bulk);
@@ -1179,6 +1183,7 @@ namespace MCGalaxy {
 		{
 			if (!Config.MiningEnabled)
 				return;
+			if (p.level.Config.MOTD.ToLower().Contains("-inventory")) return;
 			bool extBlocks = p.Session.hasExtBlocks;
             int count = 1;//p.Session.MaxRawBlock + 1;
             int size  = extBlocks ? 5 : 4;
@@ -1203,7 +1208,6 @@ namespace MCGalaxy {
 			if (!playerMiningProgress.ContainsKey(pl))
 			{
 				playerMiningProgress.Add(pl, new MiningProgress(blockType, pos));
-				return;
 			}
 			
 			var currentProgress = playerMiningProgress[pl];
@@ -1401,6 +1405,7 @@ namespace MCGalaxy {
 		{
 			if (!Config.InventoryEnabled)
 				return;
+			if (p.level.Config.MOTD.ToLower().Contains("-inventory")) return;
 			ushort x=1;
 			for (ushort i=0; i < 767; i++)
 			{
@@ -1474,7 +1479,8 @@ namespace MCGalaxy {
 				return;
 			if (cancel)
 				return;
-			if (placing == false && Config.MiningEnabled)
+			if (p.level.Config.MOTD.ToLower().Contains("-inventory")) return;
+			if ((placing == false || block == 0) && Config.MiningEnabled)
 			{
 				cancel = true;
 				p.RevertBlock(x,y,z);
@@ -2030,6 +2036,7 @@ namespace MCGalaxy {
 			if (!maplist.Contains(p.level.name)) return;
 			if (entity != 255 && AttemptPvp(p, button, action, yaw, pitch, entity, x, y, z, face))
 				return;
+			if (p.level.Config.MOTD.ToLower().Contains("-inventory")) return;
 			if (Config.MiningEnabled && button == MouseButton.Left)
 				MineBlock(p, new ushort[]{x, y, z});
 			
@@ -2083,6 +2090,8 @@ namespace MCGalaxy {
 			if (block <= 0)
 				return "";
 			ushort amount = InventoryGetBlockAmount(p, block);
+			if (amount == 0 && p.level.Config.MOTD.ToLower().Contains("-inventory"))
+				return "";
 			/*if (block != 256 && amount == 0)
 			{
 				SetHeldBlock(p, (ushort)(256+256));
@@ -2451,6 +2460,11 @@ namespace MCGalaxy {
 
         public override void Use(Player p, string message, CommandData data)
         {
+			if (p.level.Config.MOTD.ToLower().Contains("-inventory"))
+			{
+				p.Message("%cYou can't craft on an inventory disabled world!");
+				return;
+			}
             if (message.Length == 0)
             {
                 Help(p);
