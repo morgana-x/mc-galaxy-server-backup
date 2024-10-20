@@ -33,6 +33,7 @@ namespace MCGalaxy {
 			public ushort MiningTime = 5;
 			public int overrideBlock = -1;
 			public bool RequirePickaxe = false;
+			public uint RequiredToolTier = 0;
 			public BlockMineConfig(ushort time = 5)
 			{
 				this.MiningTime = time;
@@ -53,7 +54,7 @@ namespace MCGalaxy {
 			public ushort Damage=2;
 			public float Knockback = 1f;
 			public float MiningBonus = 1f;
-
+			public uint ToolTier = 0;
 		}
 		public class PickaxeTool : SurvivalTool
 		{
@@ -120,19 +121,30 @@ namespace MCGalaxy {
 				RequirePickaxe = true;
 			}
 		}
+		public class OreMineConfig : StoneMineConfig
+		{
+			public OreMineConfig(ushort time = 80)
+			{
+				PickaxeTimeMultiplier = 1.5f;
+				AxeTimeMultiplier = 0.2f;
+				ShovelTimeMultiplier = 0.2f;
+				MiningTime = time;
+				RequirePickaxe = true;
+			}
+		}
 		public class WoodMineConfig : BlockMineConfig
 		{
-			public WoodMineConfig(ushort time = 25)
+			public WoodMineConfig(ushort time = 23)
 			{
 				AxeTimeMultiplier = 1.5f;
-				PickaxeTimeMultiplier = 1f;
-			    ShovelTimeMultiplier = 0.2f;
+				PickaxeTimeMultiplier = 0.1f;
+			    ShovelTimeMultiplier = 0.1f;
 			 	MiningTime = time;
 			}
 		}
 		public class DirtMineConfig : BlockMineConfig
 		{
-			public DirtMineConfig(ushort time = 15)
+			public DirtMineConfig(ushort time = 12)
 			{
 				AxeTimeMultiplier = 0.2f;
 			 	PickaxeTimeMultiplier = 1f;
@@ -213,9 +225,9 @@ namespace MCGalaxy {
 			{6, new BlockMineConfig(1)},
 			{12, new SandMineConfig()},
 			{13, new SandMineConfig()},
-			{14, new StoneMineConfig(30)},
-			{15, new StoneMineConfig(25)},
-			{16, new StoneMineConfig(){overrideBlock = 114}},
+			{14, new OreMineConfig(120){RequiredToolTier=2}},
+			{15, new StoneMineConfig(100){RequiredToolTier=1}},
+			{16, new OreMineConfig(){overrideBlock = 114}},
 			{17, new WoodMineConfig()},
 			{18, new DirtMineConfig(2) {overrideBlock = 0}},
 			{19, new DirtMineConfig(4)},
@@ -266,8 +278,9 @@ namespace MCGalaxy {
 			{81, new StoneMineConfig(4)},
 			{82, new StoneMineConfig(4)},
 			{85, new BlockMineConfig(1)},
-			{86, new StoneMineConfig(25)},
-			{87, new StoneMineConfig(25)},
+			{86, new StoneMineConfig()},
+			{87, new OreMineConfig(){overrideBlock = 111, RequiredToolTier=2}},
+			{88, new OreMineConfig(){RequiredToolTier=2}},
 			
 		};
 		public static List<SurvivalTool> customTools = new List<SurvivalTool>(){
@@ -277,7 +290,8 @@ namespace MCGalaxy {
 				TEXTURE = 204,
 				ID = 91,
 				IsSword = true,
-				Damage = 6
+				Damage = 6,
+				ToolTier = 2
 			},
 			new PickaxeTool(5f)
 			{
@@ -286,6 +300,7 @@ namespace MCGalaxy {
 				ID = 92,
 				IsSword = false,
 				Damage = 4,
+				ToolTier = 2
 			},
 			new AxeTool()
 			{
@@ -294,6 +309,7 @@ namespace MCGalaxy {
 				ID = 93,
 				IsSword = false,
 				Damage = 5,
+				ToolTier = 2
 			},
 			new ShovelTool(4f)
 			{
@@ -302,6 +318,7 @@ namespace MCGalaxy {
 				ID = 94,
 				IsSword = false,
 				Damage = 6,
+				ToolTier = 2
 			},
 			new SwordTool()
 			{
@@ -310,6 +327,7 @@ namespace MCGalaxy {
 				ID = 95,
 				IsSword = true,
 				Damage = 5,
+				ToolTier = 1
 			},
 			new SurvivalTool()
 			{
@@ -317,7 +335,8 @@ namespace MCGalaxy {
 				TEXTURE = 251,
 				ID = 96,
 				IsSword = false,
-				Damage = 4
+				Damage = 4,
+				ToolTier = 1
 			},
 			new PickaxeTool(4f)
 			{
@@ -325,7 +344,8 @@ namespace MCGalaxy {
 				TEXTURE = 235,
 				ID = 97,
 				IsSword = false,
-				Damage = 4
+				Damage = 4,
+				ToolTier = 1
 			},
 			new ShovelTool(2f)
 			{
@@ -333,7 +353,8 @@ namespace MCGalaxy {
 				TEXTURE = 219,
 				ID = 98,
 				IsSword = false,
-				Damage = 4
+				Damage = 4,
+				ToolTier = 1
 			},
 			new SwordTool()
 			{
@@ -373,7 +394,8 @@ namespace MCGalaxy {
 				TEXTURE = 206,
 				ID = 103,
 				IsSword = true,
-				Damage = 7
+				Damage = 7,
+				ToolTier = 2
 			},
 			new ShovelTool(4f)
 			{
@@ -381,7 +403,8 @@ namespace MCGalaxy {
 				TEXTURE = 222,
 				ID = 104,
 				IsSword = false,
-				Damage = 5
+				Damage = 5,
+				ToolTier = 2
 			},
 			new PickaxeTool(7f)
 			{
@@ -389,7 +412,8 @@ namespace MCGalaxy {
 				TEXTURE = 238,
 				ID = 105,
 				IsSword = false,
-				Damage = 5
+				Damage = 5,
+				ToolTier = 2
 			},
 			new AxeTool()
 			{
@@ -397,7 +421,8 @@ namespace MCGalaxy {
 				TEXTURE = 254,
 				ID = 106,
 				IsSword = false,
-				Damage = 6
+				Damage = 6,
+				ToolTier = 2
 			},
 			new SurvivalTool()
 			{
@@ -405,7 +430,8 @@ namespace MCGalaxy {
 				TEXTURE = 205,
 				ID = 107,
 				IsSword = true,
-				Damage = 8
+				Damage = 8,
+				ToolTier = 3
 			},
 			new ShovelTool(5f)
 			{
@@ -413,7 +439,8 @@ namespace MCGalaxy {
 				TEXTURE = 221,
 				ID = 108,
 				IsSword = false,
-				Damage = 6
+				Damage = 6,
+				ToolTier = 3
 			},
 			new PickaxeTool(8f)
 			{
@@ -421,7 +448,8 @@ namespace MCGalaxy {
 				TEXTURE = 237,
 				ID = 109,
 				IsSword = false,
-				Damage = 6
+				Damage = 6,
+				ToolTier = 3
 			},
 			new AxeTool()
 			{
@@ -429,7 +457,8 @@ namespace MCGalaxy {
 				TEXTURE = 253,
 				ID = 110,
 				IsSword = false,
-				Damage = 7
+				Damage = 7,
+				ToolTier = 3
 			},
 			new SurvivalTool()
 			{
@@ -1250,6 +1279,8 @@ namespace MCGalaxy {
 			if (blockMineData.overrideBlock == 0)
 				return;
 			if (blockMineData.RequirePickaxe && (tool == null || !tool.IsPickaxe))
+				return;
+			if (blockMineData.RequiredToolTier > 0 && (tool == null || tool.ToolTier < blockMineData.RequiredToolTier))
 				return;
 			if (blockMineData.overrideBlock != -1)
 			{
