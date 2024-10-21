@@ -294,7 +294,7 @@ namespace MCGalaxy {
 				Damage = 6,
 				ToolTier = 2
 			},
-			new PickaxeTool(5f)
+			new PickaxeTool(7f)
 			{
 				NAME = "Iron Pickaxe",
 				TEXTURE = 236,
@@ -339,7 +339,7 @@ namespace MCGalaxy {
 				Damage = 4,
 				ToolTier = 1
 			},
-			new PickaxeTool(4f)
+			new PickaxeTool(5f)
 			{
 				NAME = "Stone Pickaxe",
 				TEXTURE = 235,
@@ -434,7 +434,7 @@ namespace MCGalaxy {
 				Damage = 8,
 				ToolTier = 3
 			},
-			new ShovelTool(5f)
+			new ShovelTool(5)
 			{
 				NAME = "Diamond Shovel",
 				TEXTURE = 221,
@@ -443,7 +443,7 @@ namespace MCGalaxy {
 				Damage = 6,
 				ToolTier = 3
 			},
-			new PickaxeTool(8f)
+			new PickaxeTool(12f)
 			{
 				NAME = "Diamond Pickaxe",
 				TEXTURE = 237,
@@ -551,7 +551,7 @@ namespace MCGalaxy {
 		static ColumnDesc[] createInventories = new ColumnDesc[] {
             new ColumnDesc("Name", ColumnType.VarChar, 16),
             new ColumnDesc("Level", ColumnType.VarChar, 32),
-			new ColumnDesc("Inventory", ColumnType.VarChar, 200)
+			new ColumnDesc("Inventory", ColumnType.VarChar, 300)
         };
 		public static Dictionary<ushort, CraftRecipe> craftingRecipies = new Dictionary<ushort, CraftRecipe>()
 		{
