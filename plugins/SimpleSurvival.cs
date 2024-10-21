@@ -204,7 +204,7 @@ namespace MCGalaxy {
 				// MOBS
 				public static bool CanKillMobs = true;
 				public static bool SpawnMobs = true; // Requires MobAI from https://github.com/ddinan/classicube-stuff/blob/master/MCGalaxy/Plugins/MobAI.cs
-				public static int MaxMobs = 18;
+				public static int MaxMobs = 25;
 
 				// Mining
 				public static bool MiningEnabled = true;
@@ -2229,24 +2229,42 @@ namespace MCGalaxy {
 		}
 		static void SetGuiText(Player p, string top, string bottom, string bottom2 = "")
 		{
-			p.SendCpeMessage(CpeMessageType.Status1, top);
-			p.SendCpeMessage(CpeMessageType.Status2, bottom);
-			p.SendCpeMessage(CpeMessageType.Status3, bottom2);
+			if ((string)p.Extras["LAST_STATUS1"] != top)
+			{
+				p.Extras["LAST_STATUS1"] = top;
+				p.SendCpeMessage(CpeMessageType.Status1, top);
+			}
+			if ((string)p.Extras["LAST_STATUS2"] != bottom)
+			{
+				p.Extras["LAST_STATUS2"] = bottom;
+				p.SendCpeMessage(CpeMessageType.Status2, bottom);
+			}
+			if ((string)p.Extras["LAST_STATUS3"] != bottom2)
+			{
+				p.Extras["LAST_STATUS3"] = bottom2;
+				p.SendCpeMessage(CpeMessageType.Status3, bottom2);
+			}
 		}
 		public static void InitPlayer(Player p)
 		{
-			SetGuiText(p, "","");
+	
 			p.Extras["SURVIVAL_HEALTH"] = Config.MaxHealth;
 			p.Extras["SURVIVAL_AIR"] = Config.MaxAir;
 			p.Extras["PVP_HIT_COOLDOWN"] = DateTime.UtcNow;
 			p.Extras["FALLING"] = false;
 			p.Extras["FALL_START"] = p.Pos.Y;
+			p.Extras["LAST_STATUS1"] = "NULL";
+			p.Extras["LAST_STATUS2"] = "NULL";
+			p.Extras["LAST_STATUS3"] = "NULL";
 			SendPlayerGui(p);
 			SendMiningUnbreakableMessage(p);
 			SendInventory(p);
 		}
 		public static void ResetPlayerState(Player p)
         {
+			p.Extras["LAST_STATUS1"] = "NULL";
+			p.Extras["LAST_STATUS2"] = "NULL";
+			p.Extras["LAST_STATUS3"] = "NULL";
 			SetGuiText(p,"","");
             p.Extras["SURVIVAL_HEALTH"] = 10;
             p.Extras["SURVIVAL_AIR"] = 10;
