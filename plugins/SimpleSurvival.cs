@@ -264,7 +264,7 @@ namespace MCGalaxy {
 				ShovelTimeMultiplier = 1f;
 				MiningTime = time;
 				breakEffect = new BreakParticleEffect(77, 214, 52);
-				LootChance = 0.1f;
+				LootChance = 0.05f;
 				overrideBlock = 6;
 			}
 		}
@@ -1687,8 +1687,8 @@ namespace MCGalaxy {
 				return;
 			cancel = true;
 			Player.Console.Message("Spawning tree at " + x.ToString());
-			var tree = new OakTree();
-			tree.SetData(new System.Random(), 8);
+			var tree = new ClassicTree();
+			tree.SetData(new System.Random(), 6);
 			tree.Generate((ushort)x, (ushort)(y), (ushort)z, (X, Y, Z, raw) =>
             {
                 BlockID here = lvl.GetBlock(X, Y, Z);
