@@ -13,8 +13,11 @@ using MCGalaxy.Network;
 using MCGalaxy.Commands;
 using MCGalaxy.Bots;
 using MCGalaxy.SQL;
+using MCGalaxy.Generator.Foliage;
 //pluginref door.dll
 //pluginref bed.dll
+//pluginref goodlyeffects.dll
+//pluginref nasgen.dll
 namespace MCGalaxy {
 
 	public class SimpleSurvival : Plugin {
@@ -34,11 +37,96 @@ namespace MCGalaxy {
 			public int overrideBlock = -1;
 			public bool RequirePickaxe = false;
 			public uint RequiredToolTier = 0;
+			public float LootChance = 1f;
+			public BreakParticleEffect breakEffect = new BreakParticleEffect();
 			public BlockMineConfig(ushort time = 5)
 			{
 				this.MiningTime = time;
 			}
 		}
+		public class BreakParticleEffect : GoodlyEffects.EffectConfig
+		{
+			public BreakParticleEffect(byte r = 255, byte g = 255, byte b = 255, int grav = 2, byte fCount = 1)
+			{
+				pixelU1 = 0;
+				pixelV1 = 0;
+				pixelU2 = 10;
+				pixelV2 = 10;
+				//tint uses RGB color values to determine what color to tint the particle. Here we've set it to be tinted pink, since the original texture is white.
+				tintRed = r;
+				tintGreen = g;
+				tintBlue = b;
+				//#frameCount determines how many frames of animation will be played over the particle's lifespan (faster life, faster animation).
+				//#Frames are always the same size as each other and are stored left-to-right in particles.png.
+				frameCount = fCount;
+				//#particleCount is how many hearts are spawned per-effect.
+				particleCount = 10;
+				//#pixelSize is how large in "pixel" units the particle is. 8 is the size of a player's head. You are allowed to be as precise as half a pixel, therefore the smallest possible size is 0.5.
+				pixelSize = 4;
+				//#sizeVariation is how much the particle can randomly vary in size. 1 means 100% variation, 0 means 0% variation.
+				sizeVariation = 0.8f;
+				//#spread allows the particles to spawn randomly around the point they were told to spawn at. A spread of "0.5" is equal to the width of a full block (because the spread goes both ways).
+				spread = 1f;
+				//#speed is how fast this particles moves away from the origin.
+				speed = 0.25f;
+				//#gravity adds to the up/down speed of the particle over time. -1 here means the heart will float up
+				gravity = grav;
+				//#baseLifetime is the time (in seconds) this particle is allowed to live at most (colliding with blocks may kill it sooner).
+				baseLifetime = 2f;
+				//#lifetimeVariation is how much the particle's lifespan can randomly vary. 1 means 100% variation, 0 means 0% variation.
+				lifetimeVariation = 0;
+				//#expireUponTouchingGround means particle dies if it hits solid floor
+				expireUponTouchingGround = false;
+				//#collides determine what blocks count as "solid".
+				collidesSolid = true;
+				collidesLiquid = false;
+				collidesLeaves = false;
+				//#fullBright means it will always have its original brightness, even in dark environments.
+				fullBright = false;
+			}
+		}
+		public class PVPParticleEffect : GoodlyEffects.EffectConfig
+		{
+			public PVPParticleEffect(byte r = 255, byte g = 0, byte b = 0, int grav = 4)
+			{
+				pixelU1 = 0;
+				pixelV1 = 0;
+				pixelU2 = 10;
+				pixelV2 = 10;
+				//tint uses RGB color values to determine what color to tint the particle. Here we've set it to be tinted pink, since the original texture is white.
+				tintRed = r;
+				tintGreen = g;
+				tintBlue = b;
+				//#frameCount determines how many frames of animation will be played over the particle's lifespan (faster life, faster animation).
+				//#Frames are always the same size as each other and are stored left-to-right in particles.png.
+				frameCount = 2;
+				//#particleCount is how many hearts are spawned per-effect.
+				particleCount = 10;
+				//#pixelSize is how large in "pixel" units the particle is. 8 is the size of a player's head. You are allowed to be as precise as half a pixel, therefore the smallest possible size is 0.5.
+				pixelSize = 4;
+				//#sizeVariation is how much the particle can randomly vary in size. 1 means 100% variation, 0 means 0% variation.
+				sizeVariation = 0.8f;
+				//#spread allows the particles to spawn randomly around the point they were told to spawn at. A spread of "0.5" is equal to the width of a full block (because the spread goes both ways).
+				spread = 0.5f;
+				//#speed is how fast this particles moves away from the origin.
+				speed = 0.4f;
+				//#gravity adds to the up/down speed of the particle over time. -1 here means the heart will float up
+				gravity = grav;
+				//#baseLifetime is the time (in seconds) this particle is allowed to live at most (colliding with blocks may kill it sooner).
+				baseLifetime = 1f;
+				//#lifetimeVariation is how much the particle's lifespan can randomly vary. 1 means 100% variation, 0 means 0% variation.
+				lifetimeVariation = 0;
+				//#expireUponTouchingGround means particle dies if it hits solid floor
+				expireUponTouchingGround = false;
+				//#collides determine what blocks count as "solid".
+				collidesSolid = true;
+				collidesLiquid = false;
+				collidesLeaves = false;
+				//#fullBright means it will always have its original brightness, even in dark environments.
+				fullBright = false;
+			}
+		}
+		public static PVPParticleEffect pvpParticleEffect = new PVPParticleEffect(){ID = 25};
 		public class SurvivalTool
 		{
 			public ushort TEXTURE;
@@ -56,6 +144,7 @@ namespace MCGalaxy {
 			public float MiningBonus = 1f;
 			public uint ToolTier = 0;
 		}
+	
 		public class PickaxeTool : SurvivalTool
 		{
 			public PickaxeTool(float mining=1.5f)
@@ -108,6 +197,7 @@ namespace MCGalaxy {
 				ShovelTimeMultiplier = 0.2f;
 				MiningTime = time;
 				RequirePickaxe = true;
+				breakEffect = new BreakParticleEffect(143, 143, 143);
 			}
 		}
 		public class ObsidianMineConfig : StoneMineConfig
@@ -141,6 +231,7 @@ namespace MCGalaxy {
 				PickaxeTimeMultiplier = 0.1f;
 			    ShovelTimeMultiplier = 0.1f;
 			 	MiningTime = time;
+				breakEffect = new BreakParticleEffect(124, 98, 62);
 			}
 		}
 		public class DirtMineConfig : BlockMineConfig
@@ -151,6 +242,7 @@ namespace MCGalaxy {
 			 	PickaxeTimeMultiplier = 1f;
 				ShovelTimeMultiplier = 1.5f;
 				MiningTime = time;
+				breakEffect = new BreakParticleEffect(121, 85, 58);
 			}
 		}
 		public class WoolMineConfig : BlockMineConfig
@@ -163,6 +255,19 @@ namespace MCGalaxy {
 				MiningTime = time;
 			}
 		}
+		public class LeafMineConfig : BlockMineConfig
+		{
+			public LeafMineConfig(ushort time = 2)
+			{
+				AxeTimeMultiplier = 1f;
+			 	PickaxeTimeMultiplier = 1f;
+				ShovelTimeMultiplier = 1f;
+				MiningTime = time;
+				breakEffect = new BreakParticleEffect(77, 214, 52);
+				LootChance = 0.1f;
+				overrideBlock = 6;
+			}
+		}
 		public class SandMineConfig : BlockMineConfig
 		{
 			public SandMineConfig(ushort time = 7)
@@ -171,6 +276,7 @@ namespace MCGalaxy {
 			 	PickaxeTimeMultiplier = 1f;
 				ShovelTimeMultiplier = 1.5f;
 				MiningTime = time;
+				breakEffect = new BreakParticleEffect(214, 207, 157);
 			}
 		}
 		public class CraftRecipe
@@ -230,7 +336,7 @@ namespace MCGalaxy {
 			{15, new StoneMineConfig(100){RequiredToolTier=1}},
 			{16, new OreMineConfig(){overrideBlock = 114}},
 			{17, new WoodMineConfig()},
-			{18, new DirtMineConfig(2) {overrideBlock = 0}},
+			{18, new LeafMineConfig()},
 			{19, new DirtMineConfig(4)},
 			{20, new DirtMineConfig(2)},
 			{21, new WoolMineConfig()},
@@ -245,6 +351,7 @@ namespace MCGalaxy {
 			{30, new WoolMineConfig()},
 			{31, new WoolMineConfig()},
 			{32, new WoolMineConfig()},
+			{33, new WoolMineConfig()},
 			{34, new WoolMineConfig()},
 			{35, new WoolMineConfig()},
 			{36, new WoolMineConfig()},
@@ -1265,14 +1372,9 @@ namespace MCGalaxy {
 			playerMiningProgress[pl].LastMine = DateTime.Now;
 			ushort amount =  (ushort)Math.Min(10, (int) (( (float)playerMiningProgress[pl].Progress / (float)blockMineData.MiningTime) * 10));
 			setMineIndicator(pl, pos,amount);
-			spawnMineParticles(pl, pos);
+			spawnMineParticles(pl, pos, blockMineData.breakEffect);
 			if (playerMiningProgress[pl].Progress < blockMineData.MiningTime)
 				return;
-			if (Config.UseGoodlyEffects)
-			{
-				// Despawn break particle
-				pl.Send(Packet.DefineEffect(200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1000, 0, 0, false, false, false, false, false));
-			}
 			playerMiningProgress.Remove(pl);
 			destroyMineIndicator(pl);
 			pl.level.UpdateBlock(pl, pos[0], pos[1], pos[2], 0);
@@ -1290,6 +1392,8 @@ namespace MCGalaxy {
 				if (blockType > 256)
 					blockType = (ushort)(blockType -256);
 			}
+			if (blockMineData.LootChance < 1f && new System.Random().NextDouble() > blockMineData.LootChance)
+				return;
 			InventoryAddBlocks(pl, blockType, 1);
 			if ( true || InventoryGetBlockAmount(pl, blockType) == 1)
 			{
@@ -1330,18 +1434,51 @@ namespace MCGalaxy {
 			PlayerBot.Add(bot);
 			mineProgressIndicators.Add(p, bot);
 		}
-		private void spawnMineParticles(Player pl, ushort[] pos)
+		private static void defineEffect(Player pl, byte id, GoodlyEffects.EffectConfig effect)
+		{
+			// Spawn break particle
+			//pl.Send(Packet.DefineEffect(ID, 0, 105, 15, 120, 255, 255, 255, 10, 1, 28, 0, 0, 0, 0, 10f, 0, true, true, true, true, true));
+			effect.ID = id;
+			GoodlyEffects.DefineEffect(pl, effect); //new GoodlyEffects.EffectConfig(){ID = ID});
+		}
+		static byte currentEffectId = 20;
+		private static void spawnEffect(Level lvl, GoodlyEffects.EffectConfig effect, float[] pos, float[] origin)
+		{
+			byte ID = currentEffectId;
+			currentEffectId += 1;
+			if (currentEffectId > 254)
+				currentEffectId = 20;
+			Player[] players = PlayerInfo.Online.Items;
+            foreach (Player p in players) {
+                if (p.level != lvl || !p.Supports(CpeExt.CustomParticles)) { continue; }
+				defineEffect(p, ID, effect);
+                p.Send(Packet.SpawnEffect(ID, pos[0], pos[1], pos[2], origin[0], origin[1], origin[2]));
+            }
+		}
+		private static void spawnEffect(Level lvl, GoodlyEffects.EffectConfig effect, float[] pos)
+		{
+			spawnEffect(lvl, effect, pos, pos);
+		}
+		private static void spawnMineParticles(Player pl, ushort[] pos, GoodlyEffects.EffectConfig effect)
 		{
 			if (!Config.UseGoodlyEffects)
 				return;
-			if (true)
-				return;
-			float px = Convert.ToSingle(pos[0]), py = Convert.ToSingle(pos[1]), pz = Convert.ToSingle(pos[2]);
+			float px = (float) pos[0], py =(float)pos[1] + 0.5f, pz =(float) pos[2]; //Convert.ToSingle(pos[0]), py = Convert.ToSingle(pos[1]), pz = Convert.ToSingle(pos[2]);
 			px += 0.5f;
             pz += 0.5f;
-			// Spawn break particle
-			pl.Send(Packet.DefineEffect(200, 0, 105, 15, 120, 255, 255, 255, 10, 1, 28, 0, 0, 0, 0, 10f, 0, true, true, true, true, true));
-			pl.Send(Packet.SpawnEffect(200, px, py, pz, px, py, pz));
+			spawnEffect(pl.level, effect, new float[3]{px, py, pz});
+		}
+		private static void spawnHurtParticles(Player pl)
+		{
+			if (!Config.UseGoodlyEffects)
+				return;
+			spawnEffect(pl.level, pvpParticleEffect, new float[3]{(float)pl.Pos.BlockX, (float)pl.Pos.BlockY + 0.5f, (float)pl.Pos.BlockZ});
+		}
+		private static  void spawnHurtParticles(PlayerBot pl)
+		{
+			if (!Config.UseGoodlyEffects)
+				return;
+			spawnEffect(pl.level, pvpParticleEffect, new float[3]{(float)pl.Pos.BlockX, (float)pl.Pos.BlockY, (float)pl.Pos.BlockZ});
 		}
 		private void setMineIndicator(Player pl, ushort[] pos, ushort amount)
 		{
@@ -1539,6 +1676,28 @@ namespace MCGalaxy {
 			InventoryRemoveBlocks(p, block, 1);
 			SendMiningUnbreakableMessage(p, block);
 			SendInventory(p);
+			handleTreePlace(p.level, x,y,z,block, ref cancel);
+		}
+		void handleTreePlace(Level lvl, ushort x, ushort y, ushort z, BlockID block, ref bool cancel)
+		{
+			if (block != 6)
+				return;
+			ushort ny = FindGround(lvl, x, lvl.Height, z);
+			if (ny > y+1)
+				return;
+			cancel = true;
+			Player.Console.Message("Spawning tree at " + x.ToString());
+			var tree = new OakTree();
+			tree.SetData(new System.Random(), 8);
+			tree.Generate((ushort)x, (ushort)(y), (ushort)z, (X, Y, Z, raw) =>
+            {
+                BlockID here = lvl.GetBlock(X, Y, Z);
+                if (here == Block.Air || here == Block.Leaves || (ushort)here == (ushort)6)
+                {
+                    lvl.SetTile(X, Y, Z, (byte)raw);
+                    lvl.BroadcastChange(X, Y, Z, raw);
+                }
+            });
 		}
 		void HandleDrown(SchedulerTask task)
 		{
@@ -1653,7 +1812,7 @@ namespace MCGalaxy {
 			List<PlayerBot> players = new List<PlayerBot>();
 			foreach (PlayerBot bot in lvl.Bots.Items)
 			{
-				if (bot.DisplayName != "" || !bot.name.Contains("ssmob"))
+				if (!bot.name.Contains("ssmob"))
 				{
 					continue;
 				}
@@ -1672,7 +1831,7 @@ namespace MCGalaxy {
 				}
 				foreach (PlayerBot bot in level.Bots.Items)
 				{
-					if (bot.DisplayName != "" || !bot.name.Contains("ssmob"))
+					if (!bot.name.Contains("ssmob"))
 					{
 						continue;
 					}
@@ -1684,7 +1843,7 @@ namespace MCGalaxy {
 		{
 			foreach (PlayerBot bot in level.Bots.Items)
 			{
-				if (bot.DisplayName != "" || !bot.name.Contains("ssmob"))
+				if (!bot.name.Contains("ssmob"))
 				{
 					continue;
 				}
@@ -1888,7 +2047,7 @@ namespace MCGalaxy {
         }
 		static bool CanHitMob(Player p, PlayerBot victim)
         {
-			if (victim.AIName == "")
+			if (!victim.name.Contains("ssmob"))
 				return false;
             Vec3F32 delta = p.Pos.ToVec3F32() - victim.Pos.ToVec3F32();
             float reachSq = 12f; // 3.46410161514 block reach distance
@@ -2009,7 +2168,7 @@ namespace MCGalaxy {
             if (hit.Owner == null || !isNumber) return;
 
             hit.Owner = (hp - damage).ToString();
-
+			spawnHurtParticles(hit);
             if (hp <= 0)
             {
                 // Despawn bot
@@ -2229,6 +2388,8 @@ namespace MCGalaxy {
 		}
 		static void SetGuiText(Player p, string top, string bottom, string bottom2 = "")
 		{
+			if (!p.Extras.Contains("LAST_STATUS1"))
+				return;
 			if ((string)p.Extras["LAST_STATUS1"] != top)
 			{
 				p.Extras["LAST_STATUS1"] = top;
@@ -2326,6 +2487,7 @@ namespace MCGalaxy {
                 {
                     // Spawn effect when victim is hit
                     //Command.Find("Effect").Use(victim, Config.HitParticle + " " + (victim.Pos.X / 32) + " " + (victim.Pos.Y / 32) + " " + (victim.Pos.Z / 32) + " 0 0 0 true");
+					spawnHurtParticles(victim);
                 }
             }
             else
@@ -2423,32 +2585,6 @@ namespace MCGalaxy {
 				}
 			}
 			return false;
-            /*if (File.Exists(Config.Path + "safezones" + map + ".txt"))
-            {
-                using (var r = new StreamReader(Config.Path + "safezones" + map + ".txt"))
-                {
-                    string line;
-                    while ((line = r.ReadLine()) != null)
-                    {
-                        string[] temp = line.Split(';');
-                        string[] coord1 = temp[0].Split(',');
-                        string[] coord2 = temp[1].Split(',');
-
-                        if ((p.Pos.BlockX <= int.Parse(coord1[0]) && p.Pos.BlockX >= int.Parse(coord2[0])) || (p.Pos.BlockX >= int.Parse(coord1[0]) && p.Pos.BlockX <= int.Parse(coord2[0])))
-                        {
-                            if ((p.Pos.BlockZ <= int.Parse(coord1[2]) && p.Pos.BlockZ >= int.Parse(coord2[2])) || (p.Pos.BlockZ >= int.Parse(coord1[2]) && p.Pos.BlockZ <= int.Parse(coord2[2])))
-                            {
-                                if ((p.Pos.BlockY <= int.Parse(coord1[1]) && p.Pos.BlockY >= int.Parse(coord2[1])) || (p.Pos.BlockY >= int.Parse(coord1[1]) && p.Pos.BlockY <= int.Parse(coord2[1])))
-                                {
-                                    return true;
-                                }
-                            }
-                        }
-                    }
-                    return false;
-                }
-            }
-            return false;*/
         }
 	}
 	public sealed class CmdGiveBlock : Command2
