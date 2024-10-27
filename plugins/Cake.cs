@@ -157,13 +157,13 @@ namespace MCGalaxy {
 				
 				cancel = true;
 				p.RevertBlock(x, y, z);
-				p.level.UpdateBlock(Player.Console, x,y,z, (ushort)(cakeConfig.ID + 256));
+				p.level.UpdateBlock(p, x,y,z, (ushort)(cakeConfig.ID + 256));
 				return;
 			}	
         }
 		void HandleBlockClicked(Player p, MouseButton button, MouseAction action, ushort yaw, ushort pitch, byte entity, ushort x, ushort y, ushort z, TargetBlockFace face)
 		{
-			if (action != MouseAction.Pressed)
+			if (action != MouseAction.Pressed || button != MouseButton.Right)
 			{
 				return;
 			}
@@ -179,10 +179,10 @@ namespace MCGalaxy {
 			}
 			if (stage > 2)
 			{
-				p.level.UpdateBlock(Player.Console, x,y,z, (ushort)0);
+				p.level.UpdateBlock(p, x,y,z, (ushort)0);
 				return;
 			}
-			p.level.UpdateBlock(Player.Console, x,y,z, (ushort)(cakeConfig.ID + stage + 1 + 256));
+			p.level.UpdateBlock(p, x,y,z, (ushort)(cakeConfig.ID + stage + 1 + 256));
 		}
 	}
 }
