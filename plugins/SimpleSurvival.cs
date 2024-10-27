@@ -279,6 +279,17 @@ namespace MCGalaxy {
 				breakEffect = new BreakParticleEffect(214, 207, 157);
 			}
 		}
+		public class GravelMineConfig : BlockMineConfig
+		{
+			public GravelMineConfig(ushort time = 8)
+			{
+				AxeTimeMultiplier = 1f;
+			 	PickaxeTimeMultiplier = 1f;
+				ShovelTimeMultiplier = 1.5f;
+				MiningTime = time;
+				breakEffect = new BreakParticleEffect(130, 114, 114);
+			}
+		}
 		public class CraftRecipe
 		{
 			public CraftRecipe(Dictionary<ushort,ushort> ingredients, ushort amountMultiplier = 1, bool needCraftingTable = false)
@@ -331,7 +342,7 @@ namespace MCGalaxy {
 			{5, new WoodMineConfig()},
 			{6, new BlockMineConfig(1)},
 			{12, new SandMineConfig()},
-			{13, new SandMineConfig()},
+			{13, new GravelMineConfig()},
 			{14, new OreMineConfig(120){RequiredToolTier=2}},
 			{15, new StoneMineConfig(100){RequiredToolTier=1}},
 			{16, new OreMineConfig(){overrideBlock = 114}},
@@ -1106,7 +1117,9 @@ namespace MCGalaxy {
 			if (amount >= playerInventories[pl.level.name][pl.name][block])
 			{
 				playerInventories[pl.level.name][pl.name].Remove(block);
-				if (pl.GetHeldBlock() == block)
+				ushort heldBlock = pl.GetHeldBlock();
+				heldBlock = (heldBlock > 255) ? (ushort)(heldBlock - 256) : heldBlock;
+				if ( heldBlock == block)
 					SetHeldBlock(pl, 0);
 				return;
 			}
@@ -1311,7 +1324,7 @@ namespace MCGalaxy {
             Level level = p.level;
             for (int i = 0; i < count; i++) 
             {
-				bool canPlace = (( i < p.group.CanPlace.Length && p.group.CanPlace[i]) || (i > 65 && i+256 < p.group.CanPlace.Length && p.group.CanPlace[i+256]));
+				bool canPlace = true;//(( i < p.group.CanPlace.Length && p.group.CanPlace[i]) || (i > 65 && i+256 < p.group.CanPlace.Length && p.group.CanPlace[i+256]));
                 Packet.WriteBlockPermission((BlockID)i, i != 0 ? InventoryHasEnoughBlock(p, (ushort)i) && canPlace : true, i == 0 ? true : false, p.Session.hasExtBlocks, bulk, i * size);
             }
             p.Send(bulk);
@@ -1325,7 +1338,7 @@ namespace MCGalaxy {
             int count = 1;//p.Session.MaxRawBlock + 1;
             int size  = extBlocks ? 5 : 4;
             byte[] bulk = new byte[count * size];
-			bool canPlace =  ( id < p.group.CanPlace.Length && p.group.CanPlace[id]);
+			bool canPlace = true;// ( id < p.group.CanPlace.Length && p.group.CanPlace[id]);
 			if (id > 256)
 				id = (ushort)(id - 256);
             Packet.WriteBlockPermission((BlockID)id, id != 0 ? InventoryHasEnoughBlock(p, (ushort)id) && canPlace : true, id == 0 ? true : false, p.Session.hasExtBlocks, bulk, 0);
