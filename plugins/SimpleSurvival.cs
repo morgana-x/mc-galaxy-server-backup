@@ -1464,6 +1464,7 @@ namespace MCGalaxy {
 			Player[] players = PlayerInfo.Online.Items;
             foreach (Player p in players) {
                 if (p.level != lvl || !p.Supports(CpeExt.CustomParticles)) { continue; }
+				if ((p.Pos.ToVec3F32() -  new Vec3F32(pos[0], pos[1], pos[2])).LengthSquared > (2250)){continue;}
 				defineEffect(p, ID, effect);
                 p.Send(Packet.SpawnEffect(ID, pos[0], pos[1], pos[2], origin[0], origin[1], origin[2]));
             }
