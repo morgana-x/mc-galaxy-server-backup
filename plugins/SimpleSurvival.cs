@@ -2989,12 +2989,25 @@ namespace MCGalaxy {
             p.Message("%T/GiveBlock <Player> <BlockId> <Amount=1>");
         }
 	}
+
+
 	public sealed class CmdTradeBlock : Command2
     {
         public override string name { get { return "TradeBlock"; } }
         public override string type { get { return CommandTypes.Games; } }
         public override LevelPermission defaultRank { get { return LevelPermission.Guest; } }
 
+		private static string safeGetBlockName(Player p ,ushort blockId)
+		{
+			try
+			{
+				return Block.GetName(p,blockId > 65 ? (ushort)(blockId + 256) : blockId);
+			}
+			catch(Exception e)
+			{
+				return "???";
+			}
+		}
         public override void Use(Player p, string message, CommandData data)
         {
             if (message.Length == 0 || message.SplitSpaces().Length < 2)
@@ -3032,9 +3045,9 @@ namespace MCGalaxy {
 					p.Message("%cBlock %5\"" + args[1] + "\"%c doesn't exist!");
 					return;
 				}
-				if (blockId > 256)
-					blockId = (ushort)(blockId - 256);
 			}
+			if (blockId > 256)
+				blockId = (ushort)(blockId - 256);
 			ushort amount = 1;
 			if (args.Length > 2)
 			{
@@ -3055,13 +3068,13 @@ namespace MCGalaxy {
 			}
 			if (!MCGalaxy.SimpleSurvival.InventoryHasEnoughBlock(p, blockId, amount))
 			{
-				p.Message("You don't have x" + amount.ToString() + " " + Block.GetName(p,blockId > 65 ? (ushort)(blockId + 256) : blockId) + "!");
+				p.Message("You don't have %5" + safeGetBlockName(p,blockId) + " %ax" + amount.ToString() + "%e!");
 				return;
 			}
 			MCGalaxy.SimpleSurvival.InventoryRemoveBlocks(p, blockId, amount);
 			MCGalaxy.SimpleSurvival.InventoryAddBlocks(who, blockId, amount);
-			p.Message("Gave " + who.name + " %5" + Block.GetName(p,blockId > 65 ? (ushort)(blockId + 256) : blockId) + "%a x" + (args.Length > 2 ? args[2].ToString() : "1"));
-			who.Message(p.name + " gave you %5" + Block.GetName(p,blockId > 65 ? (ushort)(blockId + 256) : blockId) + "%a x" + (args.Length > 2 ? args[2].ToString() : "1"));
+			p.Message("Gave %2" + who.name + " %5" + safeGetBlockName(p,blockId) + "%a x" + (args.Length > 2 ? args[2].ToString() : "1"));
+			who.Message("&2" + p.name + " &egave you %5"  + safeGetBlockName(p,blockId) + "%a x" + (args.Length > 2 ? args[2].ToString() : "1"));
         }
 		public override void Help(Player p)
         {
