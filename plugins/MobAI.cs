@@ -12,7 +12,7 @@ using MCGalaxy.Network;
 using MCGalaxy.Tasks;
 
 using BlockID = System.UInt16;
-
+//pluginref simplesurvival.dll
 namespace MCGalaxy
 {
     public sealed class MobAI : Plugin
@@ -365,7 +365,7 @@ namespace MCGalaxy
                 {
                     if (meta.explodeTime == 0)
                     {
-                        meta.explodeTime = 10;
+                        meta.explodeTime = 20;
                     }
                 }
                 else meta.explodeTime = 0;
@@ -556,30 +556,9 @@ namespace MCGalaxy
 
                         if (meta.explodeTime == 1)
                         {
-                            if (closest.level.physics > 1 && closest.level.physics != 5) closest.level.MakeExplosion((ushort)(bot.Pos.X / 32), (ushort)(bot.Pos.Y / 32), (ushort)(bot.Pos.Z / 32), 0);
-                            Command.Find("Effect").Use(closest, "explosion " + (bot.Pos.X / 32) + " " + (bot.Pos.Y / 32) + " " + (bot.Pos.Z / 32) + " 0 0 0 true");
-
-                            int distanceX = closest.Pos.X - bot.Pos.X, distanceY = closest.Pos.Y - bot.Pos.Y, distanceZ = closest.Pos.Z - bot.Pos.Z;
-                            int distance = (distanceX + distanceZ) / 32;
-
-                            // Do damage to the player if player is within a 3 block radius
-
-                            if (distance < 3)
-                            {
-                                closest.Extras["SURVIVAL_HEALTH"] = closest.Extras.GetInt("SURVIVAL_HEALTH") - 23;
-
-                                if (closest.Extras.GetInt("SURVIVAL_HEALTH") <= 0)
-                                {
-                                    closest.HandleDeath(Block.Orange);
-                                }
-
-                                else
-                                {
-                                    Orientation rot = bot.Rot;
-                                    HitPlayer(bot, closest, rot);
-                                }
-                            }
-
+                            //if (closest.level.physics > 1 && closest.level.physics != 5) closest.level.MakeExplosion((ushort)(bot.Pos.X / 32), (ushort)(bot.Pos.Y / 32), (ushort)(bot.Pos.Z / 32), 0);
+                            //Command.Find("Effect").Use(closest, "explosion " + (bot.Pos.X / 32) + " " + (bot.Pos.Y / 32) + " " + (bot.Pos.Z / 32) + " 0 0 0 true");
+                            MCGalaxy.SimpleSurvival.Explosion(closest.level, (ushort)bot.Pos.BlockX,  (ushort)bot.Pos.BlockY,  (ushort)bot.Pos.BlockZ);
                             meta.explodeTime = 0;
                             PlayerBot.Remove(bot);
                             return true;
