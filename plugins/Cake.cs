@@ -157,7 +157,7 @@ namespace MCGalaxy {
 				
 				cancel = true;
 				p.RevertBlock(x, y, z);
-				p.level.UpdateBlock(p, x,y,z, (ushort)(cakeConfig.ID + 256));
+				p.level.UpdateBlock(Player.Console, x,y,z, (ushort)(cakeConfig.ID + 256));
 				return;
 			}	
         }
@@ -179,10 +179,10 @@ namespace MCGalaxy {
 			}
 			if (stage > 2)
 			{
-				p.level.UpdateBlock(p, x,y,z, (ushort)0);
+				p.level.UpdateBlock(Player.Console, x,y,z, (ushort)0);
 				return;
 			}
-			p.level.UpdateBlock(p, x,y,z, (ushort)(cakeConfig.ID + stage + 1 + 256));
+			p.level.UpdateBlock(Player.Console, x,y,z, (ushort)(cakeConfig.ID + stage + 1 + 256));
 		}
 	}
 }

@@ -358,17 +358,17 @@ namespace MCGalaxy {
 					return pos;
 				}
 			}
-			return new ushort[]{0,0,0,0};
+			return new ushort[]{};
 		}
 		void HandleBlockChanged(Player p, ushort blockx, ushort blocky, ushort blockz, ChangeResult result)
 		{
 			ushort[] neighboringBed = getNeighboringBed(p, blockx, blocky, blockz);
-			if (neighboringBed.Length > 3)
+			if (neighboringBed.Length == 0)
 				return;
 			ushort[] neighboringBed2 = getNeighboringBed(p, neighboringBed[0], neighboringBed[1], neighboringBed[2]);
-			if (neighboringBed2.Length < 3)
+			if (neighboringBed2.Length >= 3)
 				return;
-			p.level.UpdateBlock(p, neighboringBed[0], neighboringBed[1], neighboringBed[2], 0);
+			p.level.UpdateBlock(Player.Console, neighboringBed[0], neighboringBed[1], neighboringBed[2], 0);
 		}
 
 		void setBedSavePoint(Level level, Player p, ushort[] pos)

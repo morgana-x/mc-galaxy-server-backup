@@ -1142,7 +1142,6 @@ namespace MCGalaxy {
 			{
 				LoadInventory(p);
 				SendMiningUnbreakableMessage(p);
-				
 			}
 		}
                         
@@ -3014,6 +3013,11 @@ namespace MCGalaxy {
 			if (who == p)
 			{
 				p.Message("Can't trade with yourself!");
+				return;
+			}
+			if (p.level != who.level)
+			{
+				p.Message("You can only trade with people in the same level!");
 				return;
 			}
 			ushort blockId = 0;
