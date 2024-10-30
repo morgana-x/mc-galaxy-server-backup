@@ -10,6 +10,9 @@ using MCGalaxy.Tasks;
 using MCGalaxy.Maths;
 using MCGalaxy.Blocks;
 using MCGalaxy.Network;
+
+//pluginref simplesurvival.dll
+
 namespace MCGalaxy {
 	public class DoorBlock {
 		public BlockID Item_Block        {get; set;}
@@ -482,6 +485,10 @@ namespace MCGalaxy {
 		
 		void PlaceDoor(Player p, ushort x, ushort y, ushort z, BlockID block)
 		{
+			if(!p.level.IsAirAt((ushort)x, (ushort)(y + 1), (ushort)z)) {
+				MCGalaxy.SimpleSurvival.InventoryAddBlocks(p, block, 1);
+				return;
+			}
 			if (!IsDoorItem(block))
 			{
 				return;
