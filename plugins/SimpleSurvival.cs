@@ -186,7 +186,7 @@ namespace MCGalaxy {
 				//#particleCount is how many hearts are spawned per-effect.
 				particleCount = 40;
 				//#pixelSize is how large in "pixel" units the particle is. 8 is the size of a player's head. You are allowed to be as precise as half a pixel, therefore the smallest possible size is 0.5.
-				pixelSize = 15;
+				pixelSize = 20;
 				//#sizeVariation is how much the particle can randomly vary in size. 1 means 100% variation, 0 means 0% variation.
 				sizeVariation = 0.8f;
 				//#spread allows the particles to spawn randomly around the point they were told to spawn at. A spread of "0.5" is equal to the width of a full block (because the spread goes both ways).
@@ -196,9 +196,9 @@ namespace MCGalaxy {
 				//#gravity adds to the up/down speed of the particle over time. -1 here means the heart will float up
 				gravity = grav;
 				//#baseLifetime is the time (in seconds) this particle is allowed to live at most (colliding with blocks may kill it sooner).
-				baseLifetime = 3f;
+				baseLifetime = 5f;
 				//#lifetimeVariation is how much the particle's lifespan can randomly vary. 1 means 100% variation, 0 means 0% variation.
-				lifetimeVariation = 0;
+				lifetimeVariation = 0.1f;
 				//#expireUponTouchingGround means particle dies if it hits solid floor
 				expireUponTouchingGround = false;
 				//#collides determine what blocks count as "solid".
@@ -237,9 +237,9 @@ namespace MCGalaxy {
 				//#gravity adds to the up/down speed of the particle over time. -1 here means the heart will float up
 				gravity = grav;
 				//#baseLifetime is the time (in seconds) this particle is allowed to live at most (colliding with blocks may kill it sooner).
-				baseLifetime = 3f;
+				baseLifetime = 5f;
 				//#lifetimeVariation is how much the particle's lifespan can randomly vary. 1 means 100% variation, 0 means 0% variation.
-				lifetimeVariation = 0;
+				lifetimeVariation = 0.1f;
 				//#expireUponTouchingGround means particle dies if it hits solid floor
 				expireUponTouchingGround = false;
 				//#collides determine what blocks count as "solid".
@@ -1057,7 +1057,7 @@ namespace MCGalaxy {
 			{120, new CraftRecipe(new Dictionary<ushort, ushort>(){{122, 1}, {113, 1}})},
 
 			// TNT													// Sand x 10, Gunpowder x 10
-			{46,  new CraftRecipe(new Dictionary<ushort, ushort>(){{12, 10}, {121, 10}})},
+			{46,  new CraftRecipe(new Dictionary<ushort, ushort>(){{12, 10}, {121, 10}}, 1, true)},
 		};
 		
 		public class MiningProgress
@@ -3047,6 +3047,11 @@ namespace MCGalaxy {
 					Help(p);
 					return;
 				}
+			}
+			if (amount == 0 || amount < 0)
+			{
+				p.Message("Can't give 0 blocks!");
+				return;
 			}
 			if (!MCGalaxy.SimpleSurvival.InventoryHasEnoughBlock(p, blockId, amount))
 			{
