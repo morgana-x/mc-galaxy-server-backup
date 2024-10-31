@@ -10,6 +10,9 @@ using MCGalaxy.Tasks;
 using MCGalaxy.Maths;
 using MCGalaxy.Blocks;
 using MCGalaxy.Network;
+
+//pluginref simplesurvival.dll
+
 namespace MCGalaxy {
 	public class DoorBlock {
 		public BlockID Item_Block        {get; set;}
@@ -484,6 +487,10 @@ namespace MCGalaxy {
 		{
 			if (!IsDoorItem(block))
 			{
+				return;
+			}
+			if(!p.level.IsAirAt((ushort)x, (ushort)(y + 1), (ushort)z)) {
+				MCGalaxy.SimpleSurvival.InventoryAddBlocks(p, block, 1);
 				return;
 			}
 			if ( y > 0 && p.level.FastGetBlock((ushort)x, (ushort)(y-1), (ushort)z) == 0) // if placing above air
