@@ -485,12 +485,12 @@ namespace MCGalaxy {
 		
 		void PlaceDoor(Player p, ushort x, ushort y, ushort z, BlockID block)
 		{
-			if(!p.level.IsAirAt((ushort)x, (ushort)(y + 1), (ushort)z)) {
-				MCGalaxy.SimpleSurvival.InventoryAddBlocks(p, block, 1);
-				return;
-			}
 			if (!IsDoorItem(block))
 			{
+				return;
+			}
+			if(!p.level.IsAirAt((ushort)x, (ushort)(y + 1), (ushort)z)) {
+				MCGalaxy.SimpleSurvival.InventoryAddBlocks(p, block, 1);
 				return;
 			}
 			if ( y > 0 && p.level.FastGetBlock((ushort)x, (ushort)(y-1), (ushort)z) == 0) // if placing above air
