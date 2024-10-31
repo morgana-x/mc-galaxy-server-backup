@@ -125,6 +125,7 @@ namespace MCGalaxy {
 				collidesLeaves = false;
 				//#fullBright means it will always have its original brightness, even in dark environments.
 				fullBright = false;
+				definedEffects.Add(this);
 			}
 		}
 		public class ExplosionParticleEffect : GoodlyEffects.EffectConfig
@@ -166,6 +167,7 @@ namespace MCGalaxy {
 				collidesLeaves = false;
 				//#fullBright means it will always have its original brightness, even in dark environments.
 				fullBright = false;
+				definedEffects.Add(this);
 			}
 		}
 		public class ExplosionParticleEffect2 : GoodlyEffects.EffectConfig
@@ -207,6 +209,7 @@ namespace MCGalaxy {
 				collidesLeaves = false;
 				//#fullBright means it will always have its original brightness, even in dark environments.
 				fullBright = true;
+				definedEffects.Add(this);
 			}
 		}
 		public class ExplosionParticleEffect3 : GoodlyEffects.EffectConfig
@@ -248,12 +251,23 @@ namespace MCGalaxy {
 				collidesLeaves = false;
 				//#fullBright means it will always have its original brightness, even in dark environments.
 				fullBright = true;
+				definedEffects.Add(this);
 			}
 		}
-		public static PVPParticleEffect pvpParticleEffect = new PVPParticleEffect(){ID = 25};
-		public static ExplosionParticleEffect explosionParticleEffect = new ExplosionParticleEffect(){ID = 26};
-		public static ExplosionParticleEffect2 explosionParticleEffect2 = new ExplosionParticleEffect2(){ID = 27};
-		public static ExplosionParticleEffect3 explosionParticleEffect3  = new ExplosionParticleEffect3(){ID=28};
+		public static List<GoodlyEffects.EffectConfig> definedEffects = new List<GoodlyEffects.EffectConfig>();
+		public static PVPParticleEffect pvpParticleEffect = new PVPParticleEffect(){ID = 9};
+		public static ExplosionParticleEffect explosionParticleEffect = new ExplosionParticleEffect(){ID = 10};
+		public static ExplosionParticleEffect2 explosionParticleEffect2 = new ExplosionParticleEffect2(){ID = 11};
+		public static ExplosionParticleEffect3 explosionParticleEffect3  = new ExplosionParticleEffect3(){ID=12};
+		public static ExplosionParticleEffect3 explosionParticleEffect4  = new ExplosionParticleEffect3(){ID=13};
+
+		public static void defineEffects(Player p)
+		{
+			foreach(var a in definedEffects)
+			{
+				defineEffect(p, a);
+			}
+		}
 		public class SurvivalTool
 		{
 			public ushort TEXTURE;
@@ -319,12 +333,92 @@ namespace MCGalaxy {
 			int distZ = (z1 - z2);
 			return (ushort)Math.Sqrt( (distX * distX) + (distY * distY) + (distZ * distZ));
 		}
+		//private System.Random rnd = new System.Random();
+
+		private static void explosionEffect(Level level, ushort x, ushort y, ushort z)
+		{
+			if (!Config.UseGoodlyEffects)
+				return;
+
+			spawnEffect(level, explosionParticleEffect, new float[3]{(float)x, (float)y, (float)z}, false);
+			spawnEffect(level, explosionParticleEffect2, new float[3]{(float)x, (float)y, (float)z}, false);
+			spawnEffect(level, explosionParticleEffect3, new float[3]{(float)x, (float)y, (float)z}, false);
+			spawnEffect(level, explosionParticleEffect4, new float[3]{(float)x, (float)y, (float)z}, false);
+		}
+		private static List<QueuedExplosion> queuedExplosions = new List<QueuedExplosion>();
+		class QueuedExplosion
+		{
+			public Level Level;
+			public ushort[] Pos;
+		}
+		private static int getExplodeRate(int numOfExps)
+		{
+			if (numOfExps > 200)
+				return 150;
+			if (numOfExps > 100)
+				return 80;
+			if (numOfExps > 20)
+				return 15;
+			if (numOfExps > 10)
+				return 8;
+			return 5;
+		}
+		private void doExplosionQueue(SchedulerTask task)
+		{
+			explosionTask = task;
+			if (queuedExplosions.Count == 0)
+				return;
+			for (int i=0; i < queuedExplosions.Count; i++)
+			{
+				if (i > getExplodeRate(queuedExplosions.Count))
+					break;
+				QueuedExplosion exp;
+				try
+				{
+					exp = queuedExplosions[i];
+					queuedExplosions.Remove(exp);
+				}
+				catch(Exception e)
+				{
+					continue;
+				}
+				Explosion(exp.Level, exp.Pos[0], exp.Pos[1], exp.Pos[2]);
+			}
+		}
+		private static List<ushort[]> getNeighboringTNT(Level level, ushort x, ushort y, ushort z)
+		{
+			List<ushort[]> chainExplosions = new List<ushort[]>();
+			int range = 2;
+			for (int bx = -range; bx <= range; bx++)
+			{
+				for (int by = -range; by <= range; by++)
+				{
+					for(int bz = -range; bz <= range; bz++)
+					{
+						ushort ax = (ushort)(x + bx);
+						ushort ay = (ushort)(y + by);
+						ushort az = (ushort)(z + bz);
+						if (ax == 0 && ay == 0 && az == 0)
+							continue;
+						ushort block = level.FastGetBlock(ax,ay,az);
+						if (block != 46)
+							continue;
+						/*ushort dist = Dist(ax,ay,az,x,y,z);
+						if (dist > 1)
+							continue;*/
+						chainExplosions.Add(new ushort[3]{ax,ay,az});
+					}
+				}
+			}
+			return chainExplosions;
+		}
 		public static void Explosion(Level level, ushort x, ushort y, ushort z, Player p = null)
 		{
+			explosionEffect(level, x, y, z);
 			if (p == null)
 				p = Player.Console;
 			level.UpdateBlock(Player.Console, x,y,z, (ushort)0);
-
+			List<ushort[]> chainExplosions = getNeighboringTNT(level, x, y, z);
 			int range = 2;
 			for (int bx = -range; bx <= range; bx++)
 			{
@@ -340,22 +434,18 @@ namespace MCGalaxy {
 						ushort block = level.FastGetBlock(ax,ay,az);
 						if (block == 0)
 							continue;
+						/*if (block == 46)
+							continue;*/
 						int range2 = range;
 						/*if (blockMiningTimes.ContainsKey(block) && blockMiningTimes[block].MiningTime >= 60)
 							range2 = (int) (range2 /2);*/
 						ushort dist = Dist(ax,ay,az,x,y,z);
 						if (dist > range2)
 							continue;
-						if (block == 46)
-						{
-							Explosion(level, ax, ay, az);
-							continue;
-						}
 						level.UpdateBlock(Player.Console, ax, ay, az, 0);
 					}
 				}
 			}
-
 			foreach (Player v in PlayerInfo.Online.Items)
 			{
 				if (v.level != level)
@@ -369,11 +459,13 @@ namespace MCGalaxy {
 				if (GetHealth(v) <= 0)
 					Die(v, 46);
 			}
-			if (!Config.UseGoodlyEffects)
-				return;
-			spawnEffect(level, explosionParticleEffect, new float[3]{(float)x, (float)y, (float)z});
-			spawnEffect(level, explosionParticleEffect2, new float[3]{(float)x, (float)y, (float)z});
-			spawnEffect(level, explosionParticleEffect3, new float[3]{(float)x, (float)y, (float)z});
+
+			foreach (var a in chainExplosions)
+			{
+				queuedExplosions.Add(new QueuedExplosion(){Level = level, Pos = a});
+				//Explosion(level, a[0], a[1], a[2], p);
+			}
+		
 		}
 		public class PickaxeTool : SurvivalTool
 		{
@@ -1053,8 +1145,8 @@ namespace MCGalaxy {
 			// Diamond Axe									// Stick x 2 + Diamond x 4 = 1x Diamond Axe
 			{110, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 2}, {111, 4}}, 1, true)},
 
-			// Flint and Steel										// Flint x1, Iron igot x 1
-			{120, new CraftRecipe(new Dictionary<ushort, ushort>(){{122, 1}, {113, 1}})},
+			// Flint and Steel										// Flint x1, Iron igot x 1 = 12x flint and steel
+			{120, new CraftRecipe(new Dictionary<ushort, ushort>(){{122, 1}, {113, 1}}, 12, false)},
 
 			// TNT													// Sand x 10, Gunpowder x 10
 			{46,  new CraftRecipe(new Dictionary<ushort, ushort>(){{12, 10}, {121, 10}}, 1, true)},
@@ -1085,7 +1177,7 @@ namespace MCGalaxy {
 		SchedulerTask guiTask;
 		SchedulerTask regenTask;
 		SchedulerTask mobSpawningTask;
-		
+		SchedulerTask explosionTask;
 
 		public static Dictionary<string, Dictionary<string, Dictionary<ushort, ushort>>> playerInventories = new  Dictionary<string, Dictionary<string, Dictionary<ushort, ushort>>>();
 		public Dictionary<Player, MiningProgress> playerMiningProgress = new Dictionary<Player, MiningProgress>();
@@ -1105,6 +1197,7 @@ namespace MCGalaxy {
 			Server.MainScheduler.QueueRepeat(HandleGUI, null, TimeSpan.FromMilliseconds(100));
 			Server.MainScheduler.QueueRepeat(HandleRegeneration, null, TimeSpan.FromSeconds(4));
 			Server.MainScheduler.QueueRepeat(HandleMobSpawning, null, TimeSpan.FromSeconds(1));
+			Server.MainScheduler.QueueRepeat(doExplosionQueue, null, TimeSpan.FromMilliseconds(100));
 			Command.Register(new CmdPvP());
 			Command.Register(new CmdGiveBlock());
 			Command.Register(new CmdCraft());
@@ -1126,6 +1219,7 @@ namespace MCGalaxy {
 			foreach (Player p in PlayerInfo.Online.Items)
 			{
 				InitPlayer(p);
+				defineEffects(p);
 			}
 			
 			if(!Directory.Exists(Config.Path))
@@ -1158,7 +1252,7 @@ namespace MCGalaxy {
 			Server.MainScheduler.Cancel(guiTask);
 			Server.MainScheduler.Cancel(regenTask);
 			Server.MainScheduler.Cancel(mobSpawningTask);
-			
+			Server.MainScheduler.Cancel(explosionTask);
 			Command.Unregister(Command.Find("PvP"));
 			Command.Unregister(Command.Find("GiveBlock"));
 			Command.Unregister(Command.Find("TradeBlock"));
@@ -1166,6 +1260,7 @@ namespace MCGalaxy {
 
 			SaveAllInventory();
 			mobHealth.Clear();
+			queuedExplosions.Clear();
 
 			foreach(var pair in mineProgressIndicators)
 			{
@@ -1751,24 +1846,34 @@ namespace MCGalaxy {
 			effect.ID = id;
 			GoodlyEffects.DefineEffect(pl, effect); //new GoodlyEffects.EffectConfig(){ID = ID});
 		}
-		static byte currentEffectId = 20;
-		private static void spawnEffect(Level lvl, GoodlyEffects.EffectConfig effect, float[] pos, float[] origin)
+		private static void defineEffect(Player pl, GoodlyEffects.EffectConfig effect)
 		{
-			byte ID = currentEffectId;
-			currentEffectId += 1;
-			if (currentEffectId > 254)
-				currentEffectId = 20;
+			GoodlyEffects.DefineEffect(pl, effect);
+		}
+		static byte currentEffectId = 100;
+		private static void spawnEffect(Level lvl, GoodlyEffects.EffectConfig effect, float[] pos, float[] origin, bool define=true)
+		{
+
+			byte ID = effect.ID;
+			if (define)
+			{
+				currentEffectId += 1;
+				if (currentEffectId > 254)
+					currentEffectId = 100;
+				ID = currentEffectId;
+			}
 			Player[] players = PlayerInfo.Online.Items;
             foreach (Player p in players) {
                 if (p.level != lvl || !p.Supports(CpeExt.CustomParticles)) { continue; }
 				if ((p.Pos.ToVec3F32() -  new Vec3F32(pos[0], pos[1], pos[2])).LengthSquared > (2250)){continue;}
-				defineEffect(p, ID, effect);
+				if (define)
+					defineEffect(p, ID, effect);
                 p.Send(Packet.SpawnEffect(ID, pos[0], pos[1], pos[2], origin[0], origin[1], origin[2]));
             }
 		}
-		private static void spawnEffect(Level lvl, GoodlyEffects.EffectConfig effect, float[] pos)
+		private static void spawnEffect(Level lvl, GoodlyEffects.EffectConfig effect, float[] pos, bool define=true)
 		{
-			spawnEffect(lvl, effect, pos, pos);
+			spawnEffect(lvl, effect, pos, pos, define);
 		}
 		private static void spawnMineParticles(Player pl, ushort[] pos, GoodlyEffects.EffectConfig effect)
 		{
@@ -1955,6 +2060,7 @@ namespace MCGalaxy {
 				p.Extras["MINING_LASTPROG"] = 0;
 				return;
 			}
+			defineEffects(p);
 			LoadInventory(p);
 			ClearHotbar(p);
 			InitPlayer(p);
@@ -2114,6 +2220,7 @@ namespace MCGalaxy {
 			InitPlayer(p);
 			SendMiningUnbreakableMessage(p);
 			ClearHotbar(p);
+			defineEffects(p);
 		}
 
 		int GetLagCompensation(int ping)
@@ -2128,7 +2235,7 @@ namespace MCGalaxy {
 			if (ping > 180) penalty = 250; // "horrible"
 			return penalty;
 		}
-		Random rnd = new Random();
+		static Random rnd = new Random();
 		PlayerBot[] GetMobsInLevel(Level lvl)
 		{
 			List<PlayerBot> players = new List<PlayerBot>();
@@ -3211,6 +3318,7 @@ namespace MCGalaxy {
                 {
                     SimpleSurvival.ResetPlayerState(pl);
 					SimpleSurvival.InitPlayer(pl);
+					SimpleSurvival.defineEffects(pl);
                 }
             }
         }
