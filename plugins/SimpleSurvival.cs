@@ -676,6 +676,9 @@ namespace MCGalaxy {
 
 				// Inventory
 				public static bool InventoryEnabled = true;
+
+				// Backend
+				public static ushort MineBlockIndicatorStart = 490;
 		}
 		
 		ushort defaultMiningTime = 5;
@@ -1909,7 +1912,7 @@ namespace MCGalaxy {
 				createMineIndicator(pl, indicatorPosition);
 			if (mineProgressIndicators[pl].Pos != indicatorPosition)
 				mineProgressIndicators[pl].Pos=indicatorPosition;
-			string newModel = "break" + amount.ToString() + "|1.005";
+			string newModel = /*"break"*/ (Config.MineBlockIndicatorStart + amount).ToString() + "|1.01";
 			if (newModel == mineProgressIndicators[pl].Model)
 				return;
 			mineProgressIndicators[pl].UpdateModel(newModel);
@@ -1918,7 +1921,7 @@ namespace MCGalaxy {
 		{
 			for (ushort i =0; i < 10; i++)
 			{
-				AddBlockDef("break" + i.ToString(), (ushort)(490 + i), 0,0,0,16,16,16, (ushort)(240 + i), true);
+				AddBlockDef("break" + i.ToString(), (ushort)(Config.MineBlockIndicatorStart + i), 0,0,0,16,16,16, (ushort)(240 + i), true);
 			}
 			// AddBlockItem(ushort Id, string Name, ushort Texture, bool admin=false)
 			AddBlockItem((ushort)256, "", 85, true );
