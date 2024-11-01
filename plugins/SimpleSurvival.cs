@@ -1010,7 +1010,7 @@ namespace MCGalaxy {
 			new SurvivalTool()
 			{
 				NAME = "Gunpowder",
-				TEXTURE = 232,
+				TEXTURE = 210,
 				ID = 121,
 				IsSword = false,
 				IsSprite = true
@@ -1018,7 +1018,7 @@ namespace MCGalaxy {
 			new SurvivalTool()
 			{
 				NAME = "Flint",
-				TEXTURE = 127,
+				TEXTURE = 211,
 				ID = 122,
 				IsSword = false,
 				IsSprite = true
@@ -1157,6 +1157,7 @@ namespace MCGalaxy {
 			public ushort BlockType;
 			public ushort Progress = 0;
 			public ushort[] Position;
+			public ushort MiningIndicatorProgress = 0;
 			public DateTime LastMine;
 
 			public bool IsExpired()
@@ -1745,16 +1746,17 @@ namespace MCGalaxy {
 			if (!playerMiningProgress.ContainsKey(pl))
 			{
 				playerMiningProgress.Add(pl, new MiningProgress(blockType, pos));
+				setMineIndicator(pl, pos,0);
 			}
 			
 			var currentProgress = playerMiningProgress[pl];
-			if (DateTime.Now.Subtract(currentProgress.LastMine).TotalMilliseconds < 200) // avoid fast mining cheat
+			if (DateTime.Now.Subtract(currentProgress.LastMine).TotalMilliseconds < 210) // avoid fast mining cheat
 				return;
 			if (currentProgress.BlockType != blockType || (pos[0] != currentProgress.Position[0]|| pos[1] !=  currentProgress.Position[1] || pos[2] != currentProgress.Position[2]))
 			{
 				//destroyMineIndicator(p);
 				playerMiningProgress[pl] = new MiningProgress(blockType, pos);
-				return;
+				setMineIndicator(pl, pos,0);
 			}
 			float miningBonus = 1f;
 			ushort heldBlock = pl.GetHeldBlock();
@@ -1770,8 +1772,12 @@ namespace MCGalaxy {
 				miningBonus *= 0.5f;
 			playerMiningProgress[pl].Progress += (ushort)(1 * miningBonus);
 			playerMiningProgress[pl].LastMine = DateTime.Now;
-			ushort amount =  (ushort)Math.Min(10, (int) (( (float)playerMiningProgress[pl].Progress / (float)blockMineData.MiningTime) * 10));
-			setMineIndicator(pl, pos,amount);
+			ushort amount =  (ushort)Math.Min(9, (int) (( (float)playerMiningProgress[pl].Progress / (float)blockMineData.MiningTime) * 9));
+			if (amount != playerMiningProgress[pl].MiningIndicatorProgress)
+			{
+				playerMiningProgress[pl].MiningIndicatorProgress = amount;
+				setMineIndicator(pl, pos,amount);
+			}
 			spawnMineParticles(pl, pos, blockMineData.breakEffect);
 			if (playerMiningProgress[pl].Progress < blockMineData.MiningTime)
 				return;
@@ -1901,7 +1907,8 @@ namespace MCGalaxy {
 			Position indicatorPosition =  Position.FromFeet((int)(pos[0]*32) +16, (int)(pos[1]*32), (int)(pos[2]*32) +16); //new Position(pos[0] << 5, pos[1] << 5, pos[2] << 5);
 			if (!mineProgressIndicators.ContainsKey(pl))
 				createMineIndicator(pl, indicatorPosition);
-			mineProgressIndicators[pl].Pos=indicatorPosition;
+			if (mineProgressIndicators[pl].Pos != indicatorPosition)
+				mineProgressIndicators[pl].Pos=indicatorPosition;
 			mineProgressIndicators[pl].UpdateModel("break" + amount.ToString() + "|1.005");
 		}
 		private void addBreakBlocks()
