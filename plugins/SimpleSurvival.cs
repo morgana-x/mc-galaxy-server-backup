@@ -1909,7 +1909,10 @@ namespace MCGalaxy {
 				createMineIndicator(pl, indicatorPosition);
 			if (mineProgressIndicators[pl].Pos != indicatorPosition)
 				mineProgressIndicators[pl].Pos=indicatorPosition;
-			mineProgressIndicators[pl].UpdateModel("break" + amount.ToString() + "|1.005");
+			string newModel = "break" + amount.ToString() + "|1.005";
+			if (newModel == mineProgressIndicators[pl].Model)
+				return;
+			mineProgressIndicators[pl].UpdateModel(newModel);
 		}
 		private void addBreakBlocks()
 		{
