@@ -2089,6 +2089,8 @@ namespace MCGalaxy {
 				return;
 			if (cancel)
 				return;
+			if (!maplist.Contains(p.level.name))
+				return;
 			var tool = getTool(block);
 			if (tool != null && !tool.IsSprite)
 			{
@@ -2111,7 +2113,6 @@ namespace MCGalaxy {
 			{
 				cancel = true;
 				p.RevertBlock(x,y,z);
-				p.Message("Insufficent amount of block \"" + block.ToString() + "\".");
 				return;
 			}
 			InventoryRemoveBlocks(p, block, 1);
