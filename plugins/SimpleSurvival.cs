@@ -63,7 +63,7 @@ namespace MCGalaxy {
 				//#particleCount is how many hearts are spawned per-effect.
 				particleCount = 10;
 				//#pixelSize is how large in "pixel" units the particle is. 8 is the size of a player's head. You are allowed to be as precise as half a pixel, therefore the smallest possible size is 0.5.
-				pixelSize = 4;
+				pixelSize = 5;
 				//#sizeVariation is how much the particle can randomly vary in size. 1 means 100% variation, 0 means 0% variation.
 				sizeVariation = 0.8f;
 				//#spread allows the particles to spawn randomly around the point they were told to spawn at. A spread of "0.5" is equal to the width of a full block (because the spread goes both ways).
@@ -75,7 +75,7 @@ namespace MCGalaxy {
 				//#baseLifetime is the time (in seconds) this particle is allowed to live at most (colliding with blocks may kill it sooner).
 				baseLifetime = 2f;
 				//#lifetimeVariation is how much the particle's lifespan can randomly vary. 1 means 100% variation, 0 means 0% variation.
-				lifetimeVariation = 0;
+				lifetimeVariation = 0.5f;
 				//#expireUponTouchingGround means particle dies if it hits solid floor
 				expireUponTouchingGround = false;
 				//#collides determine what blocks count as "solid".
