@@ -33,6 +33,7 @@ namespace MCGalaxy
 			{0,   "#709DED"},
 			{170, "#78A9FF"},
 			{175, "#212E46"},
+			{179, "#111111"},
 			{180, "#000000"},
 			{230, "#304365"},
 			{235, "#3C547F"},
@@ -57,7 +58,9 @@ namespace MCGalaxy
 		public static Dictionary<int, string> ShadowColors = new Dictionary<int, string>()
         {
 			{0,   "#9B9B9B"},
+			{177, "#101010"},
 			{180, "#090909"},
+			{225, "#101010"},
 			{230, "#757575"},
 		};
 		public static Dictionary<int, string> FogColors = new Dictionary<int, string>()
@@ -72,49 +75,18 @@ namespace MCGalaxy
 		ColorDesc GetColor(Dictionary<int, string> list, float hour)
 		{
 			int dist = 50;
-			int oldColorKey = 0;
-			int newColorKey = 0;
+			int ColorKey = 0;
 			foreach (var pair in list)
 			{
 				int d = (int)Math.Abs(pair.Key - hour);
-				if (hour > pair.Key)
-				{
-					dist = d;
-					oldColorKey = pair.Key;
-				}
+				if (d > dist)
+					continue;
+				dist = d;
+				ColorKey = pair.Key;
 			}
-			if (oldColorKey > 238)
-			{
-				newColorKey = 0;
-			}
-			else
-			{
-				foreach (var pair in list)
-				{
-					if (pair.Key > oldColorKey)
-					{
-						newColorKey = pair.Key;
-						break;
-					}
-				}
-			}
-			
 			ColorDesc oldColor = default(ColorDesc);
-			ColorDesc newColor = default(ColorDesc);
-		
-			CommandParser.GetHex(Player.Console,list[oldColorKey] ,ref oldColor);
-			if (true)
-			{
-				return oldColor;
-			}
-			if (list[oldColorKey] == list[newColorKey])
-			{
-				return oldColor;
-			}
-			CommandParser.GetHex(Player.Console,list[newColorKey] ,ref newColor);
-			
-			float progress = (newColorKey-oldColorKey)/(newColorKey-hour);
-			return LerpColor(oldColor, newColor, progress);
+			CommandParser.GetHex(Player.Console,list[ColorKey] ,ref oldColor);
+			return oldColor;
 		}
 		ColorDesc GetSkyColor(float hour)
 		{
@@ -169,7 +141,7 @@ namespace MCGalaxy
         void DoDayNightCycle(SchedulerTask task)
         {
             if (timeOfDay > 23999) timeOfDay = 0;
-            else timeOfDay += 1;
+            else timeOfDay += 2;
 
             Player[] players = PlayerInfo.Online.Items;
 
