@@ -2548,10 +2548,10 @@ namespace MCGalaxy {
 			if (block >= 66)
 				block = (ushort)(block - 256);
 			if (!InventoryHasEnoughBlock(p, block))
-				return 1f;
+				return 0.5f;
 			SurvivalTool tool = getTool(block);
 			if (tool == null)
-				return 1f;
+				return 0.5f;
 			return tool.Knockback;
 		}
 		void HandleAttackMob (Player p, byte entity)
