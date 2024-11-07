@@ -2732,7 +2732,7 @@ namespace MCGalaxy {
 			int repeatDepletedHealth = 10 - repeatHealth;
 
 
-			return ("%c" + new string('♥', repeatHealth )) + "%8" + new string('♥', repeatDepletedHealth ) ;
+			return ("%f" + new string('♥', repeatHealth )) + "%0" + new string('♥', repeatDepletedHealth ) ;
 		}
 		static string GetAirBar(int air)
 		{
@@ -2745,7 +2745,8 @@ namespace MCGalaxy {
 				return "";
 			}
 			int repeat = air; //(int)Math.Round((double)(air/Config.MaxAir) * 10);
-			return ("%9" + new string('♥', repeat)+ "%8" + new string('♥', Config.MaxAir-air ));
+			///help emotes 9○ &e- (circle), (o)
+			return ("%3" + new string('○', air)+ "%8" + new string('○', Config.MaxAir-air ));
 		}
 		static string getHeldBlockAmount(Player p)
 		{
