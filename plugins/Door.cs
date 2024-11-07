@@ -276,15 +276,15 @@ namespace MCGalaxy {
 				AddBlockItem(door.Item_Block, BLOCK_ITEM_NAME, TEXTURE_ITEM);
 				
 
-				AddDoorBlock(door.Bottom_Block,		 		 0, 0, 0,   4, 16, 16, TEXTURE_BLOCK_BOTTOM, TEXTURE_BLOCK_BOTTOM, true);
-				AddDoorBlock(door.Bottom_Block_Open, 		 0, 0, 0,   16, 4, 16, TEXTURE_BLOCK_BOTTOM, TEXTURE_BLOCK_BOTTOM, true);
-				AddDoorBlock(door.Bottom_Block_Inverse,	 	 12, 0, 0,   16, 16, 16, TEXTURE_BLOCK_BOTTOM, TEXTURE_BLOCK_BOTTOM, true);
-				AddDoorBlock(door.Bottom_Block_Inverse_Open, 0, 12, 0,   16, 16, 16, TEXTURE_BLOCK_BOTTOM, TEXTURE_BLOCK_BOTTOM, true);
+				AddDoorBlock(door.Bottom_Block,		 		 0, 0, 0,   5, 16, 16, TEXTURE_BLOCK_BOTTOM, TEXTURE_BLOCK_BOTTOM, true);
+				AddDoorBlock(door.Bottom_Block_Open, 		 0, 0, 0,   16, 5, 16, TEXTURE_BLOCK_BOTTOM, TEXTURE_BLOCK_BOTTOM, true);
+				AddDoorBlock(door.Bottom_Block_Inverse,	 	 13, 0, 0,   16, 16, 16, TEXTURE_BLOCK_BOTTOM, TEXTURE_BLOCK_BOTTOM, true);
+				AddDoorBlock(door.Bottom_Block_Inverse_Open, 0, 13, 0,   16, 16, 16, TEXTURE_BLOCK_BOTTOM, TEXTURE_BLOCK_BOTTOM, true);
 				
-				AddDoorBlock(door.Top_Block, 				0,0,0, 4, 16, 16, TEXTURE_BLOCK_BOTTOM, TEXTURE_BLOCK_TOP, true);
-				AddDoorBlock(door.Top_Block_Open, 			0,0,0, 16, 4, 16, TEXTURE_BLOCK_BOTTOM, TEXTURE_BLOCK_TOP, true);
-				AddDoorBlock(door.Top_Block_Inverse, 		12, 0, 0,   16, 16, 16, TEXTURE_BLOCK_BOTTOM, TEXTURE_BLOCK_TOP, true);
-				AddDoorBlock(door.Top_Block_Inverse_Open, 	0, 12, 0,   16, 16, 16, TEXTURE_BLOCK_BOTTOM, TEXTURE_BLOCK_TOP, true);
+				AddDoorBlock(door.Top_Block, 				0,0,0, 5, 16, 16, TEXTURE_BLOCK_BOTTOM, TEXTURE_BLOCK_TOP, true);
+				AddDoorBlock(door.Top_Block_Open, 			0,0,0, 16, 5, 16, TEXTURE_BLOCK_BOTTOM, TEXTURE_BLOCK_TOP, true);
+				AddDoorBlock(door.Top_Block_Inverse, 		13, 0, 0,   16, 16, 16, TEXTURE_BLOCK_BOTTOM, TEXTURE_BLOCK_TOP, true);
+				AddDoorBlock(door.Top_Block_Inverse_Open, 	0, 13, 0,   16, 16, 16, TEXTURE_BLOCK_BOTTOM, TEXTURE_BLOCK_TOP, true);
 				
 				
 				door.Item_Block 		       = (ushort)(door.Item_Block + 256					);
