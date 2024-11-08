@@ -35,6 +35,10 @@ namespace MCGalaxy
 			{175, "#212E46"},
 			{179, "#111111"},
 			{180, "#000000"},
+			{190, "#000000"},
+			{200, "#000000"},
+			{210, "#000000"},
+			{220, "#000000"},
 			{230, "#304365"},
 			{235, "#3C547F"},
 			{236, "#6F9CEC"},
@@ -45,6 +49,10 @@ namespace MCGalaxy
 			{170, "#FFFFFF"},
 			{175, "#926864"},
 			{180, "#000000"},
+			{190, "#000000"},
+			{200, "#000000"},
+			{210, "#000000"},
+			{220, "#000000"},
 			{230, "#D15F36"},
 		};
 		public static Dictionary<int, string> LightingColors = new Dictionary<int, string>()
@@ -52,6 +60,10 @@ namespace MCGalaxy
 			{0,   "#FFFFFF"},
 			{177, "#5c5c5c"},
 			{180, "#202020"},
+			{190, "#202020"},
+			{200, "#202020"},
+			{210, "#202020"},
+			{220, "#202020"},
 			{225, "#5c5c5c"},
 			{230, "#fac3af"},
 		};
@@ -60,6 +72,10 @@ namespace MCGalaxy
 			{0,   "#9B9B9B"},
 			{177, "#101010"},
 			{180, "#090909"},
+			{190, "#090909"},
+			{200, "#090909"},
+			{210, "#090909"},
+			{220, "#090909"},
 			{225, "#101010"},
 			{230, "#757575"},
 		};
@@ -70,15 +86,20 @@ namespace MCGalaxy
 			{175, "#3b3b3b"},
 			{180, "#0f0f0f"},
 			{190, "#0f0f0f"},
+			{200, "#0f0f0f"},
+			{210, "#0f0f0f"},
+			{220, "#0f0f0f"},
 			{230, "#D15F36"},
 		};
 		ColorDesc GetColor(Dictionary<int, string> list, float hour)
 		{
-			int dist = 50;
+			int dist = 10;
 			int ColorKey = 0;
 			foreach (var pair in list)
 			{
-				int d = (int)Math.Abs(pair.Key - hour);
+				if (hour < pair.Key)
+					continue;
+				int d = (int)Math.Abs(hour - pair.Key);
 				if (d > dist)
 					continue;
 				dist = d;
@@ -141,7 +162,7 @@ namespace MCGalaxy
         void DoDayNightCycle(SchedulerTask task)
         {
             if (timeOfDay > 23999) timeOfDay = 0;
-            else timeOfDay += 2;
+            else timeOfDay += 10;
 
             Player[] players = PlayerInfo.Online.Items;
 
