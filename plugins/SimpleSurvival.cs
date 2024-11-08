@@ -61,11 +61,11 @@ namespace MCGalaxy {
 				//#Frames are always the same size as each other and are stored left-to-right in particles.png.
 				frameCount = fCount;
 				//#particleCount is how many hearts are spawned per-effect.
-				particleCount = 10;
+				particleCount = 14;
 				//#pixelSize is how large in "pixel" units the particle is. 8 is the size of a player's head. You are allowed to be as precise as half a pixel, therefore the smallest possible size is 0.5.
-				pixelSize = 5;
+				pixelSize = 7;
 				//#sizeVariation is how much the particle can randomly vary in size. 1 means 100% variation, 0 means 0% variation.
-				sizeVariation = 0.8f;
+				sizeVariation = 0.5f;
 				//#spread allows the particles to spawn randomly around the point they were told to spawn at. A spread of "0.5" is equal to the width of a full block (because the spread goes both ways).
 				spread = 1f;
 				//#speed is how fast this particles moves away from the origin.
@@ -519,7 +519,7 @@ namespace MCGalaxy {
 				ShovelTimeMultiplier = 0.2f;
 				MiningTime = time;
 				RequirePickaxe = true;
-				breakEffect = new BreakParticleEffect(143, 143, 143);
+				breakEffect = new BreakParticleEffect(143, 143, 143){gravity = 4};
 			}
 		}
 		public class ObsidianMineConfig : StoneMineConfig
@@ -547,7 +547,7 @@ namespace MCGalaxy {
 		}
 		public class WoodMineConfig : BlockMineConfig
 		{
-			public WoodMineConfig(ushort time = 23)
+			public WoodMineConfig(ushort time = 14)
 			{
 				AxeTimeMultiplier = 1.5f;
 				PickaxeTimeMultiplier = 0.1f;
@@ -558,7 +558,7 @@ namespace MCGalaxy {
 		}
 		public class DirtMineConfig : BlockMineConfig
 		{
-			public DirtMineConfig(ushort time = 12)
+			public DirtMineConfig(ushort time = 8)
 			{
 				AxeTimeMultiplier = 0.2f;
 			 	PickaxeTimeMultiplier = 1f;
@@ -585,7 +585,7 @@ namespace MCGalaxy {
 			 	PickaxeTimeMultiplier = 1f;
 				ShovelTimeMultiplier = 1f;
 				MiningTime = time;
-				breakEffect = new BreakParticleEffect(77, 214, 52);
+				breakEffect = new BreakParticleEffect(77, 150, 52){gravity = 1};
 				LootChance = 0.05f;
 				overrideBlock = 6;
 			}
@@ -1753,7 +1753,7 @@ namespace MCGalaxy {
 			}
 			
 			var currentProgress = playerMiningProgress[pl];
-			if (DateTime.Now.Subtract(currentProgress.LastMine).TotalMilliseconds < 210) // avoid fast mining cheat
+			if (DateTime.Now.Subtract(currentProgress.LastMine).TotalMilliseconds < 200) // avoid fast mining cheat
 				return;
 			if (currentProgress.BlockType != blockType || (pos[0] != currentProgress.Position[0]|| pos[1] !=  currentProgress.Position[1] || pos[2] != currentProgress.Position[2]))
 			{
