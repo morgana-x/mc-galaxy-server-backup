@@ -40,8 +40,8 @@ namespace MCGalaxy {
 		public override string creator { get { return "morgana"; } }
 		public override bool LoadAtStartup { get { return true; } }
 
-		public bool SoundEnabled = true; // Whether sound is enabled for CEF PLUGIN CLIENTS ONLY
-		public int SoundRange = 6; // How many blocks away can players hear doors opening (CEF PLUGIN CLIENTS ONLY)
+		public static bool SoundEnabled = true; // Whether sound is enabled for CEF PLUGIN CLIENTS ONLY
+		public static int SoundRange = 6; // How many blocks away can players hear doors opening (CEF PLUGIN CLIENTS ONLY)
 		
 		public static ushort DoorBlockIdStorageIndex = 300; // Beggining of reserved Door slots will take up 8*Number of doors
 		
@@ -109,7 +109,7 @@ namespace MCGalaxy {
 			//HELP INFO!
 		}
 		
-		public void AddBlock(BlockDefinition def)
+		public static void AddBlock(BlockDefinition def)
 		{
 			BlockDefinition.Add(def, BlockDefinition.GlobalDefs, null );
 		}
@@ -117,7 +117,7 @@ namespace MCGalaxy {
 		{
 			InitCEF(p);
 		}
-		public void AddBlockItem(ushort Id, string Name, ushort Texture)
+		public static void AddBlockItem(ushort Id, string Name, ushort Texture)
 		{
 			BlockDefinition def = new BlockDefinition();
 				def.RawID = Id; def.Name = Name;
@@ -138,7 +138,7 @@ namespace MCGalaxy {
 				def.InventoryOrder = -1;
 			AddBlock(def);
 		}
-		public void SetDoorBlockPerms(ushort block)
+		public static void SetDoorBlockPerms(ushort block)
 		{
 			BlockPerms perms = BlockPerms.GetPlace((ushort)(block + 256));
 			perms.MinRank = LevelPermission.Nobody;
@@ -171,7 +171,7 @@ namespace MCGalaxy {
         {
 			InitCEF(p);	
         }
-		void PlaySound(Player p, string sound)
+		static void PlaySound(Player p, string sound)
 		{
 			if (!SoundEnabled)
 			{
@@ -184,7 +184,7 @@ namespace MCGalaxy {
 			p.Message("cef time -n " + sound + " " + 0.2);
 			//p.Message("cef resume -n " + sound);
 		}
-		void PlaySound(Player p, string sound, ushort x, ushort y, ushort z)
+		static void PlaySound(Player p, string sound, ushort x, ushort y, ushort z)
 		{
 			if (!SoundEnabled)
 			{
@@ -198,7 +198,7 @@ namespace MCGalaxy {
 			p.Message("cef time -n " + sound + " " + 0);
 			//p.Message("cef resume -n " + sound);
 		}
-		void PlaySound3D(Level level, ushort x, ushort y, ushort z, string sound)
+		static void PlaySound3D(Level level, ushort x, ushort y, ushort z, string sound)
 		{
 			if (!SoundEnabled)
 			{
@@ -228,7 +228,7 @@ namespace MCGalaxy {
 				PlaySound(p, sound, x, y, z);
 			}
 		}
-		public void AddDoorBlock(ushort Id, ushort MinX, ushort MinY, ushort MinZ, ushort MaxX, ushort MaxY, ushort MaxZ, ushort TEXTURE_SIDE, ushort TEXTURE_FRONT, bool Transperant)
+		public static void AddDoorBlock(ushort Id, ushort MinX, ushort MinY, ushort MinZ, ushort MaxX, ushort MaxY, ushort MaxZ, ushort TEXTURE_SIDE, ushort TEXTURE_FRONT, bool Transperant)
 		{
 				ushort RawID = Id;
 				string Name = "";
@@ -271,7 +271,7 @@ namespace MCGalaxy {
 				AddBlock(def);
 				SetDoorBlockPerms(Id);
 		}
-		public void AddDoorBlocks(DoorBlock door, string BLOCK_ITEM_NAME, ushort TEXTURE_ITEM, ushort TEXTURE_BLOCK_BOTTOM, ushort TEXTURE_BLOCK_TOP)
+		public static void AddDoorBlocks(DoorBlock door, string BLOCK_ITEM_NAME, ushort TEXTURE_ITEM, ushort TEXTURE_BLOCK_BOTTOM, ushort TEXTURE_BLOCK_TOP)
 		{
 				AddBlockItem(door.Item_Block, BLOCK_ITEM_NAME, TEXTURE_ITEM);
 				
@@ -304,7 +304,7 @@ namespace MCGalaxy {
 				// (4 0 0) (16 16 4)?
 
 		}
-		public void LoadDoor(DoorConfig config)
+		public static void LoadDoor(DoorConfig config)
 		{
 			ushort DoorIndexBeginning = (ushort)(DoorBlockIdStorageIndex + (DoorConfigs.IndexOf(config) * 8));
 			DoorBlock newDoor = new DoorBlock(){
@@ -322,8 +322,8 @@ namespace MCGalaxy {
 			DoorTypes.Add(newDoor);
 		}
 	
-		public List<DoorBlock> DoorTypes = new List<DoorBlock>(){};
-		public bool IsDoor(BlockID block)
+		public static List<DoorBlock> DoorTypes = new List<DoorBlock>(){};
+		public static bool IsDoor(BlockID block)
 		{
 			var b = block;
 			DoorBlock d = GetDoorFromBlock(b);
@@ -333,7 +333,7 @@ namespace MCGalaxy {
 			}
 			return true;
 		}
-		public bool IsDoorItem(BlockID block)
+		public static bool IsDoorItem(BlockID block)
 		{
 			var b = block;
 			
@@ -344,7 +344,7 @@ namespace MCGalaxy {
 			}
 			return true;
 		}
-		public DoorBlock GetDoorFromItem(BlockID block)
+		public static DoorBlock GetDoorFromItem(BlockID block)
 		{
 			foreach (DoorBlock door in DoorTypes)
 			{
@@ -355,7 +355,7 @@ namespace MCGalaxy {
 			}
 			return null;
 		}
-		public DoorBlock GetDoorFromBlock(BlockID block)
+		public static DoorBlock GetDoorFromBlock(BlockID block)
 		{
 			foreach (DoorBlock door in DoorTypes)
 			{
@@ -394,13 +394,13 @@ namespace MCGalaxy {
 			}
 			return null;
 		}
-		public bool IsDoor(Level level, ushort x, ushort y, ushort z)
+		public static bool IsDoor(Level level, ushort x, ushort y, ushort z)
 		{
 			var b = level.FastGetBlock((ushort)x, (ushort)y, (ushort)z);
 			
 			return IsDoor(b);
 		}
-		public bool IsDoorBottom(Level level, ushort x, ushort y, ushort z)
+		public static bool IsDoorBottom(Level level, ushort x, ushort y, ushort z)
 		{
 			var b = level.FastGetBlock((ushort)x, (ushort)y, (ushort)z);
 			DoorBlock d = GetDoorFromBlock(b);
@@ -411,7 +411,7 @@ namespace MCGalaxy {
 			return ( (b == d.Bottom_Block) || (b == d.Bottom_Block_Open) || (b == d.Bottom_Block_Inverse) || (b == d.Bottom_Block_Inverse_Open));
 		}
 	
-		public void OpenDoor(Level level, ushort x, ushort y, ushort z, bool mute = false)
+		public static void OpenDoor(Level level, ushort x, ushort y, ushort z, bool mute = false)
 		{
 			BlockID b = level.FastGetBlock((ushort)x, (ushort)(y), (ushort)z);
 			DoorBlock d = GetDoorFromBlock(b);
@@ -438,7 +438,7 @@ namespace MCGalaxy {
 			}
 			
 		}
-		public void CloseDoor(Level level, ushort x, ushort y, ushort z)
+		public static void CloseDoor(Level level, ushort x, ushort y, ushort z)
 		{
 			BlockID b = level.FastGetBlock((ushort)x, (ushort)(y), (ushort)z);
 			DoorBlock d = GetDoorFromBlock(b);
@@ -461,11 +461,11 @@ namespace MCGalaxy {
 			level.UpdateBlock(Player.Console, x, (ushort)(y + offset_y + 1), z, result_top   );	
 			PlaySound3D(level, x, y, z, "doorclose");
 		}
-		public bool IsOpen(Level level, DoorBlock d, BlockID b)
+		public static bool IsOpen(Level level, DoorBlock d, BlockID b)
 		{
 			return (!( b == d.Top_Block || b == d.Bottom_Block || b == d.Top_Block_Inverse || b == d.Bottom_Block_Inverse));
 		}
-		public void ToggleDoor(Level level, ushort x, ushort y, ushort z)
+		public static void ToggleDoor(Level level, ushort x, ushort y, ushort z)
 		{
 			BlockID b = level.FastGetBlock((ushort)x, (ushort)(y), (ushort)z);
 			DoorBlock d = GetDoorFromBlock(b);
@@ -483,7 +483,7 @@ namespace MCGalaxy {
 			}
 		}
 		
-		void PlaceDoor(Player p, ushort x, ushort y, ushort z, BlockID block)
+		static void PlaceDoor(Player p, ushort x, ushort y, ushort z, BlockID block)
 		{
 			if (!IsDoorItem(block))
 			{
