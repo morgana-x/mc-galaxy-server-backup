@@ -37,6 +37,7 @@ namespace VeryPlugins
         public const ushort goldDepth = 50;
         public const float coalChance = 1f;
         public const float ironChance = 1f / 4f;
+        public const float redstoneChance = 1f / 6f;       
         public const float goldChance = 1f / 8f;
         public const float diamondChance = 1f/16f;
 
@@ -420,10 +421,11 @@ namespace VeryPlugins
                         {
                             BlockID curBlock = lvl.FastGetBlock((ushort)x, (ushort)(y), (ushort)z);
                             if (curBlock != biome.Cliff) { continue; }
-                            TryGenOre(x, y, z, coalDepth, coalChance, 16);
-                            TryGenOre(x, y, z, ironDepth, ironChance, 15);
-                            TryGenOre(x, y, z, goldDepth, goldChance, 14);
-                            TryGenOre(x, y, z, goldDepth, diamondChance, (ushort)(87));
+                            TryGenOre(x, y, z, coalDepth, coalChance    , 16);
+                            TryGenOre(x, y, z, ironDepth, ironChance    , 15);
+                            TryGenOre(x, y, z, goldDepth, goldChance    , 14);
+                            TryGenOre(x, y, z, goldDepth, diamondChance , (ushort)(87));
+                            TryGenOre(x, y, z, ironDepth, redstoneChance, (ushort)(88));
                         }
             }
             bool TryGenOre(int x, int y, int z, int oreDepth, float oreChance, BlockID oreID)

@@ -130,7 +130,6 @@ namespace MCGalaxy {
 				TEXTURE_SIDE = 118,
 				TEXTURE_FRONT = 118,
 				ID = 88,
-				BRIGHTNESS = 3
 			},
 			new CustomBlock()
 			{
