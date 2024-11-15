@@ -965,7 +965,7 @@ namespace MCGalaxy {
 			new SurvivalTool()
 			{
 				NAME = "Stick",
-				TEXTURE = 255,
+				TEXTURE = 194,
 				ID = 115,
 				IsSword = false,
 				IsSprite = true
