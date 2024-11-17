@@ -489,12 +489,16 @@ namespace MCGalaxy {
 			{
 				return;
 			}
+
+			// check if there is a block above the door
 			if(!p.level.IsAirAt((ushort)x, (ushort)(y + 1), (ushort)z)) {
 				MCGalaxy.SimpleSurvival.InventoryAddBlocks(p, block, 1);
 				return;
 			}
-			if ( y > 0 && p.level.FastGetBlock((ushort)x, (ushort)(y-1), (ushort)z) == 0) // if placing above air
-			{
+
+			// check if the door is place on the floor (not in the air)
+			if ( y > 0 && p.level.FastGetBlock((ushort)x, (ushort)(y-1), (ushort)z) == 0) {
+				MCGalaxy.SimpleSurvival.InventoryAddBlocks(p, block, 1);
 				return;
 			}
 			DoorBlock d = GetDoorFromItem(block);
