@@ -731,19 +731,24 @@ namespace MCGalaxy {
 			{49, new ObsidianMineConfig()},
 			{50, new StoneMineConfig()},
 			{51, new WoodMineConfig()},
-			{53, new DirtMineConfig(1)},
 			{52, new StoneMineConfig()},
+			{53, new WoolMineConfig()},
+			{54, new FireMineConfig()},
+			{55, new WoolMineConfig()},
+			{56, new WoolMineConfig()},
+			{57, new WoolMineConfig()},
+			{58, new WoolMineConfig()},
+			{59, new WoolMineConfig()},
 			{60, new StoneMineConfig(10)},
 			{61, new StoneMineConfig()},
 			{62, new StoneMineConfig()},
 			{64, new WoodMineConfig()},
-			{54, new FireMineConfig()},
 			{65, new StoneMineConfig()},
 			{75, new WoodMineConfig(5)}, // Torch
 			{76, new WoodMineConfig()},
 			{77, new StoneMineConfig()},
 			{78, new StoneMineConfig(){overrideBlock = 77}},
-			{79, new StoneMineConfig(4)},
+			{79, new BlockMineConfig(4)},
 			{80, new StoneMineConfig(4)},
 			{81, new StoneMineConfig(4)},
 			{82, new StoneMineConfig(4)},
@@ -1100,9 +1105,47 @@ namespace MCGalaxy {
 			//  Rope
 			{51, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 7}}, 4, false)},
 			//  Redwool									// Rose + wool
-			{21, new CraftRecipe(new Dictionary<ushort, ushort>(){{38, 1}, {36, 1}}, 1, false)},
-
-
+			{21, new CraftRecipe(new Dictionary<ushort, ushort>(){{36, 1}}, 1, false)},
+			//  orngewool									// Rose + wool
+			{22, new CraftRecipe(new Dictionary<ushort, ushort>(){{36, 1}}, 1, false)},
+			//  yellowool									// Rose + wool
+			{23, new CraftRecipe(new Dictionary<ushort, ushort>(){{36, 1}}, 1, false)},
+			//  yellowool									// Rose + wool
+			{24, new CraftRecipe(new Dictionary<ushort, ushort>(){{36, 1}}, 1, false)},
+			//  yellowool									// Rose + wool
+			{25, new CraftRecipe(new Dictionary<ushort, ushort>(){{36, 1}}, 1, false)},
+			//  yellowool									// Rose + wool
+			{26, new CraftRecipe(new Dictionary<ushort, ushort>(){{36, 1}}, 1, false)},
+			//  yellowool									// Rose + wool
+			{27, new CraftRecipe(new Dictionary<ushort, ushort>(){{36, 1}}, 1, false)},
+			//  yellowool									// Rose + wool
+			{28, new CraftRecipe(new Dictionary<ushort, ushort>(){{36, 1}}, 1, false)},
+			//  yellowool									// Rose + wool
+			{29, new CraftRecipe(new Dictionary<ushort, ushort>(){{36, 1}}, 1, false)},
+			//  yellowool									// Rose + wool
+			{30, new CraftRecipe(new Dictionary<ushort, ushort>(){{36, 1}}, 1, false)},
+			//  yellowool									// Rose + wool
+			{31, new CraftRecipe(new Dictionary<ushort, ushort>(){{36, 1}}, 1, false)},
+			//  yellowool									// Rose + wool
+			{32, new CraftRecipe(new Dictionary<ushort, ushort>(){{36, 1}}, 1, false)},
+			//  yellowool									// Rose + wool
+			{33, new CraftRecipe(new Dictionary<ushort, ushort>(){{36, 1}}, 1, false)},
+			//  yellowool									// Rose + wool
+			{34, new CraftRecipe(new Dictionary<ushort, ushort>(){{36, 1}}, 1, false)},
+			//  yellowool									// Rose + wool
+			{35, new CraftRecipe(new Dictionary<ushort, ushort>(){{36, 1}}, 1, false)},
+			//  yellowool									// Rose + wool
+			{36, new CraftRecipe(new Dictionary<ushort, ushort>(){{36, 1}}, 1, false)},
+			//  yellowool									// Rose + wool
+			{55, new CraftRecipe(new Dictionary<ushort, ushort>(){{36, 1}}, 1, false)},
+			//  yellowool									// Rose + wool
+			{56, new CraftRecipe(new Dictionary<ushort, ushort>(){{36, 1}}, 1, false)},
+			//  yellowool									// Rose + wool
+			{57, new CraftRecipe(new Dictionary<ushort, ushort>(){{36, 1}}, 1, false)},
+			//  yellowool									// Rose + wool
+			{58, new CraftRecipe(new Dictionary<ushort, ushort>(){{36, 1}}, 1, false)},
+			//  yellowool									// Rose + wool
+			{59, new CraftRecipe(new Dictionary<ushort, ushort>(){{36, 1}}, 1, false)},
 			// Wooden Sword									// Stick x 1 + wood x 2 = 1x Wooden sword  [Need crafting table]
 			{99, new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 1}, {5, 2}}, 1, true)},
 			// Wooden Shovel									// Stick x 2 + wood x 1 = 1x Wooden Shovel
@@ -2414,7 +2457,7 @@ namespace MCGalaxy {
 						continue;
 					}
 				}
-				switch (rnd.Next(12))
+				switch (rnd.Next(13))
 				{
 					case 1:
 						SpawnEntity(lvl, "sheep", "roam", x, y, z);
@@ -2447,6 +2490,9 @@ namespace MCGalaxy {
 						SpawnEntity(lvl, "pig", "roam", x, y, z);
 						break;
 					case 11:
+						SpawnEntity(lvl, "sheep", "roam", x, y, z);
+						break;
+					case 12:
 						SpawnEntity(lvl, "sheep", "roam", x, y, z);
 						break;
 					default:
