@@ -16,12 +16,14 @@ namespace MCGalaxy {
 
         private static string badwordlistfile = "./plugins/swears.txt";
 		
+		private static string[] badwords = new string[]{};
+        
 		public override void Load(bool startup) {
 			//LOAD YOUR PLUGIN WITH EVENTS OR OTHER THINGS!
 			OnChatEvent.Register(HandleChatEvent, Priority.Low);
 
-            string[] obfuscatedBadwords = badwords;
-            /*for (int i=0; i<obfuscatedBadwords.Length; i++)
+            /*string[] obfuscatedBadwords = badwords;
+            for (int i=0; i<obfuscatedBadwords.Length; i++)
             {
                 obfuscatedBadwords[i] = obfuscateString(obfuscatedBadwords[i]);
             }
@@ -32,7 +34,6 @@ namespace MCGalaxy {
             for (int i=0; i<badwords.Length; i++)
             {
                 badwords[i] = deobfuscateString(badwords[i]);
-                Player.Console.Message(badwords[i]);
             }
 		}
                         
@@ -45,13 +46,7 @@ namespace MCGalaxy {
 		public override void Help(Player p) {
 			//HELP INFO!
 		}
-		public bool filterBad(Player pl, object arg)
-        {
-            if(!pl.Session.ClientName().CaselessContains("cef"))
-                return false;
-            return true;
-        }
-        
+
 		void HandleChatEvent(ChatScope scope, Player source, ref string msg, object arg, ref ChatMessageFilter filter, bool relay=false)
         {
             for (int i=0; i < badwords.Length; i++)
@@ -81,8 +76,5 @@ namespace MCGalaxy {
             }
             return newString;
         }
-
-		private static string[] badwords = new string[]{
-        };
 	}
 }
