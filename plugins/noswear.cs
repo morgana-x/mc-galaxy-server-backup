@@ -15,19 +15,20 @@ namespace MCGalaxy {
 		public override bool LoadAtStartup { get { return true; } }
 
         private static string badwordlistfile = "./plugins/swears.txt";
-		
+		private static string badwordplainlistfile = "./plugins/swearsplain.txt";
 		private static string[] badwords = new string[]{};
         
 		public override void Load(bool startup) {
 			//LOAD YOUR PLUGIN WITH EVENTS OR OTHER THINGS!
 			OnChatEvent.Register(HandleChatEvent, Priority.Low);
 
-            /*string[] obfuscatedBadwords = badwords;
+            /*string[] obfuscatedBadwords = File.ReadAllText(badwordplainlistfile).Split('\n'); //badwords;
             for (int i=0; i<obfuscatedBadwords.Length; i++)
             {
                 obfuscatedBadwords[i] = obfuscateString(obfuscatedBadwords[i]);
             }
-            File.WriteAllText(badwordlistfile, string.Join("\n",obfuscatedBadwords));*/
+            File.WriteAllText(badwordlistfile, string.Join("\n",obfuscatedBadwords));
+            return;*/
             if (!File.Exists(badwordlistfile))
                 return;
             badwords = File.ReadAllText(badwordlistfile).Split('\n');
@@ -35,6 +36,7 @@ namespace MCGalaxy {
             {
                 badwords[i] = deobfuscateString(badwords[i]);
             }
+          //  File.WriteAllText(badwordplainlistfile, string.Join("\n",badwords));
 		}
                         
 		public override void Unload(bool shutdown) {
