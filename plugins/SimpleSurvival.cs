@@ -1082,6 +1082,8 @@ namespace MCGalaxy {
 			{41, new CraftRecipe(new Dictionary<ushort, ushort>(){{112, 9}}, 1)},
 			// Diamond block
 			{86, new CraftRecipe(new Dictionary<ushort, ushort>(){{111, 9}}, 1)},
+			// Stone brick
+			{65, new CraftRecipe(new Dictionary<ushort, ushort>(){{4, 1}}, 1)},
 			// Door												// Wood x 8 = 1x Wooden Door
 			{66, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 8}}, 1, true)},
 			// Iron Door												// Wood x 8 = 1x Wooden Door
