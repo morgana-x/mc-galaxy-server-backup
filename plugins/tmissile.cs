@@ -26,7 +26,7 @@ namespace MCGalaxy {
             lvl = level;
             pos = new float[3]{(float)p[0],(float)p[1],(float)p[2]};
             dir = d;
-            life = 5000;
+            life = 3000;
             explode = true;
             
         }
@@ -38,7 +38,8 @@ namespace MCGalaxy {
             pos[0] += (dir[0]*2);
             pos[1] += (dir[1]*2);
             pos[2] += (dir[2]*2);
-            MCGalaxy.SimpleSurvival.spawnEffect(lvl, SimpleSurvival.explosionParticleEffect,pos, false, 5000);
+            MCGalaxy.SimpleSurvival.spawnEffect(lvl, SimpleSurvival.explosionParticleEffect,pos, false, 6000);
+            //MCGalaxy.SimpleSurvival.spawnEffect(lvl, SimpleSurvival.explosionParticleEffect2,pos, false, 6000);
             if (pos[0] >= lvl.Width || pos[0] >= lvl.Length)
             {
                 life = 0;
@@ -111,17 +112,27 @@ namespace MCGalaxy {
             {
                 try
                 {
-                p.Tick();
-                if (p.life > 0 )
-                    continue;
+                    p.Tick();
                 }
                 catch(Exception e)
                 {
-                    
+                    p.life = 0;
+                    p.explode = false;
                 }
+                if (p.life > 0 )
+                    continue;
                 projectilesToDelete.Add(p);
                 if (p.explode)
-                    MCGalaxy.SimpleSurvival.Explosion(p.lvl, (ushort)p.pos[0], (ushort)p.pos[1], (ushort)p.pos[2]);
+                {
+                    try
+                    {
+                        MCGalaxy.SimpleSurvival.Explosion(p.lvl, (ushort)p.pos[0], (ushort)p.pos[1], (ushort)p.pos[2]);
+                    }
+                    catch(Exception e)
+                    {
+
+                    }
+                }
             }
             foreach(var p in projectilesToDelete)
             {
@@ -137,7 +148,7 @@ namespace MCGalaxy {
 				ushort RawID = Id;
 				string Name = name;
 				byte Speed = 1;
-				byte CollideType = 0;
+				byte CollideType = 2;
 				bool BlocksLight = false;
 				byte WalkSound = 1;
 				bool FullBright = false;

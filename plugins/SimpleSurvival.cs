@@ -18,6 +18,7 @@ using MCGalaxy.Generator.Foliage;
 //pluginref bed.dll
 //pluginref goodlyeffects.dll
 //pluginref nasgen.dll
+//pluginref daynightcycle.dll
 namespace MCGalaxy {
 
 	public class SimpleSurvival : Plugin {
@@ -1195,10 +1196,10 @@ namespace MCGalaxy {
 			// Flint and Steel										// Flint x1, Iron igot x 1 = 12x flint and steel
 			{120, new CraftRecipe(new Dictionary<ushort, ushort>(){{122, 1}, {113, 1}}, 12, false)},
 
-			// TNT													// Sand x 10, Gunpowder x 10
-			{46,  new CraftRecipe(new Dictionary<ushort, ushort>(){{12, 10}, {121, 10}}, 1, true)},
-			// Missile												// TNT x 3 Iron x1
-			{220,  new CraftRecipe(new Dictionary<ushort, ushort>(){{46, 3}, {113, 1}}, 2, true)},
+			// TNT													// Sand x 10, Gunpowder x 5
+			{46,  new CraftRecipe(new Dictionary<ushort, ushort>(){{12, 10}, {121, 5}}, 1, true)},
+			// Missile												// TNT x 3 Iron x2
+			{220,  new CraftRecipe(new Dictionary<ushort, ushort>(){{46, 3}, {113, 2}}, 2, true)},
 		};
 		
 		public class MiningProgress
@@ -2388,6 +2389,8 @@ namespace MCGalaxy {
 			}
 			return players.ToArray();
 		}
+		List<string> passiveMobSpawns = new List<string>{"pig", "chicken", "sheep",}; // "roam"
+		List<string> hostileMobSpawns = new List<string>{"zombie", "skeleton", "spider", "creeper"}; // "hostile"
 		void HandleMobSpawning(SchedulerTask task)
 		{
 			mobSpawningTask = task;
@@ -2464,47 +2467,13 @@ namespace MCGalaxy {
 						continue;
 					}
 				}
-				switch (rnd.Next(13))
+				if (MCGalaxy.DayNightCycle.timeOfDay >= 17500)
 				{
-					case 1:
-						SpawnEntity(lvl, "sheep", "roam", x, y, z);
-						break;
-					case 2:
-						SpawnEntity(lvl, "pig", "roam", x, y, z);
-						break;
-					case 3:
-						SpawnEntity(lvl, "chicken", "roam", x, y, z);
-						break;
-					case 4:
-						SpawnEntity(lvl, "sheep", "roam", x, y, z);
-						break;
-					case 5:
-						SpawnEntity(lvl, "zombie", "hostile", x, y, z);
-						break;
-					case 6:
-						SpawnEntity(lvl, "skeleton", "hostile", x, y, z);
-						break;
-					case 7:
-						SpawnEntity(lvl, "spider", "hostile", x, y, z);
-						break;
-					case 8: // Creeper? aww man
-						SpawnEntity(lvl, "creeper", "hostile", x, y, z); // So we back in the mine 
-						break; // Swinging that pickaxe side to side, side side to side // HEADS UP TOTAL SHOCK FILLS YOUR BODY // OH NO ITS YOU AGAIN
-					case 9:
-						SpawnEntity(lvl, "chicken", "roam", x, y, z);
-						break;
-					case 10:
-						SpawnEntity(lvl, "pig", "roam", x, y, z);
-						break;
-					case 11:
-						SpawnEntity(lvl, "sheep", "roam", x, y, z);
-						break;
-					case 12:
-						SpawnEntity(lvl, "sheep", "roam", x, y, z);
-						break;
-					default:
-						SpawnEntity(lvl, "chicken", "roam", x, y, z);
-						break;
+					SpawnEntity(lvl, hostileMobSpawns[rnd.Next(hostileMobSpawns.Count)], "hostile", x, y, z);
+				}
+				else
+				{
+					SpawnEntity(lvl, passiveMobSpawns[rnd.Next(passiveMobSpawns.Count)], "roam", x, y, z);
 				}
 			}
 		}
