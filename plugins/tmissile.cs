@@ -34,7 +34,7 @@ namespace MCGalaxy {
         public void Tick()
         {
             life--;
-            Player.Console.Message(life.ToString());
+            //Player.Console.Message(life.ToString());
             pos[0] += (dir[0]*2);
             pos[1] += (dir[1]*2);
             pos[2] += (dir[2]*2);
