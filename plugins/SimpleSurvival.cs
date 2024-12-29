@@ -1341,6 +1341,10 @@ namespace MCGalaxy {
             }
             else File.Create(Config.Path+ "maps.txt").Dispose();
         }
+		public static bool IsSurvivalMap(Level lvl)
+		{
+			return maplist.Contains(lvl.name);        
+		}
 		//////////
 		// Tools
 		///

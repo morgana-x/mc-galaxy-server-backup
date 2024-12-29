@@ -26,7 +26,7 @@ namespace MCGalaxy {
             lvl = level;
             pos = new float[3]{(float)p[0],(float)p[1],(float)p[2]};
             dir = d;
-            life = 100;
+            life = 5000;
             explode = true;
             
         }
@@ -34,9 +34,11 @@ namespace MCGalaxy {
         public void Tick()
         {
             life--;
+            Player.Console.Message(life.ToString());
             pos[0] += (dir[0]*2);
             pos[1] += (dir[1]*2);
             pos[2] += (dir[2]*2);
+            MCGalaxy.SimpleSurvival.spawnEffect(lvl, SimpleSurvival.explosionParticleEffect,pos, false, 5000);
             if (pos[0] >= lvl.Width || pos[0] >= lvl.Length)
             {
                 life = 0;
@@ -61,7 +63,7 @@ namespace MCGalaxy {
                 life = 0;
                 return;
             }
-            MCGalaxy.SimpleSurvival.spawnEffect(lvl, SimpleSurvival.explosionParticleEffect,pos, false, 5000);
+         
         }
     }
 
@@ -185,6 +187,16 @@ namespace MCGalaxy {
 			ushort clickedBlock = p.level.GetBlock(x, y, z);
 			if (clickedBlock == missile_id + 256 && button == MouseButton.Right)
 			{
+                if (!MCGalaxy.SimpleSurvival.IsSurvivalMap(p.level))
+                {
+                    p.Message("This can only be used on survival enabled maps!");
+                    return;
+                }
+                if (projectiles.Count > 50)
+                {
+                    p.Message("too many missiles spawned! please wait!");
+                    return;
+                }
 				p.level.UpdateBlock(p, x, y, z, (ushort)(0));
                 
                 Vec3F32 dir = DirUtils.GetDirVector(p.Rot.RotY, p.Rot.HeadX);
