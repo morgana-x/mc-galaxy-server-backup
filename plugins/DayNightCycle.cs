@@ -162,7 +162,7 @@ namespace MCGalaxy
         void DoDayNightCycle(SchedulerTask task)
         {
             if (timeOfDay > 23999) timeOfDay = 0;
-            else timeOfDay += 10;
+            else timeOfDay += 5;
 
             Player[] players = PlayerInfo.Online.Items;
 
