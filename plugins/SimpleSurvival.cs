@@ -756,6 +756,7 @@ namespace MCGalaxy {
 			{86, new StoneMineConfig()},
 			{87, new OreMineConfig(){overrideBlock = 111, RequiredToolTier=2}},
 			{88, new OreMineConfig(){RequiredToolTier=2}},
+			{220, new TntMineConfig()}, // Missile
 			
 		};
 		public static List<SurvivalTool> customTools = new List<SurvivalTool>(){
@@ -1196,6 +1197,8 @@ namespace MCGalaxy {
 
 			// TNT													// Sand x 10, Gunpowder x 10
 			{46,  new CraftRecipe(new Dictionary<ushort, ushort>(){{12, 10}, {121, 10}}, 1, true)},
+			// Missile												// TNT x 3 Iron x1
+			{220,  new CraftRecipe(new Dictionary<ushort, ushort>(){{46, 3}, {113, 1}}, 2, true)},
 		};
 		
 		public class MiningProgress

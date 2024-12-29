@@ -88,9 +88,6 @@ namespace MCGalaxy {
             OnPlayerClickEvent.Register(HandleBlockClick, Priority.Low);
             Server.MainScheduler.QueueRepeat(MissileTick, null, TimeSpan.FromMilliseconds(50));
         
-            MCGalaxy.SimpleSurvival.SetMineTime(missile_id, new MCGalaxy.SimpleSurvival.BlockMineConfig());
-            if (!MCGalaxy.SimpleSurvival.craftingRecipies.ContainsKey(missile_id))
-                MCGalaxy.SimpleSurvival.craftingRecipies.Add(missile_id, new  MCGalaxy.SimpleSurvival.CraftRecipe(new Dictionary<ushort, ushort>(){{46, 5}}));
 		}
                         
 		public override void Unload(bool shutdown) {
