@@ -340,10 +340,10 @@ namespace MCGalaxy {
 			if (!Config.UseGoodlyEffects)
 				return;
 
-			spawnEffect(level, explosionParticleEffect, new float[3]{(float)x, (float)y, (float)z}, false);
-			spawnEffect(level, explosionParticleEffect2, new float[3]{(float)x, (float)y, (float)z}, false);
-			spawnEffect(level, explosionParticleEffect3, new float[3]{(float)x, (float)y, (float)z}, false);
-			spawnEffect(level, explosionParticleEffect4, new float[3]{(float)x, (float)y, (float)z}, false);
+			spawnEffect(level, explosionParticleEffect, new float[3]{(float)x, (float)y, (float)z}, false, 20000);
+			spawnEffect(level, explosionParticleEffect2, new float[3]{(float)x, (float)y, (float)z}, false, 20000);
+			spawnEffect(level, explosionParticleEffect3, new float[3]{(float)x, (float)y, (float)z}, false, 20000);
+			spawnEffect(level, explosionParticleEffect4, new float[3]{(float)x, (float)y, (float)z}, false, 20000);
 		}
 		private static List<QueuedExplosion> queuedExplosions = new List<QueuedExplosion>();
 		class QueuedExplosion
@@ -1903,7 +1903,7 @@ namespace MCGalaxy {
 			GoodlyEffects.DefineEffect(pl, effect);
 		}
 		static byte currentEffectId = 100;
-		private static void spawnEffect(Level lvl, GoodlyEffects.EffectConfig effect, float[] pos, float[] origin, bool define=true)
+		public static void spawnEffect(Level lvl, GoodlyEffects.EffectConfig effect, float[] pos, float[] origin, bool define=true, ushort maxDist = 10000)
 		{
 
 			byte ID = effect.ID;
@@ -1917,15 +1917,15 @@ namespace MCGalaxy {
 			Player[] players = PlayerInfo.Online.Items;
             foreach (Player p in players) {
                 if (p.level != lvl || !p.Supports(CpeExt.CustomParticles)) { continue; }
-				if ((p.Pos.ToVec3F32() -  new Vec3F32(pos[0], pos[1], pos[2])).LengthSquared > (2250)){continue;}
+				if ((p.Pos.ToVec3F32() -  new Vec3F32(pos[0], pos[1], pos[2])).LengthSquared > (maxDist)){continue;}
 				if (define)
 					defineEffect(p, ID, effect);
                 p.Send(Packet.SpawnEffect(ID, pos[0], pos[1], pos[2], origin[0], origin[1], origin[2]));
             }
 		}
-		private static void spawnEffect(Level lvl, GoodlyEffects.EffectConfig effect, float[] pos, bool define=true)
+		public static void spawnEffect(Level lvl, GoodlyEffects.EffectConfig effect, float[] pos, bool define=true, ushort maxDist = 10000)
 		{
-			spawnEffect(lvl, effect, pos, pos, define);
+			spawnEffect(lvl, effect, pos, pos, define, maxDist);
 		}
 		private static void spawnMineParticles(Player pl, ushort[] pos, GoodlyEffects.EffectConfig effect)
 		{
@@ -1934,19 +1934,19 @@ namespace MCGalaxy {
 			float px = (float) pos[0], py =(float)pos[1] + 0.5f, pz =(float) pos[2]; //Convert.ToSingle(pos[0]), py = Convert.ToSingle(pos[1]), pz = Convert.ToSingle(pos[2]);
 			px += 0.5f;
             pz += 0.5f;
-			spawnEffect(pl.level, effect, new float[3]{px, py, pz});
+			spawnEffect(pl.level, effect, new float[3]{px, py, pz}, maxDist: 2250);
 		}
 		private static void spawnHurtParticles(Player pl)
 		{
 			if (!Config.UseGoodlyEffects)
 				return;
-			spawnEffect(pl.level, pvpParticleEffect, new float[3]{(float)pl.Pos.BlockX, (float)pl.Pos.BlockY + 0.5f, (float)pl.Pos.BlockZ});
+			spawnEffect(pl.level, pvpParticleEffect, new float[3]{(float)pl.Pos.BlockX, (float)pl.Pos.BlockY + 0.5f, (float)pl.Pos.BlockZ}, maxDist: 2250);
 		}
 		private static  void spawnHurtParticles(PlayerBot pl)
 		{
 			if (!Config.UseGoodlyEffects)
 				return;
-			spawnEffect(pl.level, pvpParticleEffect, new float[3]{(float)pl.Pos.BlockX, (float)pl.Pos.BlockY, (float)pl.Pos.BlockZ});
+			spawnEffect(pl.level, pvpParticleEffect, new float[3]{(float)pl.Pos.BlockX, (float)pl.Pos.BlockY, (float)pl.Pos.BlockZ}, maxDist: 2250);
 		}
 		private void setMineIndicator(Player pl, ushort[] pos, ushort amount)
 		{
