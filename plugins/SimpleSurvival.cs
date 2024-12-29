@@ -2469,6 +2469,7 @@ namespace MCGalaxy {
 						continue;
 					}
 				}
+				//Player.Console.Message(MCGalaxy.DayNightCycle.timeOfDay.ToString());
 				if (MCGalaxy.DayNightCycle.timeOfDay >= 17500)
 				{
 					SpawnEntity(lvl, hostileMobSpawns[rnd.Next(hostileMobSpawns.Count)], "hostile", x, y, z);
@@ -2725,6 +2726,7 @@ namespace MCGalaxy {
 			if (p.level.Config.MOTD.ToLower().Contains("-inventory")) return;
 			if (Config.MiningEnabled && button == MouseButton.Left)
 				MineBlock(p, new ushort[]{x, y, z});
+			if (p.Game.Referee || p.invincible ) return;
 			toolUse(p, button, action, yaw, pitch, entity, x, y, z, face);
 			
 		}

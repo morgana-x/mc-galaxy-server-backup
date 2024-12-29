@@ -198,6 +198,7 @@ namespace MCGalaxy {
 			ushort clickedBlock = p.level.GetBlock(x, y, z);
 			if (clickedBlock == missile_id + 256 && button == MouseButton.Right)
 			{
+                if (p.Game.Referee || p.invincible ) return;
                 if (!MCGalaxy.SimpleSurvival.IsSurvivalMap(p.level))
                 {
                     p.Message("This can only be used on survival enabled maps!");
