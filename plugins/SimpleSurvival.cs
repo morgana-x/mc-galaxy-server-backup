@@ -1946,13 +1946,13 @@ namespace MCGalaxy {
             pz += 0.5f;
 			spawnEffect(pl.level, effect, new float[3]{px, py, pz}, maxDist: 2250);
 		}
-		private static void spawnHurtParticles(Player pl)
+		public static void spawnHurtParticles(Player pl)
 		{
 			if (!Config.UseGoodlyEffects)
 				return;
 			spawnEffect(pl.level, pvpParticleEffect, new float[3]{(float)pl.Pos.BlockX, (float)pl.Pos.BlockY + 0.5f, (float)pl.Pos.BlockZ}, maxDist: 2250);
 		}
-		private static  void spawnHurtParticles(PlayerBot pl)
+		public static  void spawnHurtParticles(PlayerBot pl)
 		{
 			if (!Config.UseGoodlyEffects)
 				return;
@@ -2723,10 +2723,10 @@ namespace MCGalaxy {
 			if (!maplist.Contains(p.level.name)) return;
 			if (entity != 255 && AttemptPvp(p, button, action, yaw, pitch, entity, x, y, z, face))
 				return;
+			if (p.Game.Referee || p.invincible ) return;
 			if (p.level.Config.MOTD.ToLower().Contains("-inventory")) return;
 			if (Config.MiningEnabled && button == MouseButton.Left)
 				MineBlock(p, new ushort[]{x, y, z});
-			if (p.Game.Referee || p.invincible ) return;
 			toolUse(p, button, action, yaw, pitch, entity, x, y, z, face);
 			
 		}
