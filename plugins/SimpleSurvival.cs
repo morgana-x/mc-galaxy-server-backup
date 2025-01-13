@@ -641,15 +641,17 @@ namespace MCGalaxy {
 		}
 		public class CraftRecipe
 		{
-			public CraftRecipe(Dictionary<ushort,ushort> ingredients, ushort amountMultiplier = 1, bool needCraftingTable = false)
+			public CraftRecipe(Dictionary<ushort,ushort> ingredients, ushort amountMultiplier = 1, bool needCraftingTable = false, bool needFurnace = false)
 			{
 				Ingredients = ingredients;
 				amountProduced = amountMultiplier;
 				NeedCraftingTable = needCraftingTable;
+				NeedFurnace = needFurnace;
 			}
 			public Dictionary<ushort,ushort> Ingredients = new Dictionary<ushort,ushort>();
 			public ushort amountProduced = 1;
 			public bool NeedCraftingTable = false;
+			public bool NeedFurnace = false;
 			
 		}
 		public class Config {
@@ -1057,11 +1059,11 @@ namespace MCGalaxy {
 		public static Dictionary<ushort, CraftRecipe> craftingRecipies = new Dictionary<ushort, CraftRecipe>()
 		{
 			// Glass 											// Sand x1 (MOVE TO FURNACE LATER)
-			 {20, new CraftRecipe(new Dictionary<ushort, ushort>(){{12, 1}})},
+			{20, new CraftRecipe(new Dictionary<ushort, ushort>(){{12, 1}}, 1, false, true)},
 			 // Iron Ingot										// Iron Orex1 (MOVE TO FURNACE LATER)
-			{113, new CraftRecipe(new Dictionary<ushort, ushort>(){{15, 1}})},
+			{113, new CraftRecipe(new Dictionary<ushort, ushort>(){{15, 1}}, 1, false, true)},
 			// Gold bar											// Gold Orex1 (MOVE TO FURNACE LATER)
-			{112, new CraftRecipe(new Dictionary<ushort, ushort>(){{14,1}})},
+			{112, new CraftRecipe(new Dictionary<ushort, ushort>(){{14,1}}, 1, false, true)},
 			// Furnace											// Cobblestone x8 = 1x Furnace
 			{77, new CraftRecipe(new Dictionary<ushort, ushort>(){{4, 8}}, 1, true)},
 			// Crafting Table									// Woodenblock x4 = 1x Crafting table
@@ -1561,6 +1563,7 @@ namespace MCGalaxy {
 				heldBlock = (heldBlock > 255) ? (ushort)(heldBlock - 256) : heldBlock;
 				if ( heldBlock == block)
 					SetHeldBlock(pl, 0);
+				SendMiningUnbreakableMessage(pl, block);
 				return;
 			}
 			playerInventories[pl.level.name][pl.name][block] = (ushort)(playerInventories[pl.level.name][pl.name][block] - amount);
@@ -1623,6 +1626,11 @@ namespace MCGalaxy {
 				pl.Message("You need to be near a crafting table to craft this!");
 				return;
 			}
+			if (craftingRecipies[block].NeedFurnace && !IsNearFurnace(pl))
+			{
+				pl.Message("You need to be near a furnace to craft this!");
+				return;
+			}
 			foreach(var pair in craftingRecipies[block].Ingredients)
 			{
 				InventoryRemoveBlocks(pl, pair.Key, (ushort)(pair.Value * amount));
@@ -1632,7 +1640,7 @@ namespace MCGalaxy {
 			SetHeldBlock(pl, block);
 			pl.Message("Crafted " + (amount * craftingRecipies[block].amountProduced).ToString() + "x " + Block.GetName(pl, block > 65 ? (ushort)(block + 256) : block) + ".");
 		}
-		public static bool IsNearCraftingTable(Player p)
+		private static bool IsNearBlock(Player p, ushort id)
 		{
 			int blockx = p.Pos.BlockX;
 			int blocky = p.Pos.BlockY;
@@ -1652,20 +1660,31 @@ namespace MCGalaxy {
 						if (blocky + y < 0 || blocky + y >= p.level.Height)
 							continue;
 						ushort block = p.level.FastGetBlock((ushort)(blockx + x), (ushort)(blocky + y), (ushort)(blockz + z));
-						if (block == 76 + 256 )
+						if (block == id)
 							return true;
 					}
 				}
 			}
 			return false;
 		}
+		public static bool IsNearCraftingTable(Player p)
+		{
+			return IsNearBlock(p, (ushort)(76+256));
+		}
+		public static bool IsNearFurnace(Player p)
+		{
+			return IsNearBlock(p, (ushort)(77+256));
+		}
 		public static Dictionary<ushort,CraftRecipe>  GenerateCraftOptions(Player pl)
 		{
 			Dictionary<ushort,CraftRecipe> validCraftables = new Dictionary<ushort,CraftRecipe> ();
 			bool nearCraftingtable = IsNearCraftingTable(pl);
+			bool nearFurnace = IsNearFurnace(pl);
 			foreach(var recipePair in craftingRecipies)
 			{
 				if (!nearCraftingtable && recipePair.Value.NeedCraftingTable)
+					continue;
+				if (!nearFurnace && recipePair.Value.NeedFurnace)
 					continue;
 				bool valid = true;
 				foreach(var pair in recipePair.Value.Ingredients)
@@ -1687,6 +1706,7 @@ namespace MCGalaxy {
 			Dictionary<ushort,CraftRecipe> validRecipes = GenerateCraftOptions(p);
 			string message = "Craftable Items:\n";
 			bool nearCraftingtable = IsNearCraftingTable(p);
+			bool nearFurnace = IsNearFurnace(p);
 			foreach( var pair in validRecipes)
 			{
 				message += /*"  %e[%5" + pair.Key + "%e] */"    %3" + Block.GetName(p, pair.Key > 65 ? (ushort)(pair.Key + 256) : pair.Key) + "%7 ==";
@@ -1698,6 +1718,8 @@ namespace MCGalaxy {
 			}
 			if (!nearCraftingtable)
 				message += "%cStand near a crafting table to see items that require one!";
+			if (!nearFurnace)
+				message += "%cStand near a furnace to see items that require one!";
 			return message;
 		}
 		private static void LoadInventory(Player pl)
