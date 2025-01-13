@@ -14,7 +14,7 @@ using MCGalaxy.Commands.CPE;
 using MCGalaxy.Events.PlayerEvents;
 using MCGalaxy.Events;
 using MCGalaxy.Tasks;
-
+using MCGalaxy.Events.EntityEvents;
 using BlockID = System.UInt16;
 
 namespace Core
@@ -30,20 +30,18 @@ namespace Core
         public override void Load(bool startup)
         {
             OnPlayerConnectEvent.Register(HandlePlayerConnect, Priority.High);
+            OnSendingModelEvent.Register(HandleOnSendingModel,Priority.High);
             Server.MainScheduler.QueueRepeat(DoBlockLoop, null, TimeSpan.FromMilliseconds(100));
         }
 
         public override void Unload(bool shutdown)
         {
             OnPlayerConnectEvent.Unregister(HandlePlayerConnect);
+            OnSendingModelEvent.Unregister(HandleOnSendingModel);
             Server.MainScheduler.Cancel(Task);
         }
-        DateTime lastModelUpdate = DateTime.Now;
         void DoBlockLoop(SchedulerTask task)
         {
-            if (lastModelUpdate > DateTime.Now)
-                    return;
-            lastModelUpdate = DateTime.Now.AddMilliseconds(250);
             Player[] players = PlayerInfo.Online.Items;
 
             foreach (Player pl in players)
@@ -68,7 +66,14 @@ namespace Core
 
             Task = task;
         }
-
+        void HandleOnSendingModel(Entity e, ref string model, Player dst)
+        {
+            if (e!=dst)
+                return;
+            if (!model.Contains("hold"))
+                return;
+            model = "humanoid";
+        }
         void HandlePlayerConnect(Player p)
         {
             p.Extras["HOLDING_BLOCK"] = null;
