@@ -270,9 +270,11 @@ namespace MCGalaxy {
         {
             projectiles.Add(new BulletProjectile(l, p, pos, rot));
         }
+    
         void HandleBlockClick(Player p, MouseButton button, MouseAction action, ushort yaw, ushort pitch, byte entity, ushort x, ushort y, ushort z, TargetBlockFace face)
         {
             if (button != MouseButton.Right) return;
+            if (action != MouseAction.Released) return;
             if (p.Game.Referee || p.invincible ) return;
 
 		    ushort heldBlock = p.GetHeldBlock();
