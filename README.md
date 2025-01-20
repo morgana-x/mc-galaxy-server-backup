@@ -18,6 +18,8 @@ a backup of my janky customised survival server I hosted on NBN
 + Mining
 + Crafting tables
 + NasGen
++ Bows and arrows
++ Furnaces
 
 etc!
 
@@ -27,5 +29,3 @@ etc!
 + Food System
 + Redstone
 + Dropped blocks
-+ Arrows
-+ Bow
