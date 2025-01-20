@@ -1035,6 +1035,30 @@ namespace MCGalaxy {
 				IsSword = false,
 				IsSprite = true
 			},
+			new SurvivalTool()
+			{
+				NAME = "Bow",
+				TEXTURE = 223,
+				ID = 123,
+				IsSword = false,
+				IsSprite = true
+			},
+			new SurvivalTool()
+			{
+				NAME = "Arrow",
+				TEXTURE = 239,
+				ID = 124,
+				IsSword = false,
+				IsSprite = true
+			},
+			new SurvivalTool()
+			{
+				NAME = "String",
+				TEXTURE = 244,
+				ID = 125,
+				IsSword = false,
+				IsSprite = true
+			},
 		};
 
 		public static void SetMineTime(ushort blockId, BlockMineConfig config)
@@ -1049,7 +1073,9 @@ namespace MCGalaxy {
 		public static Dictionary<string, Dictionary<ushort, ushort>> mobLoot = new Dictionary<string, Dictionary<ushort, ushort>>()
 		{
 			{"sheep", new Dictionary<ushort, ushort>(){{36, 1}}},
-			{"creeper", new Dictionary<ushort, ushort>(){{121, 1}}}
+			{"creeper", new Dictionary<ushort, ushort>(){{121, 1}}},
+			{"skeleton", new Dictionary<ushort, ushort>(){{124, 2}}},
+			{"spider", new Dictionary<ushort, ushort>(){{125, 1}}}
 		};
 		static ColumnDesc[] createInventories = new ColumnDesc[] {
             new ColumnDesc("Name", ColumnType.VarChar, 16),
@@ -1204,6 +1230,14 @@ namespace MCGalaxy {
 			{46,  new CraftRecipe(new Dictionary<ushort, ushort>(){{12, 10}, {121, 5}}, 1, true)},
 			// Missile												// TNT x 3 Iron x2
 			{220,  new CraftRecipe(new Dictionary<ushort, ushort>(){{46, 3}, {113, 2}}, 2, true)},
+
+			// String
+			{125,  new CraftRecipe(new Dictionary<ushort, ushort>(){{36,1}}, 9, false)},
+
+			// Bow												// Stick x 3 + string x 3 = 1x Bow  [Need crafting table]
+			{123,  new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 3}, {125, 3}}, 1, true)},
+			// Arrow												// Stick x 1 + iron x 1 = 1x arrow  [Need crafting table]
+			{124,  new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 1}, {113, 1}}, 1, true)},
 		};
 		
 		public class MiningProgress
@@ -2976,6 +3010,33 @@ namespace MCGalaxy {
 				SetHotbar(p, i, 0);
 			}
 		}
+		public static void PushPlayer(Vec3F32 p, Player victim)
+        {
+            //int srcHeight = ModelInfo.CalcEyeHeight(p);
+            int dstHeight = ModelInfo.CalcEyeHeight(victim);
+            //int dx = (int)p.X - victim.Pos.X, dy = (int)(p.Y) - (victim.Pos.Y + dstHeight), dz = (int)p.Z - victim.Pos.Z;
+
+            Vec3F32 dir = p;// new Vec3F32(dx, dy, dz);
+            if (dir.Length > 0) dir = Vec3F32.Normalise(dir);
+
+            float mult = 1 / ModelInfo.GetRawScale(victim.Model);
+
+            float victimScale = ModelInfo.GetRawScale(victim.Model);
+
+            if (victim.Supports(CpeExt.VelocityControl))
+            {
+                // Intensity of force is in part determined by model scale
+                victim.Send(Packet.VelocityControl((-dir.X * mult) * 0.5f, 0.87f * mult, (-dir.Z * mult) * 0.5f, 0, 1, 0));
+
+                // If GoodlyEffects is enabled, show particles whenever a player is hit
+                if (Config.UseGoodlyEffects)
+                {
+                    // Spawn effect when victim is hit
+                    //Command.Find("Effect").Use(victim, Config.HitParticle + " " + (victim.Pos.X / 32) + " " + (victim.Pos.Y / 32) + " " + (victim.Pos.Z / 32) + " 0 0 0 true");
+					spawnHurtParticles(victim);
+                }
+            }
+        }
 		static void PushPlayer(Player p, Player victim)
         {
             if (p.level.Config.MOTD.ToLower().Contains("-damage")) return;
