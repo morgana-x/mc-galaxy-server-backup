@@ -138,7 +138,7 @@ namespace MCGalaxy {
 		{
 			public BulletParticle(byte r = 255, byte g = 250, byte b = 240)
 			{
-				pixelU1 = 0;pixelV1 = 0;pixelU2 = 10;pixelV2 = 10;
+				pixelU1 = 0;pixelV1 = 0;pixelU2 = 20;pixelV2 = 20;
 				//tint uses RGB color values to determine what color to tint the particle. Here we've set it to be tinted pink, since the original texture is white.
 				tintRed = r;tintGreen = g;tintBlue = b;
 				//#frameCount determines how many frames of animation will be played over the particle's lifespan (faster life, faster animation).
