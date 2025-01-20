@@ -131,7 +131,7 @@ namespace VeryPlugins
                 GenTerrain();
                 CalcHeightmap();
                 GenSoil();
-                //GenCaves();
+                GenCaves();
                 GenPlants();
                 GenOre();
 
@@ -167,10 +167,9 @@ namespace VeryPlugins
                 adjNoise.Frequency = 0.75;
                 adjNoise.OctaveCount = 5;
                 DateTime dateStartLayer;
-                int counter = 0;
                 double width = lvl.Width, height = lvl.Height, length = lvl.Length;
 
-                counter = 0;
+                int counter = 0;
                 dateStartLayer = DateTime.UtcNow;
                 for (double y = 0; y < height; y++)
                 {
@@ -264,6 +263,62 @@ namespace VeryPlugins
 
 
 
+            }
+            void GenCaves() {
+                int width = lvl.Width, height = lvl.Height, length = lvl.Length;
+
+                p.Message("Now creating caves");
+                adjNoise.Seed = (seed + "soil").GetHashCode();
+                adjNoise.Frequency = 1; //more frequency = smaller map scale
+                adjNoise.OctaveCount = 2;
+
+                int counter = 0;
+                DateTime dateStartLayer = DateTime.UtcNow;
+                for (double y = 0; y < height; y++) {
+                    //p.Message("Starting {0} layer.", ListicleNumber((int)(y+1)));
+                    for (double z = 0; z < length; ++z)
+                        for (double x = 0; x < width; ++x) {
+                            double threshold = 0.55;
+                            int caveHeight = heightmap[(int)x, (int)z] - 14;
+                            if (y > caveHeight) {
+                                threshold += 0.05 * (y - (caveHeight));
+                            }
+                            if (threshold > 1.5) { continue; }
+                            bool tryCave = false;
+                            BlockID thisBlock = lvl.FastGetBlock((ushort)x, (ushort)(y), (ushort)z);
+                            if (thisBlock == Block.Stone || thisBlock == Block.Dirt) { tryCave = true; }
+                            if (!tryCave) {
+                                continue;
+                            }
+
+                            //divide y by less for more "layers"
+                            double xVal = (x + offsetX) / 15, yVal = y / 7, zVal = (z + offsetZ) / 15;
+                            const double adj = 1;
+                            xVal += adj;
+                            yVal += adj;
+                            zVal += adj;
+                            double value = adjNoise.GetValue(xVal, yVal, zVal);
+
+                            //if (counter % (256*256) == 0) {
+                            //    Thread.Sleep(10);
+                            //}
+                            counter++;
+
+                            if (value > threshold) {
+                                if (y <= 4) {
+                                    lvl.SetTile((ushort)x, (ushort)(y), (ushort)z, Block.Lava);
+                                } else {
+                                    lvl.SetTile((ushort)x, (ushort)(y), (ushort)z, Block.Air);
+                                }
+                            }
+                        }
+                    TimeSpan span = DateTime.UtcNow.Subtract(dateStartLayer);
+                    if (span > TimeSpan.FromSeconds(5)) {
+                        p.Message("Cave gen {0}% complete.", (int)((y / height) * 100));
+                        dateStartLayer = DateTime.UtcNow;
+                    }
+                }
+                p.Message("Cave gen 100% complete.");
             }
             void CalcHeightmap()
             {
