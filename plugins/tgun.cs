@@ -18,17 +18,19 @@ namespace MCGalaxy {
     public class BulletProjectile
     {
         public float[] pos = {0,0,0};
-        public float[] dir = {0,0,0};
+        public Vec3F32 dir;
         public uint life;
         public Level lvl;
         public bool explode;
         public Player owner;
-        private float gravity = -1.5f;
-        public BulletProjectile(Level level,Player p,float[] pos, float[] d)
+        private float gravity = -1f;
+        public BulletProjectile(Level level,Player p,float[] pos, float[] d, float power =1)
         {
             lvl = level;
             this.pos = pos;//new float[3]{(float)(pos[0]),(float)(pos[1]),(float)(pos[2])};
-            dir = d;
+            dir = new Vec3F32(d[0], d[1], d[2]);
+            //if (dir.Length > 0) dir = Vec3F32.Normalise(dir);
+            dir *= power;
             life = 3000;
             owner = p;
             explode = true;
@@ -54,14 +56,14 @@ namespace MCGalaxy {
         {
             life--;
             //Player.Console.Message(life.ToString());
-            pos[0] += (dir[0]*2);
-            pos[1] += (dir[1]*2);
-            pos[2] += (dir[2]*2);
-            if (dir[1] > gravity)
+            pos[0] += (dir.X*2);
+            pos[1] += (dir.Y*2);
+            pos[2] += (dir.Z*2);
+            if (dir.Y> gravity)
             {
-                dir[1] -= 0.1f;
-                if (dir[1] < gravity)
-                    dir[1] = gravity;
+                dir.Y -= 0.1f;
+                if (dir.Y < gravity)
+                    dir.Y = gravity;
             }
             MCGalaxy.SimpleSurvival.spawnEffect(lvl, TGun.bulletTrailParticle,pos, false, 1000);
             //MCGalaxy.SimpleSurvival.spawnEffect(lvl, SimpleSurvival.explosionParticleEffect2,pos, false, 6000);
@@ -110,7 +112,7 @@ namespace MCGalaxy {
                     return;
                 }
                 MCGalaxy.SimpleSurvival.Damage(p, dmg, 10);
-                MCGalaxy.SimpleSurvival.PushPlayer(new Vec3F32(-dir[0], -dir[1], -dir[2]), p);
+                MCGalaxy.SimpleSurvival.PushPlayer(new Vec3F32(-dir.X, -dir.Y, -dir.Z), p);
                 return;
             }
             ushort b = lvl.FastGetBlock((ushort)pos[0], (ushort)pos[1], (ushort)pos[2]);
@@ -266,17 +268,24 @@ namespace MCGalaxy {
 				def.Brightness = Brightness;
 				AddBlock(def);
 		}
-        public static void SpawnBullet(Level l, Player p, float[] pos, float[] rot)
+        public static void SpawnBullet(Level l, Player p, float[] pos, float[] rot, float power=1)
         {
-            projectiles.Add(new BulletProjectile(l, p, pos, rot));
+            projectiles.Add(new BulletProjectile(l, p, pos, rot, power));
         }
-    
+
         void HandleBlockClick(Player p, MouseButton button, MouseAction action, ushort yaw, ushort pitch, byte entity, ushort x, ushort y, ushort z, TargetBlockFace face)
         {
             if (button != MouseButton.Right) return;
+            if (action == MouseAction.Pressed && !p.Extras.Contains("BOW_PULL")) { p.Extras["BOW_PULL"] = DateTime.Now; return;}
             if (action != MouseAction.Released) return;
             if (p.Game.Referee || p.invincible ) return;
-
+            float power =1;
+            if (p.Extras.Contains("BOW_PULL"))
+            {
+                var milliseconds = (float)(DateTime.Now.Subtract((DateTime)(p.Extras["BOW_PULL"]))).TotalMilliseconds;
+                power = milliseconds < 3000 ? (milliseconds / 3000) *4f : 4f; 
+                p.Extras.Remove("BOW_PULL");
+            }
 		    ushort heldBlock = p.GetHeldBlock();
 			heldBlock = (heldBlock > 255) ? (ushort)(heldBlock - 256) : heldBlock;
 			if (!(heldBlock == 123))
@@ -293,7 +302,7 @@ namespace MCGalaxy {
             }
             MCGalaxy.SimpleSurvival.InventoryAddBlocks(p, (ushort)(124+256), -1); // Remove arrow
             Vec3F32 dir = DirUtils.GetDirVector(p.Rot.RotY, p.Rot.HeadX);
-            SpawnBullet(p.level,p, new float[3]{(float)p.Pos.X/32,(float)((p.Pos.Y/32) + 0.5f),(float)(p.Pos.Z/32)}, new float[3]{dir.X,dir.Y,dir.Z});
+            SpawnBullet(p.level,p, new float[3]{(float)p.Pos.X/32,(float)((p.Pos.Y/32) + 0.5f),(float)(p.Pos.Z/32)}, new float[3]{dir.X,dir.Y,dir.Z}, power);
             return;
 		}
 	}
