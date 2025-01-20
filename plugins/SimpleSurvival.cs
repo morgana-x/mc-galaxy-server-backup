@@ -1707,7 +1707,7 @@ namespace MCGalaxy {
 		}
 		public static bool IsNearFurnace(Player p)
 		{
-			return IsNearBlock(p, (ushort)(77+256));
+			return (IsNearBlock(p, (ushort)(77+256)) || IsNearBlock(p, (ushort)(78+256)));
 		}
 		public static Dictionary<ushort,CraftRecipe>  GenerateCraftOptions(Player pl)
 		{
