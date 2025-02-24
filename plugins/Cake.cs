@@ -163,20 +163,25 @@ namespace MCGalaxy {
         }
 		void HandleBlockClicked(Player p, MouseButton button, MouseAction action, ushort yaw, ushort pitch, byte entity, ushort x, ushort y, ushort z, TargetBlockFace face)
 		{
-			if (action != MouseAction.Pressed || button != MouseButton.Right)
+			if (action != MouseAction.Pressed || button != MouseButton.Right || x == 65535)
 			{
 				return;
 			}
+            
 			BlockID block = p.level.FastGetBlock(x,y,z);
 			if (block < cakeConfig.ID + 256)
 				return;
 			int stage = getCakeStage(block);
 			if (stage == -1)
 				return;
-			if (p.Extras["SURVIVAL_HEALTH"] != null && (int)p.Extras["SURVIVAL_HEALTH"] < 20)
+			if (p.Extras["SURVIVAL_HUNGER"] != null && (int)p.Extras["SURVIVAL_HUNGER"] < 20)
+			{
+				p.Extras["SURVIVAL_HUNGER"] = (int)p.Extras["SURVIVAL_HUNGER"] + 1;
+			}else{
+            if ((int)p.Extras["SURVIVAL_FOODEXHAUSTION"] == 0 && p.Extras["SURVIVAL_HEALTH"] != null && (int)p.Extras["SURVIVAL_HEALTH"] < 20)//SURVIVAL_FOODEXHAUSTION is not 0 99.9% of the time when hunger is enabled so this quick fix works
 			{
 				p.Extras["SURVIVAL_HEALTH"] = (int)p.Extras["SURVIVAL_HEALTH"] + 2;
-			}
+			}}
 			if (stage > 2)
 			{
 				p.level.UpdateBlock(Player.Console, x,y,z, (ushort)0);
