@@ -1313,8 +1313,8 @@ namespace MCGalaxy {
 			{124,  new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 1}, {113, 1}}, 1, true)},
 			// Steak 											// beef == Steak x1
 			{118, new CraftRecipe(new Dictionary<ushort, ushort>(){{117, 1}}, 1, false, true)},
-			// Cookie 											// Cake = Cookie x4
-			{116, new CraftRecipe(new Dictionary<ushort, ushort>(){{83, 1}}, 4)}
+			// Cookie 											// Cake = Cookie x8
+			{116, new CraftRecipe(new Dictionary<ushort, ushort>(){{83, 1}}, 8)}
 		};
 		
 		public class MiningProgress
