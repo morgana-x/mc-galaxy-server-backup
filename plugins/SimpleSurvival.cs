@@ -728,7 +728,7 @@ namespace MCGalaxy {
 				public static bool InventoryEnabled = true;
                 
                 // Hunger
-                public static bool HungerEnabled = false;
+                public static bool HungerEnabled = true;
                 
                 /* 
                 The Hunger system works by removing hunger (or saturation if there is any) once exhaustion reaches 4000 (4.0 with 3 fixed decimal points)
