@@ -176,7 +176,8 @@ namespace MCGalaxy {
 				return;
 			if (p.Extras["SURVIVAL_HUNGER"] != null && (int)p.Extras["SURVIVAL_HUNGER"] < 20)
 			{
-				p.Extras["SURVIVAL_HUNGER"] = (int)p.Extras["SURVIVAL_HUNGER"] + 1;
+				p.Extras["SURVIVAL_HUNGER"] = (int)p.Extras["SURVIVAL_HUNGER"] + 2;
+                p.Extras["SURVIVAL_FOODEXHAUSTION"] = (int)p.Extras["SURVIVAL_FOODEXHAUSTION"] + 1;//prevent people from gaining health from quickly eating cake
 			}else{
             if ((int)p.Extras["SURVIVAL_FOODEXHAUSTION"] == 0 && p.Extras["SURVIVAL_HEALTH"] != null && (int)p.Extras["SURVIVAL_HEALTH"] < 20)//SURVIVAL_FOODEXHAUSTION is not 0 99.9% of the time when hunger is enabled so this quick fix works
 			{
