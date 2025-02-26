@@ -283,8 +283,11 @@ namespace MCGalaxy {
 			public bool IsSheers = false;
 			public bool IsPlaceable = false;
 			public bool IsFlintAndSteel = false;
+            public bool IsFood = false;
 			public ushort Damage=2;
-			public float Knockback = 1f;
+            public ushort FoodPoint=0;//could have used damage for this with food but since I don't know how damage might be used, Ill just be safe here ):
+			public ushort FoodSaturation=0;//So... Lets make this complex
+            public float Knockback = 1f;
 			public float MiningBonus = 1f;
 			public uint ToolTier = 0;
 
@@ -317,6 +320,48 @@ namespace MCGalaxy {
 			public FlintSteelTool()
 			{
 				IsFlintAndSteel = true;
+				IsSprite = true;
+			}
+		}
+        
+		public class FoodTool : SurvivalTool
+		{
+			public static void Eat(ushort id,Player p, MouseButton button, MouseAction action)//ushort id,
+			{
+            ushort foodeffect = getTool(id).FoodPoint; 
+            ushort FoodSaturation = getTool(id).FoodSaturation;
+            InventoryRemoveBlocks(p, id, 1);
+            int hunger = p.Extras.GetInt("SURVIVAL_HUNGER");
+            int saturation = p.Extras.GetInt("SURVIVAL_SATURATION");
+            
+            
+            if (Config.HungerEnabled == false)
+            {
+            p.Extras["SURVIVAL_HEALTH"] = p.Extras.GetInt("SURVIVAL_HEALTH") + foodeffect;  
+            if ((int)p.Extras["SURVIVAL_HEALTH"] > 20)
+            p.Extras["SURVIVAL_HEALTH"] = 20;
+            return;
+            }
+            if (hunger != null && hunger < 20)
+			{
+				hunger += foodeffect;
+                
+                saturation += FoodSaturation;
+            
+                if (hunger > 20)
+                    hunger = 20;
+                
+                if (saturation > hunger)
+                    saturation = hunger;//I see why they added this
+                }
+                p.Extras["SURVIVAL_HUNGER"] = hunger;
+                p.Extras["SURVIVAL_SATURATION"] = saturation;
+			}
+
+			public FoodTool()
+			{
+				IsFood = true;
+                Damage  =0;
 				IsSprite = true;
 			}
 		}
@@ -588,7 +633,8 @@ namespace MCGalaxy {
 				MiningTime = time;
 				breakEffect = new BreakParticleEffect(77, 150, 52){gravity = 1};
 				LootChance = 0.05f;
-				overrideBlock = 6;
+				overrideBlock = 6;          
+                
 			}
 		}
 		public class FireMineConfig : BlockMineConfig
@@ -657,6 +703,7 @@ namespace MCGalaxy {
 		public class Config {
 				// Player
 				public static int MaxHealth = 20;
+                public static int MaxHunger = 20;
 				public static int MaxAir = 10;
 				public static bool FallDamage = true;
 				public static bool VoidKills = true;
@@ -679,7 +726,22 @@ namespace MCGalaxy {
 
 				// Inventory
 				public static bool InventoryEnabled = true;
+                
+                // Hunger
+                public static bool HungerEnabled = true;
+                
+                /* 
+                The Hunger system works by removing hunger (or saturation if there is any) once exhaustion reaches 4000 (4.0 with 3 fixed decimal points)
+                so 1000 would be 1.0 and 0504 would be 0.504
 
+                                                                                            default VVVV */
+                public static int  PerSecCost   = 0010; // exhaustion added every second            0010
+                public static int  MovementCost = 0005; // exhaustion added every block traveled    0005
+                public static int  BreakCost    = 0010; // exhaustion added every block destroyed   0010
+                public static int  JumpCost     = 0050; // exhaustion added every jump              0050   
+                public static int  SwimCost     = 0010; // exhaustion added every block swimmed     0010
+                public static int  RegenCost    = 6000; // exhaustion added for each heart regened  6000        
+                public static int  AttackCost   = 0050; // exhaustion added for attacking mobs      0050                     
 				// Backend
 				public static ushort MineBlockIndicatorStart = 490;
 		}
@@ -979,37 +1041,45 @@ namespace MCGalaxy {
 				IsSword = false,
 				IsSprite = true
 			},
-			new SurvivalTool()
+			new FoodTool()
 			{
 				NAME = "Cookie",
 				TEXTURE = 201,
 				ID = 116,
 				IsSword = false,
-				IsSprite = true
+				IsSprite = true,
+                FoodPoint = 2,
+                FoodSaturation = 0
 			},
-			new SurvivalTool()
+			new FoodTool()
 			{
 				NAME = "Beef",
 				TEXTURE = 214,
 				ID = 117,
 				IsSword = false,
-				IsSprite = true
+				IsSprite = true,
+                FoodPoint = 3,
+                FoodSaturation = 1
 			},
-			new SurvivalTool()
+			new FoodTool()
 			{
 				NAME = "Steak",
 				TEXTURE = 215,
 				ID = 118,
 				IsSword = false,
-				IsSprite = true
+				IsSprite = true,
+                FoodPoint = 8,
+                FoodSaturation = 13
 			},
-			new SurvivalTool()
+			new FoodTool()
 			{
 				NAME = "Apple",
 				TEXTURE = 229,
 				ID = 119,
 				IsSword = false,
-				IsSprite = true
+				IsSprite = true,
+                FoodPoint = 2,
+                FoodSaturation = 2
 			},
 			new FlintSteelTool()
 			{
@@ -1072,6 +1142,9 @@ namespace MCGalaxy {
 		}
 		public static Dictionary<string, Dictionary<ushort, ushort>> mobLoot = new Dictionary<string, Dictionary<ushort, ushort>>()
 		{
+			{"cow", new Dictionary<ushort, ushort>(){{117, 1}}},
+			{"pig", new Dictionary<ushort, ushort>(){{117, 1}}},
+			{"chicken", new Dictionary<ushort, ushort>(){{116, 1}}},
 			{"sheep", new Dictionary<ushort, ushort>(){{36, 1}}},
 			{"creeper", new Dictionary<ushort, ushort>(){{121, 1}}},
 			{"skeleton", new Dictionary<ushort, ushort>(){{124, 2}}},
@@ -1126,8 +1199,8 @@ namespace MCGalaxy {
 			{79, new CraftRecipe(new Dictionary<ushort, ushort>(){{75, 9}}, 4, true)},
 			// Bed											// Wood x 3 + Wool x 3 = 1x Bed
 			{84, new CraftRecipe(new Dictionary<ushort, ushort>(){{5, 3}, {36, 3}}, 1, true)},
-			// Cake											// Wool x 3 = 1x Cake
-			{83, new CraftRecipe(new Dictionary<ushort, ushort>(){{36, 3}})},
+			// Cake											// Cookie x 1 + Wool x 1 + apple x 1 = 1x Cake
+			{83, new CraftRecipe(new Dictionary<ushort, ushort>(){{116, 1}, {36, 1}, {119, 1}})},
 			// Cobblestone Slab
 			{50, new CraftRecipe(new Dictionary<ushort, ushort>(){{4, 1}}, 2, false)},
 			// Double Slab
@@ -1238,6 +1311,10 @@ namespace MCGalaxy {
 			{123,  new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 3}, {125, 3}}, 1, true)},
 			// Arrow												// Stick x 1 + iron x 1 = 1x arrow  [Need crafting table]
 			{124,  new CraftRecipe(new Dictionary<ushort, ushort>(){{115, 1}, {113, 1}}, 1, true)},
+			// Steak 											// beef == Steak x1
+			{118, new CraftRecipe(new Dictionary<ushort, ushort>(){{117, 1}}, 1, false, true)},
+			// Cookie 											// Cake = Cookie x8
+			{116, new CraftRecipe(new Dictionary<ushort, ushort>(){{83, 1}}, 8)}
 		};
 		
 		public class MiningProgress
@@ -1284,7 +1361,12 @@ namespace MCGalaxy {
 			
 			Server.MainScheduler.QueueRepeat(HandleDrown, null, TimeSpan.FromMilliseconds(500));
 			Server.MainScheduler.QueueRepeat(HandleGUI, null, TimeSpan.FromMilliseconds(100));
-			Server.MainScheduler.QueueRepeat(HandleRegeneration, null, TimeSpan.FromSeconds(4));
+			
+            if (Config.HungerEnabled){//only if Hunger is enabled would we need to run this at all.
+            Server.MainScheduler.QueueRepeat(HandleStarvation, null, TimeSpan.FromSeconds(1));
+            Server.MainScheduler.QueueRepeat(HandleRegeneration, null, TimeSpan.FromSeconds(4));
+            }else
+            Server.MainScheduler.QueueRepeat(HandleBasicRegeneration, null, TimeSpan.FromSeconds(4));
 			Server.MainScheduler.QueueRepeat(HandleMobSpawning, null, TimeSpan.FromSeconds(1));
 			Server.MainScheduler.QueueRepeat(doExplosionQueue, null, TimeSpan.FromMilliseconds(100));
 			Command.Register(new CmdPvP());
@@ -1917,6 +1999,11 @@ namespace MCGalaxy {
 				else
 					return;
 			}
+            //TODO make a better system for multiple drops
+            if (blockType == 6 && new System.Random().NextDouble() > 0.25f)
+			{
+            blockType = 119;
+            }
 			InventoryAddBlocks(pl, blockType, 1);
 			if ( true || InventoryGetBlockAmount(pl, blockType) == 1)
 			{
@@ -1925,6 +2012,8 @@ namespace MCGalaxy {
 				if (heldBlock != 0)
 					SetHeldBlock(pl, heldBlock);
 			}
+            if (Config.HungerEnabled)
+            AddFoodExhaustion(pl,Config.BreakCost);
 		}
 		private void UnMineBlock(Player pl)
 		{
@@ -2200,6 +2289,7 @@ namespace MCGalaxy {
 				return;
 			if (!maplist.Contains(p.level.name))
 				return;
+            
 			var tool = getTool(block);
 			if (tool != null && !tool.IsSprite)
 			{
@@ -2284,9 +2374,42 @@ namespace MCGalaxy {
 		}
 		void HandlePlayerMove(Player p, Position next, byte rotX, byte rotY, ref bool cancel)
 		{
-			if (!maplist.Contains(p.level.name)) return;
+            
+            if (!maplist.Contains(p.level.name)) return;
 			if (Config.VoidKills && next.Y < 0) Die(p, 4); // Player fell out of the world
 			
+            if (Config.HungerEnabled){
+                ushort x = (ushort)(p.Pos.X / 32);
+				ushort y = (ushort)(((p.Pos.Y - Entities.CharacterHeight) / 32) - 1);
+                ushort nexty = (ushort)(((next.Y - Entities.CharacterHeight) / 32) - 1);
+				//ushort y2 = (ushort)(((p.Pos.Y - Entities.CharacterHeight) / 32) - 2);
+				ushort z = (ushort)(p.Pos.Z / 32);
+                
+                if (p.Extras.GetInt("LAST_POS_X") != x)
+                p.Extras["UPDATED_BLOCK"] = true;
+                if (p.Extras.GetInt("LAST_POS_Y") != y)
+                p.Extras["UPDATED_BLOCK"] = true;
+                if (p.Extras.GetInt("LAST_POS_Z") != z)
+                p.Extras["UPDATED_BLOCK"] = true;
+            
+                p.Extras["LAST_POS_X"] = x;
+                p.Extras["LAST_POS_Y"] = y;
+                p.Extras["LAST_POS_Z"] = z;
+                
+                if (p.Extras.GetBoolean("UPDATED_BLOCK")){
+                    p.Extras["UPDATED_BLOCK"] = false;
+                    if (y<nexty)
+                        AddFoodExhaustion(p,Config.JumpCost);
+            
+                    if (IsSwiming(p))
+                        AddFoodExhaustion(p,Config.SwimCost);
+                    else
+                        AddFoodExhaustion(p,Config.MovementCost);
+                }
+            }
+            
+            
+            
 			if (Config.FallDamage)
 			{
 				if (p.invincible) return;// || Hacks.CanUseFly(p)) return;
@@ -2334,7 +2457,7 @@ namespace MCGalaxy {
 					}
 				}
 			}
-            
+              
 		}
         void HandlePlayerConnect(Player p)
 		{
@@ -2659,6 +2782,8 @@ namespace MCGalaxy {
 				return;
 			}
 			HurtBot(getDamage(p), mob, p);
+            if (Config.HungerEnabled)
+            AddFoodExhaustion(p,Config.AttackCost);
 		}
 	    public static void HurtBot(int damage, PlayerBot hit, Player bot)
         {
@@ -2772,6 +2897,11 @@ namespace MCGalaxy {
 				FlintSteelTool.Lightblock(p, button, action, yaw, pitch, entity, x , y, z, face);
 				return;
 			}
+			if (tool.IsFood)
+			{
+				FoodTool.Eat(block,p, button, action);
+				return;
+			}
 			tool.HandleBlockClicked(p, button, action, yaw, pitch, entity, x , y, z, face);
 		}
 		void HandleBlockClicked(Player p, MouseButton button, MouseAction action, ushort yaw, ushort pitch, byte entity, ushort x, ushort y, ushort z, TargetBlockFace face)
@@ -2786,6 +2916,23 @@ namespace MCGalaxy {
 			toolUse(p, button, action, yaw, pitch, entity, x, y, z, face);
 			
 		}
+        
+        
+		void HandleBasicRegeneration(SchedulerTask task)
+        {
+            regenTask = task;
+            foreach (Player pl in PlayerInfo.Online.Items)
+            {
+				if (!maplist.Contains(pl.level.name)) continue;
+                int health = GetHealth(pl);
+                if (health >= Config.MaxHealth) continue; // No need to regenerate health if player is already at max health
+                
+                pl.Extras["SURVIVAL_HEALTH"] = health + 1;
+                
+            }
+        }
+        
+        
 		void HandleRegeneration(SchedulerTask task)
         {
             regenTask = task;
@@ -2793,12 +2940,71 @@ namespace MCGalaxy {
             {
 				if (!maplist.Contains(pl.level.name)) continue;
                 int health = GetHealth(pl);
-
+                int hunger = GetHunger(pl);
                 if (health >= Config.MaxHealth) continue; // No need to regenerate health if player is already at max health
-
+                
+                if (Config.HungerEnabled){   
+                if (hunger < 18) continue;
+                if (hunger == Config.MaxHunger) continue;//don't want double regen
+                AddFoodExhaustion(pl,Config.RegenCost); 
+                }
+                
                 pl.Extras["SURVIVAL_HEALTH"] = health + 1;
+                
             }
         }
+		void HandleStarvation(SchedulerTask task)
+        {
+            regenTask = task;
+            foreach (Player pl in PlayerInfo.Online.Items)
+            {
+				if (!maplist.Contains(pl.level.name)) continue;
+                int hunger = GetHunger(pl);
+                int health = GetHealth(pl);
+                int sat = GetSaturation(pl);//why, just why on I doing this,NO ONE WILL NOTICE HOW COMPLEX AND 'ACCURATE' THIS IS
+                int exh = GetFoodExhaustion(pl);//why was I so mad at myself lol
+                //pl.Message("sat " + GetSaturation(pl) + " exh " + GetFoodExhaustion(pl) + " hunger "+  GetHunger(pl));
+                exh+=Config.PerSecCost;
+                
+                if (exh>3999){//if exhaution has exceeded threshold
+                exh=0;
+                if (sat > 0)//if chain of hunger
+                    sat -=1;
+                else if (hunger > 0)
+                    hunger-=1; 
+                else if (health > 0){
+                    health-=1;
+                    exh = 3500;
+                    }
+                else{
+                    Die(pl,4);
+                    string deathMessage ="%e" + pl.color + pl.name + "%e  Starved to death.";
+                    foreach( Player plo in PlayerInfo.Online.Items)
+                    {
+                        if (pl.level == plo.level)
+                        {
+                            plo.Message(deathMessage);
+                        }
+                    }
+                }
+                
+                    
+                SetHunger(pl,hunger);
+                
+                SetSaturation(pl,sat);
+
+                }
+                
+                if (hunger == Config.MaxHunger && health < Config.MaxHealth){
+                health+=1;exh=Config.RegenCost;//yes its that high
+                }
+                
+                SetHealth(pl,health);
+                SetFoodExhaustion(pl,exh);                  
+            }
+        }     
+        
+        
 		///////////////////////////////////////////////////////////////////////////
 		// GUI
 		///////////////////////////////////////////////////////////////////////////
@@ -2816,6 +3022,22 @@ namespace MCGalaxy {
 
 			return ("%f" + new string('♥', repeatHealth )) + "%0" + new string('♥', repeatDepletedHealth ) ;
 		}
+        
+		static string GetHungerBar(int hunger)
+		{
+			if (hunger < 0)
+			{
+				hunger = 0;
+			}
+
+			int repeatHunger = (int)Math.Round(( (float) hunger / (float)Config.MaxHunger) * 10f);
+
+			int repeatDepletedHunger = 10 - repeatHunger;
+
+
+			return ("%e" + new string('♦', repeatHunger )) + "%0" + new string('♦', repeatDepletedHunger ) ;
+		}
+        
 		static string GetAirBar(int air)
 		{
 			if (air < 0)
@@ -2849,7 +3071,11 @@ namespace MCGalaxy {
 		static void SendPlayerGui(Player p)
 		{
 			if (!maplist.Contains(p.level.name)) return;
-			SetGuiText(p, GetHealthBar	(GetHealth	(p)),GetAirBar		(GetAir		(p)), getHeldBlockAmount(p));
+            
+            if (GetAir(p) == Config.MaxAir && Config.HungerEnabled)//only display air bar if drowning
+			SetGuiText(p, GetHealthBar	(GetHealth	(p)),GetHungerBar	(GetHunger	(p)), getHeldBlockAmount(p));
+            else
+            SetGuiText(p, GetHealthBar	(GetHealth	(p)),GetAirBar		(GetAir		(p)), getHeldBlockAmount(p));
 		}
 		///////////////////////////////////////////////////////////////////////////
 		// UTILITIES
@@ -2870,6 +3096,43 @@ namespace MCGalaxy {
 		{
 			return p.Extras.GetInt("SURVIVAL_HEALTH");
 		}
+        
+        
+		public static void SetHunger(Player p, int hunger)
+		{
+			p.Extras["SURVIVAL_HUNGER"] = hunger;
+		}
+		public static int GetHunger(Player p)
+		{
+			return p.Extras.GetInt("SURVIVAL_HUNGER");
+		}
+        
+        
+		public static int GetSaturation(Player p)
+		{
+			return p.Extras.GetInt("SURVIVAL_SATURATION");
+		}
+		public static void SetSaturation(Player p, int saturation)
+		{
+			p.Extras["SURVIVAL_SATURATION"] = saturation;
+		}
+        
+        
+		public static void AddFoodExhaustion(Player p, int exhaustion)
+		{
+			p.Extras["SURVIVAL_FOODEXHAUSTION"] = p.Extras.GetInt("SURVIVAL_FOODEXHAUSTION")+exhaustion;
+            if (p.Extras.GetInt("SURVIVAL_FOODEXHAUSTION")>4001)
+            p.Extras["SURVIVAL_FOODEXHAUSTION"] = 4001;
+		}     
+		public static int GetFoodExhaustion(Player p)
+		{
+			return p.Extras.GetInt("SURVIVAL_FOODEXHAUSTION");
+		}
+		public static void SetFoodExhaustion(Player p, int exhaustion)
+		{
+			p.Extras["SURVIVAL_FOODEXHAUSTION"] = exhaustion;
+		}
+        
 		public static int GetAir(Player p)
 		{
 			return p.Extras.GetInt("SURVIVAL_AIR");
@@ -2878,6 +3141,7 @@ namespace MCGalaxy {
 		{
 			p.Extras["SURVIVAL_AIR"] = air;
 		}
+        
 		public static void SetHeldBlock(Player p, ushort blockId, bool locked=false)
 		{
 			 if (!p.Supports(CpeExt.HeldBlock))
@@ -2919,6 +3183,26 @@ namespace MCGalaxy {
 			}
 			return drowning;
 		}
+        
+		bool IsSwiming(Player p)
+		{
+			ushort x = (ushort)(p.Pos.X / 32);
+			ushort y = (ushort)(((p.Pos.Y - Entities.CharacterHeight) / 32));
+			ushort z = (ushort)(p.Pos.Z / 32);
+			bool swiming = false;
+			try
+			{
+				BlockID bHead = p.level.FastGetBlock((ushort)x, (ushort)(y), (ushort)z);
+
+				swiming = (p.level.FastGetBlock((ushort)x, (ushort)y, (ushort)z) != 0) && p.level.Props[bHead].Drownable;
+			}
+			catch
+			{
+				swiming = false;
+			}
+			return swiming;
+		}
+        
 		public static void Damage(Player p, int amount, BlockID reason = 0)
 		{
 			SetHealth(p, GetHealth(p) - amount);
@@ -2931,6 +3215,7 @@ namespace MCGalaxy {
 		}
 		public static void Die(Player p, BlockID reason = 4)
 		{
+			SendInventory(p);
 			p.HandleDeath(reason, immediate: true);	
 			InitPlayer(p);
 		}
@@ -2956,8 +3241,18 @@ namespace MCGalaxy {
 		}
 		public static void InitPlayer(Player p)
 		{
-	
 			p.Extras["SURVIVAL_HEALTH"] = Config.MaxHealth;
+            p.Extras["SURVIVAL_HUNGER"] = Config.MaxHunger;
+            p.Extras["SURVIVAL_SATURATION"] = 5;
+            p.Extras["SURVIVAL_FOODEXHAUSTION"] = 0;
+            
+            p.Extras["LAST_POS_Y"] = 0;
+            p.Extras["LAST_POS_X"] = 0;
+            p.Extras["LAST_POS_Z"] = 0;
+            p.Extras["UPDATED_BLOCK"] = false;
+            
+            
+            
 			p.Extras["SURVIVAL_AIR"] = Config.MaxAir;
 			p.Extras["PVP_HIT_COOLDOWN"] = DateTime.UtcNow;
 			p.Extras["FALLING"] = false;
@@ -2976,6 +3271,9 @@ namespace MCGalaxy {
 			p.Extras["LAST_STATUS3"] = "NULL";
 			SetGuiText(p,"","");
             p.Extras["SURVIVAL_HEALTH"] = 10;
+            p.Extras["SURVIVAL_HUNGER"] = 10;
+            p.Extras["SURVIVAL_SATURATION"] = 0;
+            p.Extras["SURVIVAL_FOODEXHAUSTION"] = 4000;
             p.Extras["SURVIVAL_AIR"] = 10;
         }
 		void DoHit(Player p, Player victim)
