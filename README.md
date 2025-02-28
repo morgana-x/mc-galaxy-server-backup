@@ -26,6 +26,5 @@ etc!
 
 ## Todo (Up for grabs :D)
 + Farming
-+ Food System
 + Redstone
 + Dropped blocks
