@@ -1,4 +1,4 @@
-## This requires the inf id version of mcgalaxy
+## This requires the inf id version of mcgalaxy (and na2 custom models if using plushies)
 
 Reccomended MOTD for a survival level, also do `/pvp add [levelname]` to add survival to a level on top of this
 ```
