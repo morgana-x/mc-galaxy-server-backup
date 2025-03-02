@@ -49,7 +49,7 @@ namespace MCGalaxy {
 			//LOAD YOUR PLUGIN WITH EVENTS OR OTHER THINGS!
 			OnBlockChangingEvent.Register(HandleBlockChanged, Priority.Low);
 			OnPlayerClickEvent.Register(HandleBlockClicked, Priority.Low);
-		
+			OnSentMapEvent.Register(HandleSentMap, Priority.Low);
 			foreach (var egg in EggConfigs)
 				AddBlockItem(egg.BLOCK_ID, egg.NAME, egg.TEXTURE_ID);
 			/*
@@ -71,15 +71,18 @@ namespace MCGalaxy {
 				mikuplushies.Add(bot);
 			}
 			return mikuplushies;
-		}
-                        
+		}	
 		public override void Unload(bool shutdown) {
 			//UNLOAD YOUR PLUGIN BY SAVING FILES OR DISPOSING OBJECTS!
 			OnBlockChangingEvent.Unregister(HandleBlockChanged);
 			OnPlayerClickEvent.Unregister(HandleBlockClicked);
-			
+			OnSentMapEvent.Unregister(HandleSentMap);
 		}
-	
+		void HandleSentMap( Player p, Level prevLevel, Level level)
+		{
+			foreach( var miku in GetSpawnedMikuPlushies(level))
+				miku.DisplayName = "";
+		}
 		public override void Help(Player p) {
 			//HELP INFO!
 		}
