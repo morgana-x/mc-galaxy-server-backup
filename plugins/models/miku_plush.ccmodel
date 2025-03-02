@@ -18,7 +18,7 @@
     "Z": 16.0
   },
   "bobbing": true,
-  "pushes": true,
+  "pushes": false,
   "usesHumanSkin": true,
   "calcHumanAnims": true,
   "defaultSkin": null
