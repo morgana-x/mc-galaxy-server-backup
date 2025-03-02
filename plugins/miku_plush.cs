@@ -32,7 +32,7 @@ namespace MCGalaxy {
 		
 		public ushort uniqueId = 0;
 		
-		public LevelPermission allowedRank { get { return LevelPermission.Admin; } }
+		public LevelPermission allowedRank { get { return LevelPermission.Guest; } }
 		public List<MikuPlushSpawnEggBlock> EggConfigs = new List<MikuPlushSpawnEggBlock>(){
 			new MikuPlushSpawnEggBlock()
 			{
@@ -52,7 +52,6 @@ namespace MCGalaxy {
 		
 			foreach (var egg in EggConfigs)
 				AddBlockItem(egg.BLOCK_ID, egg.NAME, egg.TEXTURE_ID);
-			
 			/*
 			foreach (PlayerBot bot in lvl.Bots.Items)
 			{
