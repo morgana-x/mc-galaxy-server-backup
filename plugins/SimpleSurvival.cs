@@ -822,7 +822,6 @@ namespace MCGalaxy {
 			{87, new OreMineConfig(){overrideBlock = 111, RequiredToolTier=2}},
 			{88, new OreMineConfig(){RequiredToolTier=2}},
 			{220, new TntMineConfig()}, // Missile
-			
 		};
 		public static List<SurvivalTool> customTools = new List<SurvivalTool>(){
 			new SwordTool()
@@ -1314,7 +1313,9 @@ namespace MCGalaxy {
 			// Steak 											// beef == Steak x1
 			{118, new CraftRecipe(new Dictionary<ushort, ushort>(){{117, 1}}, 1, false, true)},
 			// Cookie 											// Cake = Cookie x8
-			{116, new CraftRecipe(new Dictionary<ushort, ushort>(){{83, 1}}, 8)}
+			{116, new CraftRecipe(new Dictionary<ushort, ushort>(){{83, 1}}, 8)},
+			// Miku Plush :3 									// Miku plush x 4 = white wool x1, stick x 1
+			{221, new CraftRecipe(new Dictionary<ushort, ushort>(){{36, 1}, {115, 1}}, 4)}
 		};
 		
 		public class MiningProgress
