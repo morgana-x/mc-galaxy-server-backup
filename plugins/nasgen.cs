@@ -449,7 +449,7 @@ namespace VeryPlugins
 
                                 lvl.SetBlock((ushort)x, (ushort)(y), (ushort)z, topSoil);
                                 if (r.NextDouble() > 0.95f)
-                                    lvl.SetBlock((ushort)x, (ushort)(y+1), (ushort)z, (ushort)(r.Next(37,41)));
+                                    lvl.SetBlock((ushort)x, (ushort)(y+1), (ushort)z, (ushort)(r.Next(37,39)));
                             }
                         }
             }
