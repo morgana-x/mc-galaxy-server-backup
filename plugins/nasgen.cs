@@ -131,7 +131,7 @@ namespace VeryPlugins
                 GenTerrain();
                 CalcHeightmap();
                 GenSoil();
-                GenCaves();
+               // GenCaves();
                 GenPlants();
                 GenOre();
 
@@ -448,6 +448,8 @@ namespace VeryPlugins
                                 }
 
                                 lvl.SetBlock((ushort)x, (ushort)(y), (ushort)z, topSoil);
+                                if (r.NextDouble() > 0.95f)
+                                    lvl.SetBlock((ushort)x, (ushort)(y+1), (ushort)z, (ushort)(r.Next(37,41)));
                             }
                         }
             }
