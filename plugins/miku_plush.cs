@@ -36,7 +36,7 @@ namespace MCGalaxy {
 		public List<MikuPlushSpawnEggBlock> EggConfigs = new List<MikuPlushSpawnEggBlock>(){
 			new MikuPlushSpawnEggBlock()
 			{
-				TEXTURE_ID = 181,
+				TEXTURE_ID = 134,
 				BLOCK_ID = 221,
 				MODEL = "miku_plush",
 				NAME = "Miku Plush",
