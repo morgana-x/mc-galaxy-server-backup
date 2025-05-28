@@ -1123,7 +1123,7 @@ namespace MCGalaxy {
 			new SurvivalTool()
 			{
 				NAME = "String",
-				TEXTURE = 244,
+				TEXTURE = 195,
 				ID = 125,
 				IsSword = false,
 				IsSprite = true
