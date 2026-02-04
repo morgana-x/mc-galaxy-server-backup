@@ -1373,6 +1373,7 @@ namespace MCGalaxy {
 			Command.Register(new CmdPvP());
 			Command.Register(new CmdGiveBlock());
 			Command.Register(new CmdCraft());
+            Command.Register(new CmdKeyin());
 			Command.Register(new CmdTradeBlock());
 			loadMaps();
 			SetupInventoryDB();
@@ -1818,6 +1819,53 @@ namespace MCGalaxy {
 			}
 			return validCraftables;
 		}
+        
+		public static Dictionary<ushort,CraftRecipe>  GenerateCraftMenuOptions(Player pl)//same as GenerateCraftOptions but keeps current item when out of resources so the player don't accentielty craft something else
+		{
+			Dictionary<ushort,CraftRecipe> validCraftables = new Dictionary<ushort,CraftRecipe> ();
+			bool nearCraftingtable = IsNearCraftingTable(pl);
+			bool nearFurnace = IsNearFurnace(pl);
+			foreach(var recipePair in craftingRecipies)
+			{
+				if (!nearCraftingtable && recipePair.Value.NeedCraftingTable)
+					continue;
+				if (!nearFurnace && recipePair.Value.NeedFurnace)
+					continue;
+				bool valid = true;
+                foreach(var pair in recipePair.Value.Ingredients)
+				{
+					if (!InventoryHasEnoughBlock(pl, pair.Key, pair.Value) && GetCraftblock(pl) != recipePair.Key)
+					{
+						valid = false;
+						break;
+					}
+				}
+				if (!valid)
+					continue;
+				validCraftables.Add(recipePair.Key, recipePair.Value);
+			}
+			return validCraftables;
+		}
+        
+		public static Dictionary<ushort,CraftRecipe>  GeneratePotentialCraftOptions(Player pl)
+		{
+			Dictionary<ushort,CraftRecipe> validCraftables = new Dictionary<ushort,CraftRecipe> ();
+			bool nearCraftingtable = IsNearCraftingTable(pl);
+			bool nearFurnace = IsNearFurnace(pl);
+			foreach(var recipePair in craftingRecipies)
+			{
+				if (!nearCraftingtable && recipePair.Value.NeedCraftingTable)
+					continue;
+				if (!nearFurnace && recipePair.Value.NeedFurnace)
+					continue;
+				bool valid = true;
+				if (!valid)
+					continue;
+				validCraftables.Add(recipePair.Key, recipePair.Value);
+			}
+			return validCraftables;
+		}
+        
 		public static string GenerateCraftOptionsMessage(Player p)
 		{
 			Dictionary<ushort,CraftRecipe> validRecipes = GenerateCraftOptions(p);
@@ -2267,6 +2315,7 @@ namespace MCGalaxy {
 			if (!maplist.Contains(level.name))
 			{
 				SetGuiText(p,"","");
+                ClearCraftMenu(p);
 				p.Extras["SURVIVAL_HEALTH"] = Config.MaxHealth;
 				p.Extras["SURVIVAL_AIR"] = Config.MaxAir;
 				p.Extras["MINING_LASTPROG"] = 0;
@@ -2468,6 +2517,20 @@ namespace MCGalaxy {
 			SendMiningUnbreakableMessage(p);
 			ClearHotbar(p);
 			defineEffects(p);
+            p.Send(Packet.TextHotKey("sHotkey", "/keyin 16◙", 16, 0, true));//q
+            p.Send(Packet.TextHotKey("sHotkey", "/keyin 18◙", 18, 0, true));//e
+            
+            p.Send(Packet.TextHotKey("sHotkey", "/keyin 12◙", 12, 0, true));//c
+            p.Send(Packet.TextHotKey("sHotkey", "/keyin 23◙", 23, 0, true));//i
+            
+            
+            
+            p.Send(Packet.TextHotKey("sHotkey", "/keyin 203◙", 203, 0, true));//left arrow
+            p.Send(Packet.TextHotKey("sHotkey", "/keyin 205◙", 205, 0, true));//right arrow
+            p.Send(Packet.TextHotKey("sHotkey", "/keyin 200◙", 200, 0, true));//up arrow
+            p.Send(Packet.TextHotKey("sHotkey", "/keyin 208◙", 208, 0, true));//down arrow
+            
+            p.Send(Packet.TextHotKey("sHotkey", "/keyin 28◙", 28, 0, true));//enter
 		}
 
 		int GetLagCompensation(int ping)
@@ -3067,7 +3130,7 @@ namespace MCGalaxy {
 				SetHeldBlock(p, (ushort)(5));
 				return "";
 			}*/
-			return amount.ToString();
+			return Block.GetName(p,block) + " " + amount.ToString();
 		}
 		static void SendPlayerGui(Player p)
 		{
@@ -3077,7 +3140,127 @@ namespace MCGalaxy {
 			SetGuiText(p, GetHealthBar	(GetHealth	(p)),GetHungerBar	(GetHunger	(p)), getHeldBlockAmount(p));
             else
             SetGuiText(p, GetHealthBar	(GetHealth	(p)),GetAirBar		(GetAir		(p)), getHeldBlockAmount(p));
+        //p.CpeExtension(CpeExt.LongerMessages);
+        //p.SendCpeMessage(CpeMessageType.Normal, "myhfghgfjjj" );
+        //p.SendCpeMessage(CpeMessageType.Announcement, "my name is %n \n yazdan" );
+        //p.SendCpeMessage(CpeMessageType.BigAnnouncement, "my name is %n \n yazdan" );
+        //p.SendCpeMessage(CpeMessageType.SmallAnnouncement , "my name is %n \n yazdan" );
+        //GenerateCraftOptionsgui(p);
+        int KeyCode = GetKeyCodeState(p);
+        if (GetKeyCodeState(p) == 200)//up down
+        SetCraftState(p,GetCraftState(p)+1);
+        if (GetKeyCodeState(p) == 208)
+        SetCraftState(p,GetCraftState(p)-1);
+        
+        if (GetKeyCodeState(p) == 203)//left right
+        SetCraftState(p,GetCraftState(p)-3);
+        if (GetKeyCodeState(p) == 205)
+        SetCraftState(p,GetCraftState(p)+3);
+       
+        if (GetKeyCodeState(p) == 18 || GetKeyCodeState(p) == 28)//e-enter craft
+        MCGalaxy.SimpleSurvival.Craft(p, (ushort)GetCraftblock(p), 1);
+       
+    //p.SendCpeMessage(CpeMessageType.Announcement ,"%8" + GetCraftblock(p) + " " + GetCraftState(p));
+    //if (KeyCode == 200 || KeyCode == 208 || KeyCode == 203 || KeyCode == 205 ){
+    //TODO CLEAN THIS CODE UP
+       p.SendCpeMessage(CpeMessageType.BottomRight3 ,GenerateCraftMenu(p,GetCraftState(p)+1,false) );
+       p.SendCpeMessage(CpeMessageType.BottomRight2 ,GenerateCraftMenu(p,GetCraftState(p),true));
+       p.SendCpeMessage(CpeMessageType.BottomRight1 ,GenerateCraftMenu(p,GetCraftState(p)-1,false));;
+        //p.SendCpeMessage(CpeMessageType.Status3 , "fgdgf");
+     ClearKeyCode(p);   
+		//}
+        
+        }
+        public static void ClearCraftMenu(Player p){
+               p.SendCpeMessage(CpeMessageType.BottomRight3 ,GenerateCraftMenu(p,-10,false) );
+       p.SendCpeMessage(CpeMessageType.BottomRight2 ,GenerateCraftMenu(p,-10,true));
+       p.SendCpeMessage(CpeMessageType.BottomRight1 ,GenerateCraftMenu(p,-10,false));;
+        }
+        
+        public static string GenerateCraftMenu(Player p,int index,bool effectblock)
+		{
+		Dictionary<ushort,CraftRecipe> validRecipes = GenerateCraftOptions(p);//GeneratePotentialCraftOptions	 GenerateCraftMenuOptions
+			string message = "";
+			bool nearCraftingtable = IsNearCraftingTable(p);
+			bool nearFurnace = IsNearFurnace(p);
+            int pairint = 0;
+            //bool foundanything = false;
+			foreach( var pair in validRecipes)//Array.FindAll(validRecipes,s => s.NeedCraftingTable == false)
+			{
+                if (pairint == index){
+                
+                int KeyCode = GetKeyCodeState(p);
+                
+                if (effectblock == true){
+                 //foundanything = true;
+                 if (KeyCode == 200 || KeyCode == 208 || KeyCode == 203 || KeyCode == 205 || index == 0)//when index is 0 and its not the block selected it forces that block
+                 SetCraftblock(p,pair.Key); 
+                   ushort currentblock = (ushort)GetCraftblock(p);
+                    message += "%6>> ";
+                    if (currentblock == pair.Key)
+                foreach(var pair2 in pair.Value.Ingredients)
+				{
+                    if (!InventoryHasEnoughBlock(p, pair2.Key, (ushort)(pair2.Value)))//for showing repeices you can't craft
+                    message += "%7" + Block.GetName(p, pair2.Key > 65 ? (ushort)(pair2.Key + 256) : pair2.Key) + "%cx " + pair2.Value.ToString() + " %c→ ";//e
+                    else
+					message += "%f" + Block.GetName(p, pair2.Key > 65 ? (ushort)(pair2.Key + 256) : pair2.Key) + "%ex " + pair2.Value.ToString() + " %f→ ";
+                //message += "%f" + Block.GetName(p, pair2.Key > 65 ? (ushort)(pair2.Key + 256) : pair2.Key) + "%ex " + pair2.Value.ToString();
+                //message += "%f" + Block.GetName(p, pair2.Key > 65 ? (ushort)(pair2.Key + 256) : pair2.Key) + "%ex " + pair2.Value.ToString();
+                
+				}
+                //message += " %f→ ";
+                message += /*"  %e[%5" + pair.Key + "%e] */" %b" + Block.GetName(p, currentblock > 65 ? (ushort)(currentblock + 256) : currentblock) + "%f";
+                 message += " ╣";
+                }else{
+                message += /*"  %e[%5" + pair.Key + "%e] */" %7" + Block.GetName(p, pair.Key > 65 ? (ushort)(pair.Key + 256) : pair.Key) + "%f";
+                message += " ║";}
+                
+                
+                //var pair = validRecipes.Find(x => x.Id == "xy");
+                //foundblock = index;
+
+				
+                }
+                pairint++;
+			}
+            if (effectblock == false){//totarial
+                
+                
+        if (pairint == 1){
+            //if (pairint-1 < index)
+            //message += "%fUse the %e[arrow keys]%f to move the craft menu ║";
+        //else
+            if (index < 0)
+            message += "%7Press %6[e]%7 to craft this ↑↑ !%f╝";
+             }
+         
+            if (pairint == 2){
+            if (index < 0)
+            message += "%7Use the %6[arrow keys]%7 to move the craft menu ╝";
+            }//else
+            //if (index < 0)
+            //message += "%7 [arrow keys]%7 moves [e/enter]%7 crafts ╝";
+        
+        
+            }else
+            if (effectblock == true){
+            if (pairint-1 < index)
+            SetCraftState(p,pairint-1);
+            if (index < 0)
+                SetCraftState(p,0);
+            }
+            
+            //if (foundblock == -1)
+                
+
+			//if (!nearCraftingtable)
+			//	message += "%cStand near a crafting table to see items that require one!";
+			//if (!nearFurnace)
+			//	message += "%cStand near a furnace to see items that require one!";
+
+			return message;
 		}
+        
 		///////////////////////////////////////////////////////////////////////////
 		// UTILITIES
 		///////////////////////////////////////////////////////////////////////////
@@ -3106,6 +3289,36 @@ namespace MCGalaxy {
 		public static int GetHunger(Player p)
 		{
 			return p.Extras.GetInt("SURVIVAL_HUNGER");
+		}
+        
+        
+		public static void SetCraftState(Player p, int state)
+		{
+			p.Extras["SURVIVAL_CRAFT_MENU_INDEX"] = state;
+		}
+		public static int GetCraftState(Player p)
+		{
+			return p.Extras.GetInt("SURVIVAL_CRAFT_MENU_INDEX");
+		}
+        
+		public static void SetCraftblock(Player p, int state)
+		{
+			p.Extras["SURVIVAL_CRAFTING_BLOCK"] = state;
+		}
+		public static int GetCraftblock(Player p)
+		{
+			return p.Extras.GetInt("SURVIVAL_CRAFTING_BLOCK");
+		}
+        
+       
+		public static int GetKeyCodeState(Player p)
+		{
+			return p.Extras.GetInt("SURVIVAL_KEYCODE");
+		}
+        
+		public static void ClearKeyCode(Player p)
+		{
+			p.Extras["SURVIVAL_KEYCODE"] = 0;
 		}
         
         
@@ -3261,6 +3474,14 @@ namespace MCGalaxy {
 			p.Extras["LAST_STATUS1"] = "NULL";
 			p.Extras["LAST_STATUS2"] = "NULL";
 			p.Extras["LAST_STATUS3"] = "NULL";
+            
+            
+            p.Extras["SURVIVAL_CRAFT_MENU_INDEX"] = 0;
+            p.Extras["SURVIVAL_CRAFTING_BLOCK"] = 0;
+            p.Extras["SURVIVAL_KEYCODE"] = 1;
+            
+            
+            
 			SendPlayerGui(p);
 			SendMiningUnbreakableMessage(p);
 			SendInventory(p);
@@ -3276,6 +3497,9 @@ namespace MCGalaxy {
             p.Extras["SURVIVAL_SATURATION"] = 0;
             p.Extras["SURVIVAL_FOODEXHAUSTION"] = 4000;
             p.Extras["SURVIVAL_AIR"] = 10;
+            
+            p.Extras["SURVIVAL_CRAFT_MENU_INDEX"] = 0;
+            
         }
 		void DoHit(Player p, Player victim)
 		{
@@ -3611,6 +3835,8 @@ namespace MCGalaxy {
             p.Message("%T/TradeBlock <Player> <BlockId> <Amount=1>");
         }
 	}
+    
+    
 	public sealed class CmdCraft : Command2
     {
         public override string name { get { return "Craft"; } }
@@ -3675,6 +3901,51 @@ namespace MCGalaxy {
 			p.Message("%TType %5/Craft list%T to see a list of blocks you can craft!");
         }
 	}
+    
+     	public sealed class CmdKeyin : Command2
+    {
+        public override string name { get { return "Keyin"; } }
+        public override string type { get { return CommandTypes.Games; } }
+        public override LevelPermission defaultRank { get { return LevelPermission.Guest; } }
+
+        public override void Use(Player p, string message, CommandData data)
+        {
+			string[] args = message.SplitSpaces();
+            
+           	ushort key = 1;
+			if (args.Length == 1)
+			{
+				try
+				{
+					key = ushort.Parse(args[0]);
+                    p.Extras["SURVIVAL_KEYCODE"] = key;
+				}
+				catch(Exception e)
+				{
+					Help(p);
+					return;
+				}
+			}
+            
+            //switch (key)
+            //{
+            //    case 16://q
+            //        p.Extras["SURVIVAL_KEYCODE"] = key;
+            //        return;
+            //    case 18://e
+            //        p.Extras["SURVIVAL_KEYCODE"] = key;
+            //        return;
+            //    case 23://i
+            //        p.Extras["SURVIVAL_KEYCODE"] = key;
+            //        return;
+            //}
+        }
+		public override void Help(Player p)
+        {
+            p.Message("/Keyin <KeyCode>");
+        }
+       }
+    
 	public sealed class CmdPvP : Command2
     {
         public override string name { get { return "PvP"; } }
